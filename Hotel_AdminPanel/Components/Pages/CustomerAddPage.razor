@@ -1,0 +1,77 @@
+﻿@page "/customer/add"
+@inject ICustomerService CustomerService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+        <div class="card border-0 shadow-sm mx-auto" style="max-width: 400px;">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Edit Customer Details</h3>
+                <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="AddCustomer">
+                    <dl class="row text-center">
+                        <dt class="col-12">First Name</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.FirstName" />
+                        </dd>
+
+                        <dt class="col-12">Last Name</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.LastName" />
+                        </dd>
+
+                        <dt class="col-12">Email</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.Email" />
+                        </dd>
+
+                        <dt class="col-12">Phone</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.Phone" />
+                        </dd>
+
+                        <dt class="col-12">Address</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.Address" />
+                        </dd>
+
+                        <dt class="col-12">City</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.City" />
+                        </dd>
+
+                        <dt class="col-12">Country</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.Country" />
+                        </dd>
+
+                        <dt class="col-12">Postal Code</dt>
+                        <dd class="col-12">
+                            <InputText class="form-control" @bind-Value="customer.PostalCode" />
+                        </dd>
+                    </dl>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="/customers" class="btn btn-outline-secondary ml-2">Back to List</a>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+</div>
+
+@code {
+
+
+    [SupplyParameterFromForm]
+    private Customer customer { get; set; } = new Customer();
+
+
+    private async Task HandleValidSubmit()
+    {
+        await CustomerService.CreateCustomerAsync(customer);
+        NavigationManager.NavigateTo("/customers");
+
+    }
+
+}
