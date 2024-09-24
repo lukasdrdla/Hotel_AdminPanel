@@ -1,0 +1,64 @@
+﻿@page "/reservation/add"
+@inject IReservationService ReservationService
+@inject NavigationManager NavigationManager
+@inject IRoomService RoomService
+@inject ICustomerService CustomerService
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 400px;">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4">Add Reservation Page</h3>
+            <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="CustomerId">Customer</label>
+                    <InputSelect id="CustomerId" class="form-control" @bind-Value="reservation.CustomerId">
+                        @foreach (var customer in customers)
+                        {
+                            <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Reservation reservation = new Reservation();
+    private List<Customer> customers = new List<Customer>();
+    public string? slelectedCustomerId { get; set; }
+
+    //pokud je rezervace spojen  s pokojem nastav isbook = true
+
+
+
+
+
+
+    private List<Room> rooms = new List<Room>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        customers = await CustomerService.GetCustomersAsync();
+        rooms = await RoomService.GetRooomsAsync();
+
+
+
+    }
+
+
+
+
+    private async Task HandleValidSubmit()
+    {
+        await ReservationService.CreateReservationAsync(reservation);
+        var room = rooms.FirstOrDefault(x => x.Id == reservation.RoomId);
+        NavigationManager.NavigateTo("/reservations");
+    }
+}

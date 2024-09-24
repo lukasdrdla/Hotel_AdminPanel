@@ -1,0 +1,8 @@
+﻿namespace Hotel_AdminPanel.Models
+{
+    public class RoomType
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+    }
+}

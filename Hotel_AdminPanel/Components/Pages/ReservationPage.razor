@@ -1,0 +1,86 @@
+﻿@page "/reservations"
+@inject IReservationService ReservationService
+@inject NavigationManager NavigationManager
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Room List</h3>
+    <div class="d-flex justify-content-between mb-3">
+        <div></div> <!-- Placeholder for alignment -->
+                <button class="btn btn-primary" @onclick="NavigateToAddReservation">Add Reservation</button>
+
+    </div>
+    @if (reservations == null || reservations.Count == 0)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-2">Loading reservations...</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Room Id</th>
+                        <th>Customer Name</th>
+                        <th>Note</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Adult</th>
+                        <th>Children</th>
+                        <th>Price</th>
+                        <th>Is Paid</th>
+                        <th>Is Canceled</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reservation in reservations)
+                    {
+                        <tr @onclick="() => NavigateToRoomDetail(reservation.Id)" style="cursor:pointer;">
+
+                            <td>@reservation.Id</td>
+                            <td>@reservation.RoomId</td>
+                            <td>@reservation.Customer.FirstName @reservation.Customer.LastName</td>
+                            <td>@reservation.CheckIn</td>
+                            <td>@reservation.CheckOut</td>
+                            <td>@reservation.TotalPrice.ToString("0") $</td>
+                        </tr>
+
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+
+    private List<Reservation> reservations ;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        reservations = await ReservationService.GetReservationsAsync();
+    }
+
+    private void NavigateToRoomDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/reservation/{id}");
+    }
+
+    private void NavigateToAddReservation()
+    {
+        NavigationManager.NavigateTo("/reservation/add");
+    }
+
+
+}

@@ -1,0 +1,174 @@
+﻿@page "/rooms"
+@inject IRoomService RoomService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+<style>
+    /* Styl pro tečku */
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 10px;
+        vertical-align: middle;
+    }
+
+    .available {
+        background-color: green;
+    }
+
+    .occupied {
+        background-color: red;
+    }
+
+</style>
+
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Room List</h3>
+    <div class="d-flex justify-content-end mb-3">
+        
+        <button class="btn btn-dark" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Add Room</button>
+
+    </div>
+
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search rooms..."
+               @bind="searchTerm" @oninput="SearchRooms" aria-label="Search rooms..." aria-describedby="button-search">
+    </div>
+
+
+
+    @if (rooms == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <p class="mt-2">Loading rooms...</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                        </th>
+                        <th>Room Number</th>
+                        <th>Room Type</th>
+                        <th>Room Status</th>
+                        <th>
+                            Price
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16" @onclick="FiltreByPriceUp" style="cursor:pointer;">
+                                <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5" />
+                            </svg>
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16" @onclick="FiltreByPriceDown" style="cursor:pointer;">
+                                <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
+                            </svg>
+                        </th>
+                        <th>Max Children</th>
+                        <th>Max Adults</th>
+                        <th>Decription</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var room in filteredRooms)
+                    {
+                        <tr @onclick="() => NavigateToRoomDetail(room.Id)" style="cursor:pointer;">
+                            <td>
+                                <span class="status-dot @room.RoomStatus.Status.ToLower()"></span>
+                            </td>
+                            <td>@room.RoomNumber</td>
+                            <td>
+                                @room.RoomType.Type
+                            </td>
+                            <td>@room.RoomStatus.Status</td>
+                            <td>@room.Price.ToString("0") $</td>
+                            <td>@room.MaxChildren</td>
+                            <td>@room.MaxAdults</td>
+                            <td>
+                                @if (room.Description.Length < 1)
+                                {
+                                    <span class="text-muted">No description</span>
+                                }
+                                else
+                                {
+                                    @room.Description
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+
+    private List<Room> rooms;
+    private string searchTerm;
+    private List<Room> filteredRooms;
+    
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await RoomService.GetRooomsAsync();
+        filteredRooms = rooms;
+
+    }
+
+    private void SearchRooms(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredRooms = rooms.Where(r => r.RoomNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.Price.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.RoomType.Type.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.RoomStatus.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.MaxAdults.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.MaxChildren.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+        else
+        {
+            filteredRooms = rooms;
+        }
+    }
+
+
+
+
+    private void FiltreByPriceUp()
+    {
+        filteredRooms = rooms.OrderBy(r => r.Price).ToList();
+    }
+
+    private void FiltreByPriceDown()
+    {
+        filteredRooms = rooms.OrderByDescending(r => r.Price).ToList();
+    }
+
+
+
+
+    private void NavigateToRoomDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/room/{id}");
+    }
+
+    private void NavigateToAddRoom()
+    {
+        NavigationManager.NavigateTo("/room/add");
+    }
+
+
+}

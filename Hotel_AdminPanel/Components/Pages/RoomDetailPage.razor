@@ -1,0 +1,114 @@
+﻿@page "/room/{Id:int}"
+@inject IRoomService RoomService
+@inject IRoomStatusService RoomStatusService
+@inject IRoomTypeService RoomTypeService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+
+<div class="container mt-5">
+    @if (room == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <p class="mt-2">Loading room details...</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm mx-auto" style="max-width: 600px;">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Edit Room Details</h3>
+
+                <EditForm Model="room" OnValidSubmit="HandleValidSubmit" FormName="EditRoom">
+
+                             <div class="mb-3">
+                                <label for="roomNumber" class="form-label">Room Number</label>
+                                 <input class="form-control" @bind="room.RoomNumber" readonly disabled id="roomNumber"  />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="roomType" class="form-label">Room Type</label>
+                                <InputSelect class="form-control" @bind-Value="room.RoomTypeId" id="roomType">
+                                    @foreach (var type in roomTypes)
+                                    {
+                                        <option value="@type.Id">@type.Type</option>
+                                    }
+                                </InputSelect>
+                                
+                            </div>
+
+                
+                            <div class="mb-3">
+                                <label for="roomStatus" class="form-label">Room Status</label>
+                                <InputSelect class="form-control" @bind-Value="room.RoomStatusId" id="roomStatus">
+                                    @foreach (var status in roomStatuses)
+                                    {
+                                        <option value="@status.Id">@status.Status</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Price</label>
+                                <InputNumber class="form-control" @bind-Value="room.Price" id="price" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="maxAdults" class="form-label">Max Adults</label>
+                        <InputNumber class="form-control" @bind-Value="room.MaxAdults" id="maxAdults" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="maxChildren" class="form-label">Max Children</label>
+                        <InputNumber class="form-control" @bind-Value="room.MaxChildren" id="maxChildren" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <InputTextArea class="form-control" @bind-Value="room.Description" />
+                            </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-dark">Save Changes</button>
+                        <a href="/rooms" class="btn btn-outline-secondary">Back to List</a>
+                        <button type="button" class="btn btn-danger" @onclick="HandleRemoveRoom">Remove Room</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Room room { get; set; } = new Room();
+
+    private List<RoomStatus> roomStatuses = new List<RoomStatus>();
+    private List<RoomType> roomTypes = new List<RoomType>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        room = await RoomService.GetRoomByIdAsync(Id);
+        roomStatuses = await RoomStatusService.GetRoomStatusesAsync();
+        roomTypes = await RoomTypeService.GetAllRoomTypesAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await RoomService.UpdateRoomAsync(room);
+        NavigationManager.NavigateTo("/rooms");
+    }
+
+    private async Task HandleRemoveRoom()
+    {
+        await RoomService.DeleteRoomAsync(room.Id);
+        NavigationManager.NavigateTo("/rooms");
+    }
+}

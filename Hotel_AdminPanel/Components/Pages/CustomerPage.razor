@@ -1,20 +1,27 @@
 ﻿@page "/customers"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
-
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="container mt-5">
     <h3 class="text-center mb-4">Customer List</h3>
     <div class="d-flex justify-content-between mb-3">
         <div></div> <!-- Placeholder for alignment -->
-        <button class="btn btn-primary" @onclick="NavigateToAddCustomer">Add Customer</button>
+        <button class="btn btn-dark" @onclick="NavigateToAddCustomer">Add Customer</button>
     </div>
+
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Search customers..."
+               @bind="searchTerm" @oninput="SearchCustomers" aria-label="Search customers..." aria-describedby="button-search">
+    </div>
+
+
     @if (customers == null)
     {
         <div class="text-center">
             <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
+                <span class="sr-only"></span>
             </div>
             <p class="mt-2">Loading customers...</p>
         </div>
@@ -36,7 +43,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var customer in customers)
+                    @foreach (var customer in filteredCustomers)
                     {
                         <tr @onclick="() => NavigateToCustomerDetail(customer.Id)" style="cursor:pointer;">
                             <td>@customer.FirstName</td>
@@ -58,9 +65,32 @@
 @code {
     private List<Customer> customers;
 
+    private string searchTerm;
+    private List<Customer> filteredCustomers;
+
+
+
     protected override async Task OnInitializedAsync()
     {
         customers = await CustomerService.GetCustomersAsync();
+        filteredCustomers = customers;
+    }
+
+    private void SearchCustomers(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredCustomers = customers
+                .Where(c => c.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            c.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            filteredCustomers = customers;
+        }
     }
 
     private void NavigateToCustomerDetail(int id)
@@ -72,4 +102,6 @@
     {
         NavigationManager.NavigateTo("/customer/add");
     }
+
+
 }

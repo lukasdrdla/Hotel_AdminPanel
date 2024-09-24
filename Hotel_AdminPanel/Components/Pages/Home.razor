@@ -2,58 +2,96 @@
 
 <PageTitle>Admin Panel - Hotel Management</PageTitle>
 
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+    </ol>
+</nav>
+
 <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center" style="background-image: url('/images/hotel-background.jpg'); background-size: cover; background-position: center;">
-    <div class="container mt-5 p-4 bg-white rounded shadow-lg">
+    <div class="container mt-5 p-4 bg-white rounded shadow-lg fade-in">
+        
+        <!-- User Profile Section -->
+        <div class="d-flex align-items-center mb-4">
+            <img src="/images/profile.jpg" class="rounded-circle me-2" alt="Admin Profile" width="50" height="50">
+            <div>
+                <h6 class="mb-0">Admin Name</h6>
+                <a href="/profile" class="text-muted">View Profile</a>
+            </div>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" id="darkModeToggle">
+            <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-4">
+            <input type="text" class="form-control" placeholder="Search..." aria-label="Search">
+        </div>
+
         <h1 class="text-center mb-4">Hotel Management Dashboard</h1>
+
+        <!-- Notification Alert -->
+        <div class="alert alert-info text-center">
+            <strong>Notice:</strong> You have 5 new reservations pending review.
+        </div>
 
         <div class="row">
             <!-- Manage Reservations -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Manage Reservations</h5>
                         <p class="card-text">View, create, update, or delete hotel reservations.</p>
                         <a href="/reservations" class="btn btn-primary">Go to Reservations</a>
+                        <span class="badge bg-success mt-2">3 New</span>
                     </div>
                 </div>
             </div>
 
             <!-- Manage Guests -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Manage Guests</h5>
                         <p class="card-text">View and manage guest information.</p>
-                        <a href="/guests" class="btn btn-primary">Go to Guests</a>
+                        <a href="/customers" class="btn btn-primary">Go to Guests</a>
+                        <span class="badge bg-success mt-2">5 New</span>
                     </div>
                 </div>
             </div>
 
             <!-- Manage Rooms -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Manage Rooms</h5>
                         <p class="card-text">View room availability and manage room settings.</p>
                         <a href="/rooms" class="btn btn-primary">Go to Rooms</a>
+                        <span class="badge bg-danger mt-2">2 Unavailable</span>
                     </div>
                 </div>
             </div>
 
             <!-- Manage Staff -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Manage Staff</h5>
                         <p class="card-text">Manage hotel staff information and roles.</p>
                         <a href="/staff" class="btn btn-primary">Go to Staff</a>
+                        <span class="badge bg-warning mt-2">1 Role Change</span>
                     </div>
                 </div>
             </div>
 
             <!-- Reports -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Reports</h5>
                         <p class="card-text">Generate and view reports for hotel operations.</p>
@@ -64,7 +102,7 @@
 
             <!-- Settings -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center shadow-sm">
+                <div class="card text-center shadow-sm card-hover">
                     <div class="card-body">
                         <h5 class="card-title">Settings</h5>
                         <p class="card-text">Configure system settings and preferences.</p>
@@ -75,3 +113,16 @@
         </div>
     </div>
 </div>
+
+<!-- Styles for Card Hover Effect and Animation -->
+<style>
+    .card-hover:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s;
+    }
+
+</style>

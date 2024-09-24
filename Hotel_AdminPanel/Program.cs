@@ -15,6 +15,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IRoomStatusService, RoomStatusService>();
+builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
+
+
 
 var app = builder.Build();
 
@@ -22,6 +28,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseDeveloperExceptionPage();  // This ensures more verbose errors during development
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
