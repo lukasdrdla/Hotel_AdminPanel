@@ -26,16 +26,16 @@
 </style>
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Room List</h3>
+    <h3 class="text-center mb-4 page-title">Pokoje</h3>
     <div class="d-flex justify-content-end mb-3">
         
-        <button class="btn btn-dark" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Add Room</button>
+        <button class="btn btn-primary" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Přidat Pokoj</button>
 
     </div>
 
 
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search rooms..."
+        <input type="text" class="form-control" placeholder="Vyhledat..."
                @bind="searchTerm" @oninput="SearchRooms" aria-label="Search rooms..." aria-describedby="button-search">
     </div>
 
@@ -58,11 +58,11 @@
                     <tr>
                         <th>
                         </th>
-                        <th>Room Number</th>
-                        <th>Room Type</th>
-                        <th>Room Status</th>
+                        <th>Číslo Pokoje</th>
+                        <th>Typ Pokoje</th>
+                        <th>Status</th>
                         <th>
-                            Price
+                            Cena
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16" @onclick="FiltreByPriceUp" style="cursor:pointer;">
                                 <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5" />
                             </svg>
@@ -71,9 +71,9 @@
                                 <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
                             </svg>
                         </th>
-                        <th>Max Children</th>
-                        <th>Max Adults</th>
-                        <th>Decription</th>
+                        <th>Max Dětí</th>
+                        <th>Max Dospělích</th>
+                        <th>Popis</th>
                     </tr>
                 </thead>
                 <tbody>

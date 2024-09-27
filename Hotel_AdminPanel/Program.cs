@@ -22,6 +22,7 @@ builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 
 
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

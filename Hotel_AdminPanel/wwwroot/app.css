@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Poppins','Helvetica Neue', Helvetica, Arial, sans-serif !important;
     background-color: #f8f9fa;
 }
 
@@ -9,9 +12,14 @@ a, .btn-link {
 
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #307bf6;
+    border-color: #307bf6;
 }
+
+    .btn-primary:hover {
+        border-color: #3041f6;
+        background-color: #3041f6;
+    }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -52,7 +60,11 @@ h1:focus {
 }
 
 
-
+.page-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #152335;
+}
 
 
 
@@ -64,8 +76,6 @@ h1:focus {
 
 /* Center text and add margin to the header */
 h3 {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    color: #333;
     margin-bottom: 1rem;
 }
 
@@ -111,12 +121,6 @@ h3 {
     .table tbody tr:nth-child(even) {
         background-color: #f9f9f9;
     }
-
-
-
-
-
-
 
 
 

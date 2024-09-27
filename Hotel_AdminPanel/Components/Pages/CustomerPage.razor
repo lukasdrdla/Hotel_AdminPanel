@@ -4,15 +4,15 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Customer List</h3>
+    <h3 class="text-center mb-4 page-title">Zákazníci</h3>
     <div class="d-flex justify-content-between mb-3">
         <div></div> <!-- Placeholder for alignment -->
-        <button class="btn btn-dark" @onclick="NavigateToAddCustomer">Add Customer</button>
+        <button class="btn btn-primary" @onclick="NavigateToAddCustomer">Přidat Zákazníka</button>
     </div>
 
 
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Search customers..."
+        <input type="text" class="form-control" placeholder="Vyhledat..."
                @bind="searchTerm" @oninput="SearchCustomers" aria-label="Search customers..." aria-describedby="button-search">
     </div>
 
@@ -32,14 +32,14 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Jméno</th>
+                        <th>Přijmení</th>
                         <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>City</th>
-                        <th>Country</th>
-                        <th>Postal Code</th>
+                        <th>Telefon</th>
+                        <th>Adresa</th>
+                        <th>Město</th>
+                        <th>Země</th>
+                        <th>PSČ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +84,8 @@
             filteredCustomers = customers
                 .Where(c => c.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                             c.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                            c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            c.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
         else

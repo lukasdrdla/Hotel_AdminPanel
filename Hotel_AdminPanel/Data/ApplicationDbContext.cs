@@ -27,6 +27,20 @@ namespace Hotel_AdminPanel.Data
 
         private void Seed(ModelBuilder modelBuilder)
         {
+            //vygenerováno pomocí chatgpt
+            modelBuilder.Entity<Customer>().HasData(
+                new Customer { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Phone = "123456789", Address = "123 Main St", City = "CityA", Country = "CountryA", PostalCode = "12345" },
+                new Customer { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com", Phone = "987654321", Address = "456 Elm St", City = "CityB", Country = "CountryB", PostalCode = "54321" },
+                new Customer { Id = 3, FirstName = "Alice", LastName = "Smith", Email = "alice.smith@example.com", Phone = "456789123", Address = "789 Pine St", City = "CityC", Country = "CountryC", PostalCode = "67890" },
+                new Customer { Id = 4, FirstName = "Bob", LastName = "Johnson", Email = "bob.johnson@example.com", Phone = "321654987", Address = "159 Maple St", City = "CityD", Country = "CountryD", PostalCode = "13579" },
+                new Customer { Id = 5, FirstName = "Charlie", LastName = "Brown", Email = "charlie.brown@example.com", Phone = "258369147", Address = "753 Oak St", City = "CityE", Country = "CountryE", PostalCode = "24680" },
+                new Customer { Id = 6, FirstName = "David", LastName = "Wilson", Email = "david.wilson@example.com", Phone = "963852741", Address = "951 Birch St", City = "CityF", Country = "CountryF", PostalCode = "36912" },
+                new Customer { Id = 7, FirstName = "Eve", LastName = "Davis", Email = "eve.davis@example.com", Phone = "147258369", Address = "357 Cedar St", City = "CityG", Country = "CountryG", PostalCode = "78901" },
+                new Customer { Id = 8, FirstName = "Frank", LastName = "Garcia", Email = "frank.garcia@example.com", Phone = "753159486", Address = "864 Walnut St", City = "CityH", Country = "CountryH", PostalCode = "85246" },
+                new Customer { Id = 9, FirstName = "Grace", LastName = "Martinez", Email = "grace.martinez@example.com", Phone = "951753456", Address = "258 Spruce St", City = "CityI", Country = "CountryI", PostalCode = "14789" },
+                new Customer { Id = 10, FirstName = "Hank", LastName = "Lopez", Email = "hank.lopez@example.com", Phone = "258147369", Address = "159 Fir St", City = "CityJ", Country = "CountryJ", PostalCode = "96374" }
+            );
+
 
             modelBuilder.Entity<RoomStatus>().HasData(
                 new RoomStatus { Id = 1, Status = "Available" },
