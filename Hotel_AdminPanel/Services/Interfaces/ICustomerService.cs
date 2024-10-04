@@ -6,8 +6,8 @@ namespace Hotel_AdminPanel.Services.Interfaces
     {
         Task<List<Customer>> GetCustomersAsync();
         Task<Customer> GetCustomerByIdAsync(int id);
-        Task<Customer> CreateCustomerAsync(Customer customer);
-        Task<Customer> UpdateCustomerAsync(Customer customer);
+        Task CreateCustomerAsync(Customer customer);
+        Task UpdateCustomerAsync(Customer customer);
         Task DeleteCustomerAsync(int id);
     }
 }

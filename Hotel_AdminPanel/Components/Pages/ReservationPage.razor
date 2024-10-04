@@ -6,12 +6,16 @@
 
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Reservation List</h3>
+    <h3 class="text-center mb-4">Rezervace</h3>
     <div class="d-flex justify-content-between mb-3">
         <div></div> <!-- Placeholder for alignment -->
-                <button class="btn btn-primary" @onclick="NavigateToAddReservation">Add Reservation</button>
-
+                <button class="btn btn-primary" @onclick="NavigateToAddReservation">Přidat Rezervaci</button>
     </div>
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchReservations" />
+    </div>
+
     @if (reservations == null || reservations.Count == 0)
     {
         <div class="text-center">
@@ -27,31 +31,36 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Room Id</th>
-                        <th>Customer Name</th>
-                        <th>Note</th>
+                        <th>Pokoj</th>
+                        <th>Zákazník</th>
                         <th>Check In</th>
                         <th>Check Out</th>
-                        <th>Adult</th>
-                        <th>Children</th>
-                        <th>Price</th>
-                        <th>Is Paid</th>
-                        <th>Is Canceled</th>
-                        <th>Created At</th>
+                        <th>Cena</th>
+                        <th>Status</th>
+                        <th>Dospělí</th>
+                        <th>Děti</th>
+                        <th>Stravování</th>
+                        <th>Speciální Požadavky</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var reservation in reservations)
+                    @foreach (var reservation in filteredReservations)
                     {
                         <tr @onclick="() => NavigateToRoomDetail(reservation.Id)" style="cursor:pointer;">
 
-                            <td>@reservation.Id</td>
-                            <td>@reservation.RoomId</td>
+                            <td>@reservation.Room.RoomNumber</td>
                             <td>@reservation.Customer.FirstName @reservation.Customer.LastName</td>
-                            <td>@reservation.CheckIn</td>
-                            <td>@reservation.CheckOut</td>
-                            <td>@reservation.TotalPrice.ToString("0") $</td>
+                            <td>@reservation.CheckIn.ToString("dd/MM/yyyy")</td>
+                            <td>@reservation.CheckOut.ToString("dd/MM/yyyy")</td>
+                            <td>@reservation.TotalPrice.ToString("C")</td>
+
+                            <td><span class="@GetReservationStatus(reservation.ReservationStatus.RStatus)">@reservation.ReservationStatus.RStatus</span></td>
+
+                            <td>@reservation.Adults</td>
+                            <td>@reservation.Children</td>
+                            <td>@reservation.MealPlan.Plan</td>
+                            <td>@reservation.SpecialRequest</td>
+
                         </tr>
 
                     }
@@ -65,11 +74,41 @@
 @code {
 
     private List<Reservation> reservations ;
+    private List<Reservation> filteredReservations;
+    private string? searchTerm;
 
+
+    private void SearchReservations(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredReservations = reservations.Where(r => r.Room.RoomNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.CheckIn.ToString("dd/MM/yyyy").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.CheckOut.ToString("dd/MM/yyyy").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.TotalPrice.ToString("C").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.ReservationStatus.RStatus.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Adults.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Children.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.MealPlan.Plan.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.SpecialRequest.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            filteredReservations = reservations;
+        }
+        
+
+
+    }
 
     protected override async Task OnInitializedAsync()
     {
         reservations = await ReservationService.GetReservationsAsync();
+        filteredReservations = reservations;
     }
 
     private void NavigateToRoomDetail(int id)
@@ -82,5 +121,17 @@
         NavigationManager.NavigateTo("/reservation/add");
     }
 
+
+    private string GetReservationStatus(string status)
+    {
+        return status switch
+        {
+            "Rezervováno" => "text-warning",
+            "CheckedIn" => "text-primary",
+            "Dokončeno" => "text-success",
+            "Zrušeno" => "text-danger",
+            _ => "badge badge-info"
+        };
+    }
 
 }

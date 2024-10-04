@@ -1,0 +1,106 @@
+﻿@page "/room/add"
+@inject IRoomService RoomService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+//javascript tag
+
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4 page-title">Přidat Pokoj</h3>
+            <EditForm Model="room" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                @* RoomNumber . Room type . Room statusId . Price. Img. Max Adults. Max Childrens. Description *@
+
+                <div class="form-group mb-3">
+                    <label for="RoomImg" class="form-label">Obrázek</label>
+                    <InputText id="RoomImg" class="form-control" @bind-Value="room.Image" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="RoomNumber" class="form-label">Číslo pokoje</label>
+                    <InputText id="RoomNumber" class="form-control" @bind-Value="room.RoomNumber" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="RoomType" class="form-label">Typ pokoje</label>
+                    <InputSelect id="RoomType" class="form-control" @bind-Value="room.RoomTypeId">
+                        <option value="">Vyberte typ pokoje</option>
+                        @foreach (var type in roomTypes)
+                        {
+                            <option value="@type.Id">@type.Type</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="RoomStatus" class="form-label">Status</label>
+                    <InputSelect id="RoomStatus" class="form-control" @bind-Value="room.RoomStatusId">
+                        <option value="">Vyberte status</option>
+                        @foreach (var status in roomStatuses)
+                        {
+                            <option value="@status.Id">@status.Status</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Price" class="form-label">Cena</label>
+                    <InputNumber id="Price" class="form-control" @bind-Value="room.Price" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="MaxAdults" class="form-label">Max Dospělí</label>
+                    <InputNumber id="MaxAdults" class="form-control" @bind-Value="room.MaxAdults" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="MaxChildren" class="form-label">Max Děti</label>
+                    <InputNumber id="MaxChildren" class="form-control" @bind-Value="room.MaxChildren" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Description" class="form-label">Popis</label>
+                    <InputTextArea id="Description" class="form-control" @bind-Value="room.Description" />
+                </div>
+
+
+
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <a href="/rooms" class="btn btn-outline-secondary">Zpět na seznam</a>
+                </div>
+
+
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    private Room room = new Room();
+
+    private List<RoomType> roomTypes = new List<RoomType>();
+    private List<RoomStatus> roomStatuses = new List<RoomStatus>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomTypes = await RoomService.GetRoomTypesAsync();
+        roomStatuses = await RoomService.GetRoomStatusesAsync();
+
+    }
+
+    private async void HandleValidSubmit()
+    {
+
+        RoomService.CreateRoomAsync(room);
+        NavigationManager.NavigateTo("/rooms");
+    }
+}

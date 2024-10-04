@@ -88,7 +88,7 @@
                                 @room.RoomType.Type
                             </td>
                             <td>@room.RoomStatus.Status</td>
-                            <td>@room.Price.ToString("0") $</td>
+                            <td>@room.Price.ToString("C")</td>
                             <td>@room.MaxChildren</td>
                             <td>@room.MaxAdults</td>
                             <td>
@@ -111,9 +111,9 @@
 
 @code {
 
-    private List<Room> rooms;
+    private ICollection<Room> rooms;
     private string searchTerm;
-    private List<Room> filteredRooms;
+    private ICollection<Room> filteredRooms;
     
 
 

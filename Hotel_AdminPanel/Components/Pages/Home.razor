@@ -1,89 +1,209 @@
 ﻿@page "/"
 @inject NavigationManager Navigation
 @inject IRoomService RoomService
+@inject ICustomerService CustomerService
+@inject IReservationService ReservationService
 
-<PageTitle>Admin Panel - Hotel Management</PageTitle>
+<PageTitle>Dashboard - Hotel Management</PageTitle>
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="container text-center">
-        <h1 class="display-4">Vítejte na stránkách Hotel Management</h1>
-        <p class="lead">Aplikace slouží pro správu zákazníků, pokojů a rezervací.</p>
+<div class="container-fluid mt-4">
+    <h1 class="h2 mb-4">Dashboard</h1>
 
-        <div class="row">
-            <div class="col-sm-6 mb-3 mb-sm-0">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Rooms Avaible</h5>
-                        <p class="card-text">@roomsAvaible</p>
-                        
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+    <!-- Statistika - Karty -->
+    <div class="row">
+        <!-- Počet rezervací -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card shadow-sm border-left-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-primary">Počet rezervací</h6>
+                            <h3 class="font-weight-bold">@TotalReservations</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar-alt fa-3x text-primary"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Počet zákazníků -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card shadow-sm border-left-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-success">Počet zákazníků</h6>
+                            <h3 class="font-weight-bold">@TotalCustomers</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-3x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <div class="row mt-5">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Pokoje
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Správa pokojů</h5>
-                        <p class="card-text"></p>
-                        <a href="/rooms" class="btn btn-dark">Pokoje</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Zákazníci
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Správa zákazníků</h5>
-                        <p class="card-text"></p>
-                        <a href="/customers" class="btn btn-dark">Zákazníci</a>
+        <!-- Počet pokojů -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card shadow-sm border-left-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-info">Počet pokojů</h6>
+                            <h3 class="font-weight-bold">@TotalRooms</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-bed fa-3x text-info"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Rezervace
+        </div>
+
+        <!-- Vytíženost hotelu -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card shadow-sm border-left-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-warning">Vytíženost hotelu</h6>
+                            <h3 class="font-weight-bold">@HotelOccupancy.ToString("0.00") %</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-chart-line fa-3x text-warning"></i>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Správa rezervací</h5>
-                        <p class="card-text"></p>
-                        <a href="/reservations" class="btn btn-dark">Rezervace</a>
-                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sekce pro grafy a analýzy -->
+    <div class="row">
+        <!-- Graf: Rezervace za poslední měsíc -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Rezervace za poslední měsíc
+                </div>
+                <div class="card-body">
+                    @foreach (var reservation in reservationsLastMonth)
+                    {
+                        <p>@reservation.CheckIn.ToString("dd/MM/yyyy") - @reservation.CheckOut.ToString("dd/MM/yyyy")</p>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Graf: Příjmy za poslední měsíc -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    Příjmy za poslední měsíc
+                </div>
+                <div class="card-body">
+                    <h3 class="text-success font-weight-bold">@TotalRevenue.ToString("C")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Nadcházející odjezdy a příjezdy -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Nadcházející odjezdy a příjezdy
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Zákazník</th>
+                                <th>Pokoj</th>
+                                <th>Datum Příjezdu</th>
+                                <th>Datum Odjezdu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reservation in upcomingReservations)
+                            {
+                                <tr>
+                                    <td>@reservation.Customer.FirstName @reservation.Customer.LastName</td>
+                                    <td>@reservation.Room.RoomNumber</td>
+                                    <td>@reservation.CheckIn.ToShortDateString()</td>
+                                    <td>@reservation.CheckOut.ToShortDateString()</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Údržba a úklid pokojů -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    Údržba a úklid pokojů
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Pokoj</th>
+                                <th>Stav</th>
+                                <th>Poslední úklid</th>
+                                <th>Údržba</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var room in maintenanceRooms)
+                            {
+                                <tr>
+                                    <td>@room.RoomNumber</td>
+                                    <td>@room.RoomStatus.Status</td>
+                                    
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
-
 @code {
-    private List<Room> rooms = new List<Room>();
-    private int roomsAvaible = 0;
+    private int TotalReservations;
+    private int TotalCustomers;
+    private int TotalRooms;
+    private double HotelOccupancy;
+    private int occupiedRooms;
+    private List<Reservation> reservationsLastMonth = new List<Reservation>();
+    private List<Reservation> upcomingReservations = new List<Reservation>();
+    private List<Room> maintenanceRooms = new List<Room>();
+    private decimal TotalRevenue;
+
 
     protected override async Task OnInitializedAsync()
     {
-        rooms = await RoomService.GetRooomsAsync();
-        roomsAvaible = rooms.Count(room => room.RoomStatus.Id == 1);
-        
-    }
-    
+        TotalCustomers = (await CustomerService.GetCustomersAsync()).Count;
+        TotalReservations = (await ReservationService.GetReservationsAsync()).Count;
+        TotalRooms = (await RoomService.GetRooomsAsync()).Count;
 
+        occupiedRooms = (await RoomService.GetRooomsAsync()).Where(r => r.RoomStatus.Status == "Obsazeno").Count();
+        reservationsLastMonth = (await ReservationService.GetReservationsAsync()).Where(r => r.CheckIn.Month == DateTime.Now.AddMonths(-1).Month).ToList();
+
+        TotalRevenue = reservationsLastMonth.Sum(r => r.TotalPrice);
+
+        upcomingReservations = (await ReservationService.GetReservationsAsync()).Where(r => r.CheckIn.Date == DateTime.Today || r.CheckOut.Date == DateTime.Today).ToList();
+
+        // Vytíženost hotelu
+        HotelOccupancy = ((double)occupiedRooms / TotalRooms) * 100;
+    }
 }

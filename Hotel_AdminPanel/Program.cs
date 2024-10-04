@@ -1,7 +1,9 @@
 using Hotel_AdminPanel.Components;
 using Hotel_AdminPanel.Data;
+using Hotel_AdminPanel.Models;
 using Hotel_AdminPanel.Services;
 using Hotel_AdminPanel.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +15,16 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
+builder.Services.AddIdentity<AppUser, IdentityRole>(options => 
+            options.SignIn.RequireConfirmedAccount = false
+    )
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IRoomStatusService, RoomStatusService>();
-builder.Services.AddScoped<IRoomTypeService, RoomTypeService>();
 
 
 

@@ -1,0 +1,70 @@
+﻿@page "/register"
+@using Hotel_AdminPanel.Models.ViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> UserManager
+@inject SignInManager<AppUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject ICustomerService CustomerService
+@rendermode InteractiveServer
+
+<h3>RegisterPage</h3>
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="card-body">
+            <h3 class="card-title">Register</h3>
+            <EditForm Model="registerModel" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="Email" class="form-label">Email</label>
+                    <InputText id="Email" class="form-control" @bind-Value="registerModel.Email" />
+                </div>
+
+                <div class="form-group">
+                    <label for="Password" class="form-label">Password</label>
+                    <InputText id="Password" type="password" class="form-control" @bind-Value="registerModel.Password" />
+                </div>
+
+                <div class="form-group">
+                    <label for="ConfirmPassword" class="form-label">Confirm Password</label>
+                    <InputText id="ConfirmPassword" type="password" class="form-control" @bind-Value="registerModel.ConfirmPassword" />
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterViewModel registerModel = new RegisterViewModel();
+
+    private async Task HandleValidSubmit()
+    {
+        var user = new AppUser
+            {
+                UserName = registerModel.Email,
+                Email = registerModel.Email,
+                // Můžeš zde přidat další vlastnosti, pokud je to potřeba
+            };
+
+        var result = await UserManager.CreateAsync(user, registerModel.Password);
+
+        if (result.Succeeded)
+        {
+
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                Console.WriteLine(error.Description);
+            }
+        }
+    }
+}

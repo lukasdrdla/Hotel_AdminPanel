@@ -20,10 +20,14 @@ namespace Hotel_AdminPanel.Services
         {
             var newRoom = new Room
             {
+                Image = room.Image,
                 RoomNumber = room.RoomNumber,
-                RoomType = room.RoomType,
+                RoomTypeId = room.RoomTypeId,
+                RoomStatusId = room.RoomStatusId,
                 Price = room.Price,
-                Description = room.Description,
+                MaxAdults = room.MaxAdults,
+                MaxChildren = room.MaxChildren,
+                Description = room.Description
             };
 
             await _context.Rooms.AddAsync(newRoom);
@@ -59,7 +63,19 @@ namespace Hotel_AdminPanel.Services
             return room;
         }
 
-        public async Task<List<Room>> GetRooomsAsync()
+        public async Task<List<RoomStatus>> GetRoomStatusesAsync()
+        {
+            var roomStatuses = await _context.RoomStatuses.ToListAsync();
+            return roomStatuses;
+        }
+
+        public async Task<List<RoomType>> GetRoomTypesAsync()
+        {
+            var roomTypes = await _context.RoomTypes.ToListAsync();
+            return roomTypes;
+        }
+
+        public async Task<ICollection<Room>> GetRooomsAsync()
         {
             var rooms = await _context.Rooms.
                 Include(r => r.RoomType)
@@ -77,10 +93,12 @@ namespace Hotel_AdminPanel.Services
             }
 
             existingRoom.RoomNumber = room.RoomNumber;
-            existingRoom.RoomType = room.RoomType;
+            existingRoom.RoomTypeId = room.RoomTypeId;
+            existingRoom.RoomStatusId = room.RoomStatusId;
             existingRoom.Price = room.Price;
+            existingRoom.MaxAdults = room.MaxAdults;
+            existingRoom.MaxChildren = room.MaxChildren;
             existingRoom.Description = room.Description;
-            
 
             await _context.SaveChangesAsync();
             return existingRoom;

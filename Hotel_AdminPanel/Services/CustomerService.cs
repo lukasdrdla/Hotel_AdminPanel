@@ -14,11 +14,11 @@ namespace Hotel_AdminPanel.Services
             _context = context;
         }
 
-        public async Task<Customer> CreateCustomerAsync(Customer customer)
+        public async Task CreateCustomerAsync(Customer customer)
         {
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
-            return customer;
+
         }
 
         public async Task DeleteCustomerAsync(int id)
@@ -46,12 +46,13 @@ namespace Hotel_AdminPanel.Services
             return customers;
         }
 
-        public async Task<Customer> UpdateCustomerAsync(Customer customer)
+        public async Task UpdateCustomerAsync(Customer customer)
         {
             var existingCustomer = await _context.Customers.FindAsync(customer.Id);
             if (existingCustomer == null)
             {
-                return null;
+                return;
+
             }
 
             existingCustomer.FirstName = customer.FirstName;
@@ -65,7 +66,6 @@ namespace Hotel_AdminPanel.Services
 
             _context.Customers.Update(existingCustomer);
             await _context.SaveChangesAsync();
-            return existingCustomer;
         }
     }
 }
