@@ -18,12 +18,14 @@ namespace Hotel_AdminPanel.Data
         public DbSet<MealPlan> MealPlans { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<Room> Rooms { get; set; }
+
         
         public DbSet<Employee> Employees { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             Seed(modelBuilder);
 
         }
@@ -75,15 +77,15 @@ namespace Hotel_AdminPanel.Data
                 new MealPlan { Id = 4, Plan = "All-Inclusive" }
                 );
 
-            modelBuilder.Entity<Employee>().HasData(
-                new Employee { Id = 1, FirstName = "Jan", Surname = "Novák", Email = "j.novak@hoap.com", Image = "" },
-                new Employee { Id = 2, FirstName = "Petr", Surname = "Svoboda", Email = "p.svoboda@hoap.com", Image = "" },
-                new Employee { Id = 3, FirstName = "Martina", Surname = "Kovářová", Email = "m.kovarova@hoap.com", Image = "" },
-                new Employee { Id = 4, FirstName = "Tomáš", Surname = "Dvořák", Email = "t.dvorak@hoap.com", Image = "" },
-                new Employee { Id = 5, FirstName = "Alena", Surname = "Veselá", Email = "a.vesela@hoap.com", Image = "" },
-                new Employee { Id = 6, FirstName = "Lucie", Surname = "Králová", Email = "l.kralova@hoap.com", Image = "" },
-                new Employee { Id = 7, FirstName = "Jiří", Surname = "Beneš", Email = "j.benes@hoap.com", Image = "" }
-            );
+            //modelBuilder.Entity<Employee>().HasData(
+            //    new Employee { Id = 1, FirstName = "Jan", Surname = "Novák", Email = "j.novak@hoap.com", Image = "" },
+            //    new Employee { Id = 2, FirstName = "Petr", Surname = "Svoboda", Email = "p.svoboda@hoap.com", Image = "" },
+            //    new Employee { Id = 3, FirstName = "Martina", Surname = "Kovářová", Email = "m.kovarova@hoap.com", Image = "" },
+            //    new Employee { Id = 4, FirstName = "Tomáš", Surname = "Dvořák", Email = "t.dvorak@hoap.com", Image = "" },
+            //    new Employee { Id = 5, FirstName = "Alena", Surname = "Veselá", Email = "a.vesela@hoap.com", Image = "" },
+            //    new Employee { Id = 6, FirstName = "Lucie", Surname = "Králová", Email = "l.kralova@hoap.com", Image = "" },
+            //    new Employee { Id = 7, FirstName = "Jiří", Surname = "Beneš", Email = "j.benes@hoap.com", Image = "" }
+            //);
 
 
 

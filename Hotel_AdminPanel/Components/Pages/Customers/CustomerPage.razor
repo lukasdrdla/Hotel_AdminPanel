@@ -1,7 +1,8 @@
-﻿@page "/customers"
+﻿@page "/zakaznici"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 
 <div class="container mt-5">
     <h3 class="text-center mb-4 page-title">Zákazníci</h3>
@@ -12,8 +13,7 @@
 
 
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Vyhledat..."
-               @bind="searchTerm" @oninput="SearchCustomers" aria-label="Search customers..." aria-describedby="button-search">
+        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchCustomers">
     </div>
 
 
@@ -23,7 +23,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only"></span>
             </div>
-            <p class="mt-2">Loading customers...</p>
+            <p class="mt-2">Načítám zákazníky...</p>
         </div>
     }
     else
@@ -64,7 +64,6 @@
 
 @code {
     private List<Customer> customers;
-
     private string searchTerm;
     private List<Customer> filteredCustomers;
 
@@ -96,12 +95,12 @@
 
     private void NavigateToCustomerDetail(int id)
     {
-        NavigationManager.NavigateTo($"/customer/{id}");
+        NavigationManager.NavigateTo($"/zakaznik/{id}");
     }
 
     private void NavigateToAddCustomer()
     {
-        NavigationManager.NavigateTo("/customer/add");
+        NavigationManager.NavigateTo("/pridat-zakaznika");
     }
 
 

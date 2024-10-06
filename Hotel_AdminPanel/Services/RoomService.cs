@@ -16,7 +16,7 @@ namespace Hotel_AdminPanel.Services
         }
 
 
-        public async Task<Room> CreateRoomAsync(Room room)
+        public async Task CreateRoomAsync(Room room)
         {
             var newRoom = new Room
             {
@@ -32,7 +32,6 @@ namespace Hotel_AdminPanel.Services
 
             await _context.Rooms.AddAsync(newRoom);
             await _context.SaveChangesAsync();
-            return newRoom;
 
 
 
@@ -84,7 +83,7 @@ namespace Hotel_AdminPanel.Services
             return rooms;
         }
 
-        public async Task<Room> UpdateRoomAsync(Room room)
+        public async Task UpdateRoomAsync(Room room)
         {
             var existingRoom = await _context.Rooms.FindAsync(room.Id);
             if (existingRoom == null)
@@ -101,7 +100,19 @@ namespace Hotel_AdminPanel.Services
             existingRoom.Description = room.Description;
 
             await _context.SaveChangesAsync();
-            return existingRoom;
+
+        }
+
+        public async Task UpdateRoomStatusAsync(int roomId, int statusId)
+        {
+            var room = await _context.Rooms.FindAsync(roomId);
+            if (room == null)
+            {
+                throw new Exception("Room not found");
+            }
+
+            room.RoomStatusId = statusId;
+            await _context.SaveChangesAsync();
 
 
         }

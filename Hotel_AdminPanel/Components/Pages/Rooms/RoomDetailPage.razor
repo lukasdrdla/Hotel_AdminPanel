@@ -1,5 +1,6 @@
-﻿@page "/room/{Id:int}"
+﻿@page "/pokoj/{Id:int}"
 @inject IRoomService RoomService
+@inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
 
 @rendermode InteractiveServer
@@ -12,7 +13,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only"></span>
             </div>
-            <p class="mt-2">Loading room details...</p>
+            <p class="mt-2">Načítám podrobnosti o pokoji...</p>
         </div>
     }
     else
@@ -71,7 +72,7 @@
                             </div>
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-primary">Uložit</button>
-                        <a href="/rooms" class="btn btn-outline-secondary">Zpět na seznam</a>
+                        <a href="/pokoje" class="btn btn-outline-secondary">Zpět na seznam</a>
                         <button type="button" class="btn btn-danger" @onclick="HandleRemoveRoom">Odstranit</button>
                     </div>
                 </EditForm>
@@ -90,23 +91,24 @@
     private List<RoomStatus> roomStatuses = new List<RoomStatus>();
     private List<RoomType> roomTypes = new List<RoomType>();
 
-
     protected override async Task OnInitializedAsync()
     {
+
         room = await RoomService.GetRoomByIdAsync(Id);
         roomStatuses = await RoomService.GetRoomStatusesAsync();
         roomTypes = await RoomService.GetRoomTypesAsync();
+    
     }
 
     private async Task HandleValidSubmit()
     {
         await RoomService.UpdateRoomAsync(room);
-        NavigationManager.NavigateTo("/rooms");
+        NavigationManager.NavigateTo("/pokoje");
     }
 
     private async Task HandleRemoveRoom()
     {
         await RoomService.DeleteRoomAsync(room.Id);
-        NavigationManager.NavigateTo("/rooms");
+        NavigationManager.NavigateTo("/pokoje");
     }
 }

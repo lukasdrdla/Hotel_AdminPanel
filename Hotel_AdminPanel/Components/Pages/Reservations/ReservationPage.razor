@@ -1,15 +1,13 @@
-﻿@page "/reservations"
+﻿@page "/rezervace"
 @inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
-
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
-
+@attribute [Authorize]
 
 <div class="container mt-5">
     <h3 class="text-center mb-4">Rezervace</h3>
     <div class="d-flex justify-content-between mb-3">
-        <div></div> <!-- Placeholder for alignment -->
-                <button class="btn btn-primary" @onclick="NavigateToAddReservation">Přidat Rezervaci</button>
+        <div></div><button class="btn btn-primary" @onclick="NavigateToAddReservation">Přidat Rezervaci</button>
     </div>
 
     <div class="input-group mb-3">
@@ -22,7 +20,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only"></span>
             </div>
-            <p class="mt-2">Loading reservations...</p>
+            <p class="mt-2">Načítám rezervace...</p>
         </div>
     }
     else
@@ -53,9 +51,7 @@
                             <td>@reservation.CheckIn.ToString("dd/MM/yyyy")</td>
                             <td>@reservation.CheckOut.ToString("dd/MM/yyyy")</td>
                             <td>@reservation.TotalPrice.ToString("C")</td>
-
                             <td><span class="@GetReservationStatus(reservation.ReservationStatus.RStatus)">@reservation.ReservationStatus.RStatus</span></td>
-
                             <td>@reservation.Adults</td>
                             <td>@reservation.Children</td>
                             <td>@reservation.MealPlan.Plan</td>

@@ -13,7 +13,21 @@ namespace Hotel_AdminPanel.Services
         {
             _context = context;
         }
-        public async Task<Reservation> CreateReservationAsync(Reservation reservation)
+
+        public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
+        {
+            // Získat všechny rezervace pro daný pokoj
+            var reservations = await _context.Reservations
+                .Where(r => r.RoomId == roomId &&
+                            (r.CheckIn < checkOut && r.CheckOut > checkIn))
+                .ToListAsync();
+
+            return !reservations.Any(); // Vrátí true, pokud žádná rezervace není
+        }
+
+
+
+        public async Task CreateReservationAsync(Reservation reservation)
         {
             var newReservation = new Reservation
             {
@@ -32,15 +46,10 @@ namespace Hotel_AdminPanel.Services
 
             await _context.Reservations.AddAsync(newReservation);
             await _context.SaveChangesAsync();
-            return newReservation;
 
 
         }
 
-        public Task DeleteReservationAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<List<MealPlan>> GetMealPlansAsync()
         {
@@ -48,10 +57,6 @@ namespace Hotel_AdminPanel.Services
             return mealPlans;
         }
 
-        public Task<Reservation> GetReservationByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<List<Reservation>> GetReservationsAsync()
         {
@@ -70,22 +75,7 @@ namespace Hotel_AdminPanel.Services
             return reservationStatuses;
         }
 
-        public async Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut)
-        {
-            // Získejte všechny rezervace pro daný pokoj
-            var reservations = await _context.Reservations
-                .Where(r => r.RoomId == roomId)
-                .ToListAsync();
 
-            // Zkontrolujte, zda je pokoj obsazen v daném období
-            return reservations.All(reservation =>
-                reservation.CheckOut <= checkIn || reservation.CheckIn >= checkOut);
-        }
-
-        public Task<Reservation> UpdateReservationAsync(Reservation reservation)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<List<string>> GetUnavailableDatesForRoomAsync(int roomId)
         {
@@ -110,6 +100,27 @@ namespace Hotel_AdminPanel.Services
             }
 
             return unavailableDates;
+        }
+
+        public async Task<Reservation> GetReservationByIdAsync(int id)
+        {
+            var reservation = await _context.Reservations
+                .Include(r => r.Customer)
+                .Include(r => r.Room)
+                .Include(r => r.MealPlan)
+                .Include(r => r.ReservationStatus).FirstOrDefaultAsync(r => r.Id == id);
+
+            return reservation;
+        }
+
+        public Task UpdateReservationAsync(Reservation reservation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteReservationAsync(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

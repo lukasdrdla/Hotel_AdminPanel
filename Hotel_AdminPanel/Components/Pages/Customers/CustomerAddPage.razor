@@ -1,4 +1,4 @@
-﻿@page "/customer/add"
+﻿@page "/pridat-zakaznika"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 
@@ -51,7 +51,7 @@
 
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-primary">Přidat</button>
-                    <a href="/customers" class="btn btn-outline-secondary ml-2">Zpět na seznam</a>
+                    <a href="/zakaznici" class="btn btn-outline-secondary ml-2">Zpět na seznam</a>
                 </div>
             </EditForm>
         </div>
@@ -65,6 +65,6 @@
     private async Task HandleValidSubmit()
     {
         await CustomerService.CreateCustomerAsync(customer);
-        NavigationManager.NavigateTo("/customers");
+        NavigationManager.NavigateTo("/zakaznici");
     }
 }

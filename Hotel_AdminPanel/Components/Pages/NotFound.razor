@@ -1,0 +1,42 @@
+﻿@page "/Error/{statusCode:int}"
+
+<div class="container-fluid min-vh-100 d-flex flex-column justify-content-between">
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <h1 class="display-1 text-danger fw-bold">@statusCode</h1>
+            <h3 class="text-muted">Not Found</h3>
+        </div>
+    </div>
+
+    <div class="row align-items-center justify-content-center flex-grow-1">
+        <div class="col-md-6 col-sm-8 text-center">
+            <h2 class="display-4 mb-4">@GetErrorMessage()</h2>
+            <p class="lead mb-5">Omlouváme se, ale stránka, kterou hledáte, neexistuje nebo došlo k neočekávané chybě.</p>
+            <a href="/" class="btn btn-lg btn-outline-primary">
+                <i class="fas fa-home"></i> Zpět na domovskou stránku
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 text-center mb-3">
+            <small class="text-muted">&copy; 2024 Tvůj Web</small>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int statusCode { get; set; }
+
+    private string GetErrorMessage()
+    {
+        return statusCode switch
+        {
+            404 => "Stránka nenalezena",
+            500 => "Interní chyba serveru",
+            403 => "Přístup odepřen",
+            _ => "Došlo k neočekávané chybě"
+        };
+    }
+}

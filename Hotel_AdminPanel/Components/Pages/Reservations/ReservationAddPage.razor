@@ -3,6 +3,7 @@
 @inject NavigationManager NavigationManager
 @inject IRoomService RoomService
 @inject ICustomerService CustomerService
+@inject IReservationService ReservationService
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
@@ -17,7 +18,7 @@
                 <div class="form-group mb-3">
                     <label for="CustomerId" class="form-label">Zákazník</label>
                     <InputSelect id="CustomerId" class="form-control" @bind-Value="reservation.CustomerId">
-                        <option value="">Vyber zákazníka</option> <!-- Placeholder option -->
+                        <option value="">Vyber zákazníka</option>
                         @foreach (var customer in customers)
                         {
                             <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
@@ -29,7 +30,7 @@
                 <div class="form-group mb-3">
                     <label for="RoomId" class="form-label">Pokoj</label>
                     <select id="RoomId" class="form-control" @onchange="OnRoomSelected" >
-                        <option value="">Vyber pokoj</option> <!-- Placeholder option -->
+                        <option value="">Vyber pokoj</option>
                         @foreach (var room in rooms)
                         {
                             <option value="@room.Id">@room.RoomNumber - @room.RoomType.Type</option>
@@ -87,12 +88,9 @@
                     </select>
                 </div>
 
-
-
                 <div class="form-group mb-3">
                     <label for="ReservationStatusId" class="form-label">Status</label>
                     <InputSelect id="ReservationStatusId" class="form-control" @bind-Value="reservation.ReservationStatusId">
-                        <option value="">Vyber status</option> <!-- Placeholder option -->
                         @foreach (var reservationStatus in reservationStatuses)
                         {
                             <option value="@reservationStatus.Id">@reservationStatus.RStatus</option>
@@ -108,19 +106,12 @@
 
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-primary">Přidat</button>
-                    <a href="/reservations" class="btn btn-outline-secondary ml-2">Zpět na seznam</a>
+                    <a href="/rezervace" class="btn btn-outline-secondary ml-2">Zpět na seznam</a>
                 </div>
-
-                
-
-
-
-                
             </EditForm>
         </div>
     </div>
 </div>
-
 
 
 
@@ -145,7 +136,6 @@
 
         mealPlans = await ReservationService.GetMealPlansAsync();
         reservationStatuses = await ReservationService.GetReservationStatusesAsync();
-
 
     }
 
@@ -227,13 +217,24 @@
         selectedRoom = rooms.FirstOrDefault(room => room.Id == roomId);
 
 
+
         CalculateTotalPrice();
     }
 
     private async Task HandleValidSubmit()
     {
 
+        var isRoomAvailable = await ReservationService.IsRoomAvailableAsync(reservation.RoomId, reservation.CheckIn, reservation.CheckOut);
+        if (!isRoomAvailable)
+        {
+            // Zde můžeme zobrazit chybovou zprávu
+            await JSRuntime.InvokeVoidAsync("alert", "Pokoj je již rezervovaný v tomto období.");
+            return; // Zastavíme proces vytváření rezervace
+        }
         await ReservationService.CreateReservationAsync(reservation);
-        NavigationManager.NavigateTo("/reservations");
+
+        await RoomService.UpdateRoomStatusAsync(reservation.RoomId, 2);
+
+        NavigationManager.NavigateTo("/rezervace");
     }
 }

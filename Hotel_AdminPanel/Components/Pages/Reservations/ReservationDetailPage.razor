@@ -1,0 +1,83 @@
+﻿@page "/reservation/{id:int}"
+@inject IReservationService ReservationService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-2">
+    @if (reservation == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <p class="mt-2">Loading reservation details...</p>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4 page-title">Upravit Rezervaci</h3>
+                <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit" FormName="EditReservation">
+                    <div class="mb-3">
+                        <label for="room" class="form-label">Pokoj</label>
+                        <InputNumber id="room" class="form-control" @bind-Value="reservation.RoomId" />
+                    </div>
+@* 
+                    <div class="mb-3">
+                        <label for="customer" class="form-label">Zákazník</label>
+                        <InputText id="customer" class="form-control" @bind-Value="reservation.Customer.FirstName" />
+                    </div> *@
+
+                    <div class="mb-3">
+                        <label for="checkIn" class="form-label">Datum příjezdu</label>
+                        <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="checkOut" class="form-label">Datum odjezdu</label>
+                        <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Cena</label>
+                        <InputNumber id="price" class="form-control" @bind-Value="reservation.TotalPrice" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <InputSelect id="status" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                            @foreach (var status in reservationStatuses)
+                            {
+                                <option value="@status.Id">@status.RStatus</option>
+                            }
+                        </InputSelect>
+                    </div>
+                </EditForm>
+             </div>
+        </div>
+    }
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Reservation reservation { get; set; } = new Reservation();
+
+    private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        reservation = await ReservationService.GetReservationByIdAsync(Id);
+        reservationStatuses = await ReservationService.GetReservationStatusesAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ReservationService.UpdateReservationAsync(reservation);
+        NavigationManager.NavigateTo("/reservations");
+    }
+}

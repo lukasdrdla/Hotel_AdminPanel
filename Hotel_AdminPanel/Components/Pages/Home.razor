@@ -4,7 +4,11 @@
 @inject ICustomerService CustomerService
 @inject IReservationService ReservationService
 
+
 <PageTitle>Dashboard - Hotel Management</PageTitle>
+
+
+
 
 <div class="container-fluid mt-4">
     <h1 class="h2 mb-4">Dashboard</h1>
@@ -190,8 +194,10 @@
     private decimal TotalRevenue;
 
 
+
     protected override async Task OnInitializedAsync()
     {
+
         TotalCustomers = (await CustomerService.GetCustomersAsync()).Count;
         TotalReservations = (await ReservationService.GetReservationsAsync()).Count;
         TotalRooms = (await RoomService.GetRooomsAsync()).Count;

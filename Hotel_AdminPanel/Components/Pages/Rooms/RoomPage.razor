@@ -1,53 +1,27 @@
-﻿@page "/rooms"
+﻿@page "/pokoje"
 @inject IRoomService RoomService
+@inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 
-<style>
-    /* Styl pro tečku */
-    .status-dot {
-        display: inline-block;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        margin-right: 10px;
-        vertical-align: middle;
-    }
 
-    .available {
-        background-color: green;
-    }
-
-    .occupied {
-        background-color: red;
-    }
-
-</style>
 
 <div class="container mt-5">
     <h3 class="text-center mb-4 page-title">Pokoje</h3>
     <div class="d-flex justify-content-end mb-3">
-        
         <button class="btn btn-primary" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Přidat Pokoj</button>
-
     </div>
-
-
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Vyhledat..."
-               @bind="searchTerm" @oninput="SearchRooms" aria-label="Search rooms..." aria-describedby="button-search">
+        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchRooms">
     </div>
-
-
-
     @if (rooms == null)
     {
         <div class="text-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only"></span>
             </div>
-            <p class="mt-2">Loading rooms...</p>
+            <p class="mt-2">Načítám pokoje...</p>
         </div>
     }
     else
@@ -56,8 +30,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>
-                        </th>
+                        <th></th>
                         <th>Číslo Pokoje</th>
                         <th>Typ Pokoje</th>
                         <th>Status</th>
@@ -80,13 +53,9 @@
                     @foreach (var room in filteredRooms)
                     {
                         <tr @onclick="() => NavigateToRoomDetail(room.Id)" style="cursor:pointer;">
-                            <td>
-                                <span class="status-dot @room.RoomStatus.Status.ToLower()"></span>
-                            </td>
+                            <td></td>
                             <td>@room.RoomNumber</td>
-                            <td>
-                                @room.RoomType.Type
-                            </td>
+                            <td>@room.RoomType.Type</td>
                             <td>@room.RoomStatus.Status</td>
                             <td>@room.Price.ToString("C")</td>
                             <td>@room.MaxChildren</td>
@@ -94,7 +63,7 @@
                             <td>
                                 @if (room.Description.Length < 1)
                                 {
-                                    <span class="text-muted">No description</span>
+                                    <span class="text-muted">Bez popisku</span>
                                 }
                                 else
                                 {
@@ -109,18 +78,22 @@
     }
 </div>
 
+
+
 @code {
 
     private ICollection<Room> rooms;
     private string searchTerm;
     private ICollection<Room> filteredRooms;
-    
+    private bool isAvailable;
+
 
 
     protected override async Task OnInitializedAsync()
     {
         rooms = await RoomService.GetRooomsAsync();
         filteredRooms = rooms;
+
 
     }
 
@@ -144,9 +117,6 @@
         }
     }
 
-
-
-
     private void FiltreByPriceUp()
     {
         filteredRooms = rooms.OrderBy(r => r.Price).ToList();
@@ -158,16 +128,14 @@
     }
 
 
-
-
     private void NavigateToRoomDetail(int id)
     {
-        NavigationManager.NavigateTo($"/room/{id}");
+        NavigationManager.NavigateTo($"/pokoj/{id}");
     }
 
     private void NavigateToAddRoom()
     {
-        NavigationManager.NavigateTo("/room/add");
+        NavigationManager.NavigateTo("/pridat-pokoj");
     }
 
 

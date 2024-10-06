@@ -1,19 +1,15 @@
-﻿@page "/room/add"
+﻿@page "/pridat-pokoj"
 @inject IRoomService RoomService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-
-//javascript tag
-
 
 <div class="container mt-2">
     <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
         <div class="card-body">
             <h3 class="card-title text-center mb-4 page-title">Přidat Pokoj</h3>
-            <EditForm Model="room" OnValidSubmit="HandleValidSubmit">
+            <EditForm Model="room" OnValidSubmit="HandleValidSubmit" FormName="AddRoom">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                @* RoomNumber . Room type . Room statusId . Price. Img. Max Adults. Max Childrens. Description *@
 
                 <div class="form-group mb-3">
                     <label for="RoomImg" class="form-label">Obrázek</label>
@@ -67,15 +63,10 @@
                     <InputTextArea id="Description" class="form-control" @bind-Value="room.Description" />
                 </div>
 
-
-
-
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-primary">Uložit</button>
-                    <a href="/rooms" class="btn btn-outline-secondary">Zpět na seznam</a>
+                    <a href="/pokoje" class="btn btn-outline-secondary">Zpět na seznam</a>
                 </div>
-
-
             </EditForm>
         </div>
     </div>
@@ -85,7 +76,8 @@
 
 
 @code {
-    private Room room = new Room();
+    [SupplyParameterFromForm]
+    private Room room { get; set; } = new Room();
 
     private List<RoomType> roomTypes = new List<RoomType>();
     private List<RoomStatus> roomStatuses = new List<RoomStatus>();
@@ -100,7 +92,7 @@
     private async void HandleValidSubmit()
     {
 
-        RoomService.CreateRoomAsync(room);
-        NavigationManager.NavigateTo("/rooms");
+        await RoomService.CreateRoomAsync(room);
+        NavigationManager.NavigateTo("/pokoje");
     }
 }

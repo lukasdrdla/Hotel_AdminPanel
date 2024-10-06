@@ -7,6 +7,5 @@ namespace Hotel_AdminPanel.Models
     public class AppUser : IdentityUser
     {
 
-
     }
 }

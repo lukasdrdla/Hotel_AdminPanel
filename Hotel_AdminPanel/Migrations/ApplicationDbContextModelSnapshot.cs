@@ -97,38 +97,31 @@ namespace Hotel_AdminPanel.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PostalCode")
                         .IsRequired()
@@ -146,6 +139,10 @@ namespace Hotel_AdminPanel.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AppUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -165,65 +162,9 @@ namespace Hotel_AdminPanel.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees");
+                    b.HasIndex("AppUserId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "j.novak@hoap.com",
-                            FirstName = "Jan",
-                            Image = "",
-                            Surname = "Novák"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "p.svoboda@hoap.com",
-                            FirstName = "Petr",
-                            Image = "",
-                            Surname = "Svoboda"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "m.kovarova@hoap.com",
-                            FirstName = "Martina",
-                            Image = "",
-                            Surname = "Kovářová"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Email = "t.dvorak@hoap.com",
-                            FirstName = "Tomáš",
-                            Image = "",
-                            Surname = "Dvořák"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Email = "a.vesela@hoap.com",
-                            FirstName = "Alena",
-                            Image = "",
-                            Surname = "Veselá"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Email = "l.kralova@hoap.com",
-                            FirstName = "Lucie",
-                            Image = "",
-                            Surname = "Králová"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Email = "j.benes@hoap.com",
-                            FirstName = "Jiří",
-                            Image = "",
-                            Surname = "Beneš"
-                        });
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Models.MealPlan", b =>
@@ -690,6 +631,17 @@ namespace Hotel_AdminPanel.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Models.Employee", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Models.Reservation", b =>

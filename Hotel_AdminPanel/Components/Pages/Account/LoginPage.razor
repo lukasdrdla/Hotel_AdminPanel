@@ -1,0 +1,45 @@
+﻿@page "/login"
+@inject IAccountService AccountService
+@inject NavigationManager NavigationManager
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="card-body">
+            <h3 class="card-title">
+                Přihlášení
+            </h3>
+            <EditForm Model="loginModel" OnValidSubmit="HandleValidSubmit" FormName="login">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label for="Email">Email</label>
+                    <InputText id="Email" class="form-control" @bind-Value="loginModel.Email" />
+                    <ValidationMessage For="@(() => loginModel.Email)" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <InputText id="Password" class="form-control" @bind-Value="loginModel.Password" />
+                    <ValidationMessage For="@(() => loginModel.Password)" />
+                </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </EditForm>
+        </div>
+</div>
+</div>
+@code {
+    [SupplyParameterFromForm]
+    private LoginViewModel loginModel { get; set; } = new LoginViewModel();
+
+    private async Task HandleValidSubmit()
+    {
+        var result = await AccountService.LoginAsync(loginModel);
+        if (result.Succeeded)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}
