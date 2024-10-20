@@ -1,0 +1,66 @@
+﻿@page "/muj-profil"
+@inject IAccountService AccountService
+@rendermode InteractiveServer
+
+<h3 class="text-center">Můj Profil</h3>
+
+<div class="container">
+    @if (userProfileModel == null)
+    {
+        <p>Načítání...</p>
+    }
+    else
+    {
+        <EditForm Model="@userProfileModel" OnValidSubmit="@HandleValidSubmit" FormName="EditUser">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="userName">Uživatelské jméno</label>
+                <InputText id="userName" class="form-control" @bind-Value="userProfileModel.UserName" />
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <InputText id="email" class="form-control" @bind-Value="userProfileModel.Email" disabled />
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Telefonní číslo</label>
+                <InputText id="phoneNumber" class="form-control" @bind-Value="userProfileModel.PhoneNumber" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Aktualizovat profil</button>
+
+            @if (updateResult != null)
+            {
+                <div class="alert @(updateResult.Succeeded ? "alert-success" : "alert-danger") mt-3">
+                    @(updateResult.Succeeded ? "Profil byl úspěšně aktualizován!" : "Chyba při aktualizaci profilu.")
+                </div>
+            }
+        </EditForm>
+
+
+
+        
+    }
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private AppUser userProfileModel { get; set; } = new AppUser();
+    private IdentityResult updateResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userProfileModel = await AccountService.GetCurrentUserAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Získání výsledku aktualizace a přiřazení do updateResult
+        updateResult = await AccountService.UpdateUserProfileAsync(userProfileModel);
+    }
+
+
+}

@@ -1,0 +1,27 @@
+﻿@page "/test-page"
+
+<h3>Dropdowny</h3>
+
+<DropdownMenu ButtonText="Rezervace" Links="reservationLinks" @rendermode="InteractiveServer" />
+<DropdownMenu ButtonText="Zákazníci" Links="customerLinks" @rendermode="InteractiveServer" />
+<DropdownMenu ButtonText="Nastavení" Links="settingsLinks" @rendermode="InteractiveServer" />
+
+@code {
+    private List<DropdownLink> reservationLinks = new()
+    {
+        new DropdownLink("Vytvořit Rezervaci", "/rezervace/vytvorit"),
+        new DropdownLink("Správa Rezervací", "/rezervace/sprava")
+    };
+
+    private List<DropdownLink> customerLinks = new()
+    {
+        new DropdownLink("Přidat Zákazníka", "/zakaznik/vytvorit"),
+        new DropdownLink("Správa Zákazníků", "/zakaznik/sprava")
+    };
+
+    private List<DropdownLink> settingsLinks = new()
+    {
+        new DropdownLink("Obecná Nastavení", "/nastaveni/obecna"),
+        new DropdownLink("Nastavení Uživatelů", "/nastaveni/uzivatele")
+    };
+}

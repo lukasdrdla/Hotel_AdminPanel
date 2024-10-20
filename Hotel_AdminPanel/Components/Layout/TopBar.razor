@@ -1,0 +1,14 @@
+﻿
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <DropdownMenu Icon="bi bi-gear" ButtonText="" Color="btn-primary" Links="settingsLinks" @rendermode="InteractiveServer" />
+ </div>
+ </nav>
+
+@code {
+    private List<DropdownLink> settingsLinks = new()
+    {
+        new DropdownLink("nastaveni-rezervace", "Nastavení rezervací"),
+        new DropdownLink("nastaveni-pokoju", "Nastavení pokojů")
+    };
+}

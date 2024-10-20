@@ -1,8 +1,9 @@
 ﻿@page "/zakaznici"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-
+@attribute [Authorize]
 
 <div class="container mt-5">
     <h3 class="text-center mb-4 page-title">Zákazníci</h3>
@@ -17,7 +18,7 @@
     </div>
 
 
-    @if (customers == null)
+    @if (customers == null || customers.Count == 0)
     {
         <div class="text-center">
             <div class="spinner-border text-primary" role="status">
@@ -32,31 +33,68 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Jméno</th>
-                        <th>Přijmení</th>
-                        <th>Email</th>
-                        <th>Telefon</th>
-                        <th>Adresa</th>
-                        <th>Město</th>
-                        <th>Země</th>
-                        <th>PSČ</th>
+                        <th scope="col">Jméno</th>
+                        <th scope="col">Přijmení</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Telefon</th>
+                        <th scope="col">Adresa</th>
+                        <th scope="col">Město</th>
+                        <th scope="col">PSČ</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var customer in filteredCustomers)
                     {
-                        <tr @onclick="() => NavigateToCustomerDetail(customer.Id)" style="cursor:pointer;">
-                            <td>@customer.FirstName</td>
-                            <td>@customer.LastName</td>
-                            <td>@customer.Email</td>
-                            <td>@customer.Phone</td>
-                            <td>@customer.Address</td>
-                            <td>@customer.City</td>
-                            <td>@customer.Country</td>
-                            <td>@customer.PostalCode</td>
+                        <tr>
+                            @if (editCustomerId == customer.Id)
+                            {
+                                <!-- Inputy pro úpravu zákazníka -->
+                                <td><input @bind="customer.FirstName" class="form-control" /></td>
+                                <td><input @bind="customer.LastName" class="form-control" /></td>
+                                <td><input @bind="customer.Email" class="form-control" /></td>
+                                <td><input @bind="customer.Phone" class="form-control" /></td>
+                                <td><input @bind="customer.Address" class="form-control" /></td>
+                                <td><input @bind="customer.City" class="form-control" /></td>
+                                <td><input @bind="customer.PostalCode" class="form-control" /></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" @onclick="() => SaveCustomer(customer)">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" @onclick="CancelEdit">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </td>
+                            }
+                            else
+                            {
+                                <!-- Zobrazení zákazníka -->
+                                <td>@customer.FirstName</td>
+                                <td>@customer.LastName</td>
+                                <td>@customer.Email</td>
+                                <td>@customer.Phone</td>
+                                <td>@customer.Address</td>
+                                <td>@customer.City</td>
+                                <td>@customer.PostalCode</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" @onclick="() => EditCustomer(customer.Id)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(customer.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+
+                                    <button class="btn btn-success btn-sm" @onclick="() => NavigateToCustomerDetail(customer.Id)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+
+                            }
                         </tr>
                     }
                 </tbody>
+
             </table>
         </div>
     }
@@ -67,7 +105,44 @@
     private string searchTerm;
     private List<Customer> filteredCustomers;
 
+    private int? editCustomerId = null;
 
+
+    private void EditCustomer(int id)
+    {
+        editCustomerId = id;
+    }
+
+    private void CancelEdit()
+    {
+        editCustomerId = null;
+    }
+
+    private async Task SaveCustomer(Customer customer)
+    {
+        await CustomerService.UpdateCustomerAsync(customer);
+        editCustomerId = null;
+    }
+
+    private async Task DeleteCustomer (int id)
+    {
+
+        var customer = customers.FirstOrDefault(c => c.Id == id);
+
+        if (customer != null)
+        {
+            var result = await JSRuntime.InvokeAsync<bool>("confirm", $"Opravdu chcete smazat zákazníka {customer.FirstName} {customer.LastName}?");
+
+            if (result == true)
+            {
+                await CustomerService.DeleteCustomerAsync(id);
+
+                customers = await CustomerService.GetCustomersAsync();
+                filteredCustomers = customers;
+            }
+        }
+        
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,0 +1,15 @@
+﻿@page "/odhlasit"
+@inject IAccountService AccountService
+@inject NavigationManager NavigationManager
+
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AccountService.LogoutAsync();
+        NavigationManager.NavigateTo("/");
+    }
+
+}

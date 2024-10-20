@@ -122,10 +122,11 @@
     {
         return status switch
         {
-            "Rezervováno" => "text-warning",
-            "CheckedIn" => "text-primary",
-            "Dokončeno" => "text-success",
-            "Zrušeno" => "text-danger",
+            "Čekající" => "text-warning",
+            "Potvrzená" => "text-primary",
+            "Dokončená" => "text-success",
+            "Zrušená" => "text-danger",
+            "Odmítnutá" => "text-danger",
             _ => "badge badge-info"
         };
     }

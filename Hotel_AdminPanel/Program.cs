@@ -1,10 +1,9 @@
 using Blazored.LocalStorage;
+using Hotel_AdminPanel.Application.Interfaces;
+using Hotel_AdminPanel.Application.Services;
 using Hotel_AdminPanel.Components;
-using Hotel_AdminPanel.Data;
-using Hotel_AdminPanel.Models;
-using Hotel_AdminPanel.Services;
-using Hotel_AdminPanel.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Hotel_AdminPanel.Domain.Entities;
+using Hotel_AdminPanel.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,17 +16,28 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie();
+
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.LoginPath = "/Login";
+    options.AccessDeniedPath = "/AccessDenied";
+    options.SlidingExpiration = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
 
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+
 
 builder.Services.AddBlazoredLocalStorage();
 
@@ -48,9 +58,8 @@ app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-
-app.UseAuthentication(); // Pøidejte tuto øádku
-app.UseAuthorization();  // Pøidejte tuto øádku
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

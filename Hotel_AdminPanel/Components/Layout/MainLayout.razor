@@ -1,37 +1,16 @@
 ﻿@using Blazored.LocalStorage
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ILocalStorageService LocalStorage
+@inject IAccountService AccountService
 
 
-<style>
-    .dark-theme {
-        background-color: #2c3e50;
-        color: #ffffff;
-    }
-
-    .light-theme {
-        background-color: white;
-        color: #000000;
-    }
-</style>
-
-<div class="page @(selectedTheme == "dark" ? "dark-theme" : "light-theme")">
+<div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
 
     <main>
-        <div class="alert alert-primary" role="alert">
-            Aplikace se nachází ve vývoji. Některé funkce nemusí být dostupné
-            @if (isAuthenticated)
-            {
-                <div class="user-info d-flex align-items-center">
-                    <span class="font-weight-bold me-2">Přihlášený uživatel:</span>
-                    <span class="user-name badge bg-secondary">@userName</span>
-                </div>
-            }
-        </div>
+        <TopBar @rendermode="InteractiveServer" />
         <article class="content px-4">
             @Body
         </article>
@@ -44,11 +23,24 @@
     <a class="dismiss">🗙</a>
 </div>
 
+<style>
+    .user-info {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .user-name {
+        font-weight: bold;
+        color: #222;
+    }
+
+</style>
 
 @code {
     private string userName;
     private bool isAuthenticated;
-    private string selectedTheme = "light";
 
 
     protected override async Task OnInitializedAsync()
@@ -59,13 +51,6 @@
 
         isAuthenticated = user.Identity.IsAuthenticated;
         userName = isAuthenticated ? user.Identity.Name : string.Empty;
-
-        var storedTheme = await LocalStorage.GetItemAsync<string>("theme");
-        if (storedTheme != null)
-        {
-            selectedTheme = storedTheme;
-        }
-
 
 
     }

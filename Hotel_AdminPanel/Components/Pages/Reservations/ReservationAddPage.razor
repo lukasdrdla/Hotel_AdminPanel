@@ -5,6 +5,9 @@
 @inject ICustomerService CustomerService
 @inject IReservationService ReservationService
 @inject IJSRuntime JSRuntime
+@attribute [Authorize]
+
+
 @rendermode InteractiveServer
 
 <div class="container mt-2">
@@ -16,16 +19,23 @@
                 <ValidationSummary />
 
                 <div class="form-group mb-3">
-                    <label for="CustomerId" class="form-label">Zákazník</label>
-                    <InputSelect id="CustomerId" class="form-control" @bind-Value="reservation.CustomerId">
-                        <option value="">Vyber zákazníka</option>
-                        @foreach (var customer in customers)
-                        {
-                            <option value="@customer.Id">@customer.FirstName @customer.LastName</option>
-                        }
-                    </InputSelect>
+                    <div class="form-group mb-3">
+                        <label for="CustomerId" class="form-label">Zákazník</label>
+                        <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @oninput="OnInputChange" />
 
-                </div>
+                        @if (filteredCustomers != null && filteredCustomers.Any())
+                        {
+                            <ul class="list-group mt-2">
+                                @foreach (var customer in filteredCustomers)
+                                {
+                                    <li class="list-group-item" @onclick="() => SelectCustomer(customer)">
+                                        @customer.FirstName @customer.LastName - @customer.Email - @customer.City @customer.Address - @customer.DocumentNumber
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    </div>
 
                 <div class="form-group mb-3">
                     <label for="RoomId" class="form-label">Pokoj</label>
@@ -74,11 +84,13 @@
                     <InputNumber id="Total" class="form-control" @bind-Value="reservation.TotalPrice" />
                 </div>
 
+
              
 
                 <div class="form-group mb-3">
                     <label for="MealPlanId" class="form-label">Stravování</label>
                     <select id="MealPlanId" class="form-control" @onchange="OnMealSelect">
+                        <option value="">Vyber stravování</option>
                         @foreach (var mealPlan in mealPlans)
                         {
                             <option value="@mealPlan.Id">@mealPlan.Plan</option>
@@ -91,6 +103,7 @@
                 <div class="form-group mb-3">
                     <label for="ReservationStatusId" class="form-label">Status</label>
                     <InputSelect id="ReservationStatusId" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                        <option value="">Vyber status</option>
                         @foreach (var reservationStatus in reservationStatuses)
                         {
                             <option value="@reservationStatus.Id">@reservationStatus.RStatus</option>
@@ -114,12 +127,11 @@
 </div>
 
 
-
-
-
 @code {
     private Reservation reservation = new Reservation();
     private List<Customer> customers = new List<Customer>();
+    private List<Customer> filteredCustomers = new List<Customer>();
+    private string? searchTerm;
     private ICollection<Room> rooms = new List<Room>();
     private Room selectedRoom;
     private List<MealPlan> mealPlans = new List<MealPlan>();
@@ -132,6 +144,7 @@
         reservation.CheckIn = DateTime.Now;
         reservation.CheckOut = DateTime.Now.AddDays(1);
         customers = await CustomerService.GetCustomersAsync();
+        filteredCustomers = new List<Customer>();
         rooms = await RoomService.GetRooomsAsync();
 
         mealPlans = await ReservationService.GetMealPlansAsync();
@@ -139,18 +152,56 @@
 
     }
 
+    private void OnInputChange(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        FilterCustomers();
+        StateHasChanged();
+    }
+
+    private void FilterCustomers()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredCustomers = new List<Customer>();
+        }
+        else
+        {
+            filteredCustomers = customers
+                .Where(c => c.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                             c.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                             c.FirstName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                             c.LastName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase)
+                )
+                .ToList();
+        }
+    }
+
+    private void SelectCustomer(Customer customer)
+    {
+        reservation.CustomerId = customer.Id;
+        searchTerm = $"{customer.FirstName} {customer.LastName}";
+        filteredCustomers = new List<Customer>();
+    }
+
     private void CalculateTotalPrice()
     {
-        if (selectedRoom != null)
+        if (selectedRoom == null || reservation.CheckIn >= reservation.CheckOut)
         {
-            numberOfNights = (int)(reservation.CheckOut - reservation.CheckIn).TotalDays;
-            reservation.TotalPrice = selectedRoom.Price * numberOfNights;
-
-            if (reservation.MealPlan != null)
-            {
-                reservation.TotalPrice += (reservation.MealPlan.Price * reservation.Adults) + ((reservation.MealPlan.Price / 2) * reservation.Children);
-            }
+            reservation.TotalPrice = 0;
+            return;
         }
+
+        numberOfNights = (int)(reservation.CheckOut - reservation.CheckIn).TotalDays;
+        reservation.TotalPrice = selectedRoom.Price * numberOfNights;
+
+        if (reservation.MealPlan != null)
+        {
+            reservation.TotalPrice +=
+                (reservation.MealPlan.Price * reservation.Adults) +
+                ((reservation.MealPlan.Price / 2) * reservation.Children);
+        }
+
     }
 
     private void OnAdultsSelect(ChangeEventArgs e)
@@ -216,10 +267,9 @@
         var roomId = int.Parse(e.Value.ToString());
         selectedRoom = rooms.FirstOrDefault(room => room.Id == roomId);
 
-
-
         CalculateTotalPrice();
     }
+
 
     private async Task HandleValidSubmit()
     {

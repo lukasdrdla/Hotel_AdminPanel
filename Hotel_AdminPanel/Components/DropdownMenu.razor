@@ -1,0 +1,47 @@
+﻿@code {
+    [Parameter] public string ButtonText { get; set; } = "Dropdown";
+    [Parameter] public string Color { get; set; } = "btn-secondary"; // Tady nastavujeme barvu tlačítka
+    //ikonku z bi -bootstrapu
+    [Parameter] public string Icon { get; set; } = "bi bi-list";
+    [Parameter] public List<DropdownLink> Links { get; set; } = new();
+    private bool isDropdownOpen = false;
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
+
+    private string GetDropdownClass()
+    {
+        return isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
+    }
+
+    public class DropdownLink
+    {
+        public string Href { get; set; }
+        public string Text { get; set; }
+
+        public DropdownLink(string href, string text)
+        {
+            Href = href;
+            Text = text;
+        }
+    }
+
+
+}
+
+<div class="dropdown px-3">
+    <button class="btn @Color dropdown-toggle" type="button"
+            @onclick="ToggleDropdown" aria-expanded="@isDropdownOpen">
+            <i class="@Icon"></i>
+        @ButtonText
+    </button>
+
+    <ul class="@GetDropdownClass()" aria-labelledby="dropdownMenuButton">
+        @foreach (var link in Links)
+        {
+            <li><NavLink class="dropdown-item" href="@link.Href">@link.Text</NavLink></li>
+        }
+    </ul>
+</div>

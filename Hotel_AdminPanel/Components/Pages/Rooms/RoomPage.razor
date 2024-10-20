@@ -1,6 +1,7 @@
 ﻿@page "/pokoje"
 @inject IRoomService RoomService
 @inject IReservationService ReservationService
+@inject IJSRuntime jsRuntime
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -9,13 +10,15 @@
 
 <div class="container mt-5">
     <h3 class="text-center mb-4 page-title">Pokoje</h3>
+
     <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Přidat Pokoj</button>
+        <button class="btn btn-primary me-3" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Přidat Pokoj</button>
+        <button class="btn btn-primary" @onclick="NavigateToSettingRoomPage" style="justify-content:flex-end;"><i class="bi bi-gear"></i></button>
     </div>
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchRooms">
     </div>
-    @if (rooms == null)
+    @if (rooms == null || rooms.Count == 0)
     {
         <div class="text-center">
             <div class="spinner-border text-primary" role="status">
@@ -30,30 +33,62 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col">Číslo Pokoje</th>
+                        <th scope="col">Typ Pokoje</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Cena</th>
+                        <th scope="col">Děti</th>
+                        <th scope="col">Dospělí</th>
                         <th></th>
-                        <th>Číslo Pokoje</th>
-                        <th>Typ Pokoje</th>
-                        <th>Status</th>
-                        <th>
-                            Cena
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-up" viewBox="0 0 16 16" @onclick="FiltreByPriceUp" style="cursor:pointer;">
-                                <path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5" />
-                            </svg>
-
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down" viewBox="0 0 16 16" @onclick="FiltreByPriceDown" style="cursor:pointer;">
-                                <path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1" />
-                            </svg>
-                        </th>
-                        <th>Max Dětí</th>
-                        <th>Max Dospělích</th>
-                        <th>Popis</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var room in filteredRooms)
                     {
-                        <tr @onclick="() => NavigateToRoomDetail(room.Id)" style="cursor:pointer;">
-                            <td></td>
+
+
+                        <tr>
+                            @if(editRoomId == room.Id)
+                            {
+                                <td><input @bind="room.RoomNumber" class="form-control" /></td>
+                                <td>
+                                    
+                                    <InputSelect @bind-Value="room.RoomTypeId" class="form-control">
+                                        @foreach (var roomType in RoomTypes)
+                                        {
+                                            <option value="@roomType.Id">@roomType.Type</option>
+                                        }
+                                    </InputSelect>
+                                </td>
+                                <td>
+
+                                    <InputSelect @bind-Value="room.RoomStatusId" class="form-control">
+                                        @foreach (var roomStatus in RoomStatuses)
+                                        {
+                                            <option value="@roomStatus.Id">@roomStatus.Status</option>
+                                        }
+                                    </InputSelect>
+                                    
+                                </td>
+                                <td><input @bind="room.Price" class="form-control" /></td>
+                                <td><input @bind="room.MaxChildren" class="form-control" /></td>
+                                <td><input @bind="room.MaxAdults" class="form-control" /></td>
+                                <td>
+                                    <button class="btn btn-success btn-sm" @onclick="() => SaveRoom(room)">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" @onclick="CancelEdit">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </td>
+                            }
+ 
+                            else
+                            {
+                                
+                            
+
+
                             <td>@room.RoomNumber</td>
                             <td>@room.RoomType.Type</td>
                             <td>@room.RoomStatus.Status</td>
@@ -61,15 +96,22 @@
                             <td>@room.MaxChildren</td>
                             <td>@room.MaxAdults</td>
                             <td>
-                                @if (room.Description.Length < 1)
-                                {
-                                    <span class="text-muted">Bez popisku</span>
-                                }
-                                else
-                                {
-                                    @room.Description
-                                }
+                                <button class="btn btn-primary btn-sm" @onclick="() => EditRoom(room.Id)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteRoom(room.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <button class="btn btn-success btn-sm" @onclick="() => NavigateToRoomDetail(room.Id)">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                    
+
+
+
                             </td>
+                            }
                         </tr>
                     }
                 </tbody>
@@ -84,15 +126,59 @@
 
     private ICollection<Room> rooms;
     private string searchTerm;
+    private List<RoomType> RoomTypes = new List<RoomType>();
+    private List<RoomStatus> RoomStatuses = new List<RoomStatus>();
     private ICollection<Room> filteredRooms;
     private bool isAvailable;
 
 
+    private int? editRoomId;
+
+
+    private void EditRoom(int id)
+    {
+        editRoomId = id;
+    }
+
+    private void CancelEdit()
+    {
+        editRoomId = null;
+    }
+
+    private async Task SaveRoom(Room room)
+    {
+        await RoomService.UpdateRoomAsync(room);
+        editRoomId = null;
+    }
+
+    private void NavigateToSettingRoomPage()
+    {
+        NavigationManager.NavigateTo("/nastaveni-pokoju");
+    }
+
+
+    private async Task DeleteRoom(int id)
+    {
+        var room = rooms.FirstOrDefault(r => r.Id == id);
+        if (room != null)
+        {
+            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat tento pokoj?");
+            if (confirmResult)
+            {
+                await RoomService.DeleteRoomAsync(id);
+                rooms.Remove(room);
+                filteredRooms = rooms;
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         rooms = await RoomService.GetRooomsAsync();
         filteredRooms = rooms;
+
+        RoomTypes = await RoomService.GetRoomTypesAsync();
+        RoomStatuses = await RoomService.GetRoomStatusesAsync();
 
 
     }

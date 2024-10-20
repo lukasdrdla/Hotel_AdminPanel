@@ -1,8 +1,11 @@
 ﻿@page "/zakaznik/{Id:int}"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
+@inject IReservationService ReservationService
+@attribute [Authorize]
 
 @rendermode InteractiveServer
+
 
 <div class="container mt-2">
     @if (customer == null)
@@ -21,6 +24,12 @@
                 <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
 
                 <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="EditCustomer">
+
+                    <div class="mb-3">
+                        <label for="customerId" class="form-label">Číslo Zákazníka</label>
+                        <InputNumber id="customerId" class="form-control" @bind-Value="customer.Id" disabled />
+                    </div>
+
                     <div class="mb-3">
                         <label for="firstName" class="form-label">Jméno</label>
                         <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
@@ -29,6 +38,37 @@
                     <div class="mb-3">
                         <label for="lastName" class="form-label">Příjmení</label>
                         <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                    </div>
+
+                    <div class="mb-3">
+                         <label for="documentNumber" class="form-label">Číslo Dokladu</label>
+                         <InputText id="documentNumber" class="form-control" @bind-Value="customer.DocumentNumber" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="placeOfBirth" class="form-label">Místo Narození</label>
+                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dateOfBirth" class="form-label">Datum Narození</label>
+                        <InputDate id="dateOfBirth" class="form-control" @bind-Value="customer.DateOfBirth" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="dateOfIssue" class="form-label">Datum Vydání (dokladu)</label>
+                        <InputDate id="dateOfIssue" class="form-control" @bind-Value="customer.DateOfIssue" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dateOfExpiry" class="form-label">Datum Expirace (dokladu)</label>
+                        <InputDate id="dateOfExpiry" class="form-control" @bind-Value="customer.DateOfExpiry" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="personalIdentificationNumber" class="form-label">Rodné Číslo</label>
+                        <InputText id="personalIdentificationNumber" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
                     </div>
 
                     <div class="mb-3">
@@ -69,6 +109,40 @@
                 </EditForm>
             </div>
         </div>
+
+
+         <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+
+                <h3 class="card-title">Rezervace</h3>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Číslo Rezervace</th>
+                                <th scope="col">Datum Od</th>
+                                <th scope="col">Datum Do</th>
+                                <th scope="col">Pokoj</th>
+                                <th scope="col">Cena</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reservation in customerReservations)
+                            {
+                                <tr @onclick="() => NavigateToReservationDetail(reservation.Id)" style="cursor:pointer;">
+                                    <td>@reservation.Id</td>
+                                    <td>@reservation.CheckIn.ToShortDateString()</td>
+                                    <td>@reservation.CheckOut.ToShortDateString()</td>
+                                    <td>@reservation.Room.RoomNumber</td>
+                                    <td>@reservation.TotalPrice.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                  </div>
+            </div>
+         </div>
     }
 </div>
 
@@ -79,9 +153,21 @@
     [SupplyParameterFromForm]
     private Customer customer { get; set; } = new Customer();
 
+    private List<Reservation> customerReservations = new List<Reservation>();
+
     protected override async Task OnInitializedAsync()
     {
         customer = await CustomerService.GetCustomerByIdAsync(Id);
+
+        if (customer != null)
+        {
+            customerReservations = await ReservationService.GetReservationsByCustomerIdAsync(Id);
+        }
+    }
+
+    private void NavigateToReservationDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/rezervace/{id}");
     }
 
     private async Task HandleValidSubmit()
