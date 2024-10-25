@@ -1,9 +1,13 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace Hotel_AdminPanel.Domain.Entities
 {
     public class Customer
     {
         public int Id { get; set; }
+        [Required]
+        [StringLength(100)]
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string DocumentNumber { get; set; } = string.Empty;

@@ -1,1 +1,45 @@
 ﻿@page "/zamestnanci"
+@inject IAccountService AccountService
+
+<h3>Zaměstnanci</h3>
+
+@if (pagedEmployees.Count == 0)
+{
+    <p>Nejsou zde žádní zaměstnanci.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Jméno</th>
+                <th>Email</th>
+                <th>Telefon</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in pagedEmployees)
+            {
+                <tr>
+                    <td>@employee.FirstName</td>
+                    <td>@employee.Email</td>
+                    <td>@employee.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+@code {
+    private List<AppUser> employees = new();
+    private List<AppUser> pagedEmployees = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        employees = await AccountService.GetAllUsersAsync();
+    }
+
+
+}

@@ -1,51 +1,66 @@
 ﻿@page "/pridat-zakaznika"
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 @attribute [Authorize]
 
 <div class="container mt-2">
     <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
         <div class="card-body">
-            <h3 class="card-title text-center mb-4 page-title">Přidat Nového Zákazníka</h3>
+            <h3 class="card-title text-center mb-4 page-title">Přidat Rezervaci</h3>
             <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="AddCustomer">
-                <div class="mb-3">
-                    <label for="firstName" class="form-label">Jméno</label>
-                    <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
+
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label">Jméno</label>
+                        <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
+                        <ValidationMessage For="@(() => customer.FirstName)" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label">Přijmení</label>
+                        <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="lastName" class="form-label">Přijmení</label>
-                    <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <InputText id="email" type="email" class="form-control" @bind-Value="customer.Email" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Telefon</label>
+                        <InputText id="phone" class="form-control" @bind-Value="customer.Phone" />
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <InputText id="email" type="email" class="form-control" @bind-Value="customer.Email" />
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="address" class="form-label">Adresa</label>
+                        <InputText id="address" class="form-control" @bind-Value="customer.Address" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Město</label>
+                        <InputText id="city" class="form-control" @bind-Value="customer.City" />
+                    </div>
                 </div>
 
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Telefon</label>
-                    <InputText id="phone" class="form-control" @bind-Value="customer.Phone" />
-                </div>
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="country" class="form-label">Země</label>
+                        <InputText id="country" class="form-control" @bind-Value="customer.Country" />
+                    </div>
 
-                <div class="mb-3">
-                    <label for="address" class="form-label">Adresa</label>
-                    <InputText id="address" class="form-control" @bind-Value="customer.Address" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="city" class="form-label">Město</label>
-                    <InputText id="city" class="form-control" @bind-Value="customer.City" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="country" class="form-label">Země</label>
-                    <InputText id="country" class="form-control" @bind-Value="customer.Country" />
-                </div>
-
-                <div class="mb-3">
-                    <label for="postalCode" class="form-label">PSČ</label>
-                    <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
+                    <div class="col-md-6">
+                        <label for="postalCode" class="form-label">PSČ</label>
+                        <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
+                    </div>
                 </div>
 
                 <div class="text-center mt-4">

@@ -28,7 +28,6 @@ nav {
 
 .navbar-brand {
     font-size: 2rem;
-    color: white;
     font-weight: bold;
     letter-spacing: 0.02rem; 
     transition: color 0.3s ease, transform 0.3s ease;
@@ -44,7 +43,7 @@ nav {
     display: inline-block;
     position: relative;
     width: 1.25rem;
-    height: 1.25rem;
+    height: 1.2rem;
     margin-right: 0.75rem;
     top: -1px;
     background-size: cover;
@@ -63,8 +62,12 @@ nav {
 }
 
 .nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    font-size: 1rem;
+    padding-bottom: 1.2rem;
+}
+
+.nav-item i {
+    padding-bottom: 0.2rem !important;
 }
 
     .nav-item:first-of-type {
@@ -76,25 +79,22 @@ nav {
     }
 
 .nav-item ::deep .nav-link {
-        color: white;
         background: none;
         border: none;
         border-radius: 4px;
-        height: 3rem;
+        height: 2rem;
         display: flex;
         align-items: center;
-        line-height: 3rem;
+        line-height: 1rem;
         width: 100%;
 }
 
     .nav-item ::deep a.active {
-        background-color: rgba(48,123,246,0.8);
-        color: white;
+        color: #5558D8;
     }
 
     .nav-item ::deep .nav-link:hover {
-        background-color: rgba(48,123,246,0.2);
-        color: white;
+        color: #5558D8;
     }
 
 .nav-scrollable {

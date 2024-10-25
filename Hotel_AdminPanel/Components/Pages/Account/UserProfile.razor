@@ -16,6 +16,42 @@
             <ValidationSummary />
 
             <div class="form-group">
+                <label for="ProfilePicture">Profile Picture</label>
+                <InputText id="ProfilePicture" class="form-control" @bind-Value="userProfileModel.ProfilePicture" />
+                <ValidationMessage For="@(() => userProfileModel.ProfilePicture)" />
+            </div>
+
+            <div class="form-group">
+                <label for="FirstName">First Name</label>
+                <InputText id="FirstName" class="form-control" @bind-Value="userProfileModel.FirstName" />
+                <ValidationMessage For="@(() => userProfileModel.FirstName)" />
+            </div>
+
+            <div class="form-group">
+                <label for="LastName">Last Name</label>
+                <InputText id="LastName" class="form-control" @bind-Value="userProfileModel.LastName" />
+                <ValidationMessage For="@(() => userProfileModel.LastName)" />
+            </div>
+
+            <div class="form-group">
+                <label for="PersonalIdentificationNumber">Personal Identification Number</label>
+                <InputText id="PersonalIdentificationNumber" class="form-control" @bind-Value="userProfileModel.PersonalIdentificationNumber" />
+                <ValidationMessage For="@(() => userProfileModel.PersonalIdentificationNumber)" />
+            </div>
+
+            <div class="form-group">
+                <label for="PlaceOfBirth">Place Of Birth</label>
+                <InputText id="PlaceOfBirth" class="form-control" @bind-Value="userProfileModel.PlaceOfBirth" />
+                <ValidationMessage For="@(() => userProfileModel.PlaceOfBirth)" />
+            </div>
+
+            <div class="form-group">
+                <label for="InsuranceCompanyId">Insurance Company</label>
+                <InputNumber id="InsuranceCompanyId" class="form-control" @bind-Value="userProfileModel.InsuranceCompanyId" />
+                <ValidationMessage For="@(() => userProfileModel.InsuranceCompanyId)" />
+            </div>
+
+            <div class="form-group">
                 <label for="userName">Uživatelské jméno</label>
                 <InputText id="userName" class="form-control" @bind-Value="userProfileModel.UserName" />
             </div>

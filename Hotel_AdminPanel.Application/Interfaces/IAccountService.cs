@@ -11,7 +11,8 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<SignInResult> LoginAsync(LoginViewModel model);
         Task LogoutAsync();
         Task<AppUser> GetCurrentUserAsync();
-        Task<IdentityResult> UpdateUserProfileAsync(AppUser model);
+
         Task<List<AppUser>> GetAllUsersAsync();
+        Task<IdentityResult> UpdateUserProfileAsync(AppUser model);
     }
 }

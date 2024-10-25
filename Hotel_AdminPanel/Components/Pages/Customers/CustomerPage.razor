@@ -9,14 +9,12 @@
     <h3 class="text-center mb-4 page-title">Zákazníci</h3>
     <div class="d-flex justify-content-between mb-3">
         <div></div> <!-- Placeholder for alignment -->
-        <button class="btn btn-primary" @onclick="NavigateToAddCustomer">Přidat Zákazníka</button>
+        <button class="btn btn-primary" @onclick="ShowAddCustomerModal">Přidat Zákazníka</button>
     </div>
-
 
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchCustomers">
     </div>
-
 
     @if (customers == null || customers.Count == 0)
     {
@@ -94,11 +92,13 @@
                         </tr>
                     }
                 </tbody>
-
             </table>
         </div>
     }
 </div>
+
+<AddCustomerModal OnCustomerAdded="AddCustomer" isVisible="isAddCustomerModalVisible" OnClose="() => isAddCustomerModalVisible = false" />
+
 
 @code {
     private List<Customer> customers;
@@ -106,7 +106,27 @@
     private List<Customer> filteredCustomers;
 
     private int? editCustomerId = null;
+    private bool isAddCustomerModalVisible = false;
+    private Customer newCustomer = new Customer();
 
+    private void ShowAddCustomerModal()
+    {
+        isAddCustomerModalVisible = true;
+        newCustomer = new Customer(); // Reset new customer
+    }
+
+    private void CloseAddCustomerModal()
+    {
+        isAddCustomerModalVisible = false;
+    }
+
+    private async Task AddCustomer()
+    {
+        await CustomerService.CreateCustomerAsync(newCustomer);
+        customers = await CustomerService.GetCustomersAsync();
+        filteredCustomers = customers;
+        CloseAddCustomerModal();
+    }
 
     private void EditCustomer(int id)
     {
@@ -124,9 +144,8 @@
         editCustomerId = null;
     }
 
-    private async Task DeleteCustomer (int id)
+    private async Task DeleteCustomer(int id)
     {
-
         var customer = customers.FirstOrDefault(c => c.Id == id);
 
         if (customer != null)
@@ -136,12 +155,10 @@
             if (result == true)
             {
                 await CustomerService.DeleteCustomerAsync(id);
-
                 customers = await CustomerService.GetCustomersAsync();
                 filteredCustomers = customers;
             }
         }
-        
     }
 
     protected override async Task OnInitializedAsync()
@@ -172,11 +189,4 @@
     {
         NavigationManager.NavigateTo($"/zakaznik/{id}");
     }
-
-    private void NavigateToAddCustomer()
-    {
-        NavigationManager.NavigateTo("/pridat-zakaznika");
-    }
-
-
 }

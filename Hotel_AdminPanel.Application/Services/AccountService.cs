@@ -124,6 +124,12 @@ namespace Hotel_AdminPanel.Application.Services
                 user.Email = model.Email;
                 user.PhoneNumber = model.PhoneNumber;
                 user.UserName = model.UserName;
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PersonalIdentificationNumber = model.PersonalIdentificationNumber;
+                user.PlaceOfBirth = model.PlaceOfBirth;
+                user.ProfilePicture = model.ProfilePicture;
+                user.InsuranceCompanyId = model.InsuranceCompanyId;
 
                 var updateResult = await _userManager.UpdateAsync(user);
                 return updateResult;

@@ -2,19 +2,17 @@
 @inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAccountService AccountService
-
+@inject NavigationManager NavigationManager
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <TopBar @rendermode="InteractiveServer" />
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+        <main>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
 </div>
 
 <div id="blazor-error-ui">
@@ -41,6 +39,16 @@
 @code {
     private string userName;
     private bool isAuthenticated;
+
+    private bool IsLoginPage => NavigationManager.Uri.Contains("/login");
+
+
+    private List<DropdownMenu.DropdownLink> reservationLinks = new()
+    {
+        new DropdownMenu.DropdownLink("/pridat-rezervaci", "Vytvořit Rezervaci"),
+        new DropdownMenu.DropdownLink("/pridat-zakaznika", "Vytvořit Zakazníka"),
+        new DropdownMenu.DropdownLink("/pridat-pokoj", "Vytvořit Pokoj")
+    };
 
 
     protected override async Task OnInitializedAsync()

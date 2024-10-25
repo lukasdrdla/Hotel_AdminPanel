@@ -29,7 +29,7 @@
     }
     else
     {
-        <div class="table-container">
+        <div class="">
             <table class="table">
                 <thead>
                     <tr>
@@ -116,6 +116,7 @@
                     }
                 </tbody>
             </table>
+
         </div>
     }
 </div>
@@ -130,6 +131,8 @@
     private List<RoomStatus> RoomStatuses = new List<RoomStatus>();
     private ICollection<Room> filteredRooms;
     private bool isAvailable;
+
+
 
 
     private int? editRoomId;
@@ -181,7 +184,11 @@
         RoomStatuses = await RoomService.GetRoomStatusesAsync();
 
 
+
+
     }
+
+
 
     private void SearchRooms(ChangeEventArgs e)
     {
