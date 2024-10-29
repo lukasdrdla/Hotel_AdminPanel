@@ -5,13 +5,12 @@
 @inject ICustomerService CustomerService
 @inject IReservationService ReservationService
 @inject IJSRuntime JSRuntime
-@attribute [Authorize]
 
 
 @rendermode InteractiveServer
 
 <div class="container mt-2">
-    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm mx-auto">
         <div class="card-body">
             <h3 class="card-title text-center mb-4 page-title">Přidat Rezervaci</h3>
             <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit">
@@ -20,6 +19,10 @@
 
                 <div class="form-group mb-3">
                     <div class="form-group mb-3">
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary" @onclick="OpenAddCustomerModal">Přidat zákazníka</button>
+                        </div>
+
                         <label for="CustomerId" class="form-label">Zákazník</label>
                         <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @oninput="OnInputChange" />
 
@@ -34,8 +37,25 @@
                                 }
                             </ul>
                         }
-                    </div>
-                    </div>
+                    </div> 
+                </div>
+
+
+                <!-- Hosté -->
+                <div class="d-flex justify-content-between">
+                    <label for="Guests" class="form-label">Hosté</label>
+                    <button type="button" class="btn btn-primary" @onclick="AddGuest">Přidat hosta</button>
+                </div>
+                <div class="form-group mb-3">
+                    @foreach (var guest in reservation.Guests)
+                    {
+                        <div class="d-flex mb-2">
+                            <input type="text" class="form-control me-2" placeholder="Jméno hosta" @bind="guest.FirstName" />
+                            <input type="text" class="form-control" placeholder="Příjmení hosta" @bind="guest.LastName" />
+                        </div>
+                    }
+                </div>
+
 
                 <div class="form-group mb-3">
                     <label for="RoomId" class="form-label">Pokoj</label>
@@ -43,40 +63,45 @@
                         <option value="">Vyber pokoj</option>
                         @foreach (var room in rooms)
                         {
-                            <option value="@room.Id">@room.RoomNumber - @room.RoomType.Type</option>
+                            <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
                         }
                     </select>
                    
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="CheckIn" class="form-label">Check In</label>
-                    <input type="date" id="CheckIn" class="form-control" @onchange="OnDateSelectIn" />
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="CheckIn" class="form-label">Check In</label>
+                        <input type="date" id="CheckIn" class="form-control" @onchange="OnDateSelectIn" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="CheckOut" class="form-label">Check Out</label>
+                        <input type="date" id="CheckOut" class="form-control" @onchange="OnDateSelectOut" />
+                    </div>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="CheckOut" class="form-label">Check Out</label>
-                    <input type="date" id="CheckOut" class="form-control" @onchange="OnDateSelectOut" />
-                </div>
 
-                <div class="form-group mb-3">
-                    <label for="Adults" class="form-label">Dospělí</label>
-                    <select id="Adults" class="form-control" @onchange="OnAdultsSelect">
-                        @for (int i = 0; i <= selectedRoom?.MaxAdults; i++)
-                        {
-                            <option value="@i">@i</option>
-                        }
-                    </select>
-                </div>
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="Adults" class="form-label">Dospělí</label>
+                        <select id="Adults" class="form-control" @onchange="OnAdultsSelect">
+                            @for (int i = 0; i <= selectedRoom?.MaxAdults; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
 
-                <div class="form-group mb-3">
-                    <label for="Children" class="form-label">Děti</label>
-                    <select id="Children" class="form-control" @onchange="OnChildrenSelect">
-                        @for (int i = 0; i <= selectedRoom?.MaxChildren; i++)
-                        {
-                            <option value="@i">@i</option>
-                        }
-                    </select>
+                    <div class="col-md-6">
+                        <label for="Children" class="form-label">Děti</label>
+                        <select id="Children" class="form-control" @onchange="OnChildrenSelect">
+                            @for (int i = 0; i <= selectedRoom?.MaxChildren; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-group mb-3">
@@ -86,34 +111,41 @@
 
 
              
-
-                <div class="form-group mb-3">
-                    <label for="MealPlanId" class="form-label">Stravování</label>
-                    <select id="MealPlanId" class="form-control" @onchange="OnMealSelect">
-                        <option value="">Vyber stravování</option>
-                        @foreach (var mealPlan in mealPlans)
-                        {
-                            <option value="@mealPlan.Id">@mealPlan.Plan</option>
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                
+                        <label for="MealPlanId" class="form-label">Stravování</label>
+                        <select id="MealPlanId" class="form-control" @onchange="OnMealSelect">
+                            <option value="">Vyber stravování</option>
+                            @foreach (var mealPlan in mealPlans)
+                            {
+                                <option value="@mealPlan.Id">@mealPlan.Name</option>
 
                             
-                        }
-                    </select>
-                </div>
+                            }
+                        </select>
+                    </div>
 
-                <div class="form-group mb-3">
-                    <label for="ReservationStatusId" class="form-label">Status</label>
-                    <InputSelect id="ReservationStatusId" class="form-control" @bind-Value="reservation.ReservationStatusId">
-                        <option value="">Vyber status</option>
-                        @foreach (var reservationStatus in reservationStatuses)
-                        {
-                            <option value="@reservationStatus.Id">@reservationStatus.RStatus</option>
-                        }
-                    </InputSelect>
+                    <div class="col-md-6">
+                        <label for="ReservationStatusId" class="form-label">Status</label>
+                        <InputSelect id="ReservationStatusId" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                            <option value="">Vyber status</option>
+                            @foreach (var reservationStatus in reservationStatuses)
+                            {
+                                <option value="@reservationStatus.Id">@reservationStatus.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
                 </div>
 
                 <div class="form-group mb-3">
                     <label for="SpecialRequest" class="form-label">Speciální Požadavky</label>
                     <InputTextArea id="SpecialRequest" class="form-control" @bind-Value="reservation.SpecialRequest" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="adminNote" class="form-label">Poznámka Zaměstnance</label>
+                    <InputTextArea id="adminNote" class="form-control" @bind-Value="reservation.AdminNote" />
                 </div>
 
 
@@ -126,6 +158,12 @@
     </div>
 </div>
 
+<Hotel_AdminPanel.Components.Pages.Customers.CustomerAddModal IsVisible="isAddCustomerModalVisible" OnClose="HandleCustomerModalClose" />
+
+
+
+
+
 
 @code {
     private Reservation reservation = new Reservation();
@@ -137,6 +175,11 @@
     private List<MealPlan> mealPlans = new List<MealPlan>();
     private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
     int numberOfNights;
+
+    private bool isAddCustomerModalVisible = false;
+    private Customer newCustomerModel = new Customer();
+
+
 
 
     protected override async Task OnInitializedAsync()
@@ -286,5 +329,26 @@
         await RoomService.UpdateRoomStatusAsync(reservation.RoomId, 2);
 
         NavigationManager.NavigateTo("/rezervace");
+    }
+
+    private void OpenAddCustomerModal()
+    {
+        isAddCustomerModalVisible = true;
+    }
+
+    private void HandleCustomerModalClose()
+    {
+        isAddCustomerModalVisible = false;
+    }
+
+    private async void HandleAddCustomer()
+    {
+        await CustomerService.CreateCustomerAsync(newCustomerModel);
+        isAddCustomerModalVisible = false;
+    }
+
+    private void AddGuest()
+    {
+        reservation.Guests.Add(new Guest());
     }
 }

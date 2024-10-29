@@ -15,18 +15,28 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task UpdateReservationAsync(Reservation reservation);
         Task DeleteReservationAsync(int id);
 
+        //Guests
+        Task<List<Guest>> GetGuestsByReservationIdAsync(int reservationId);
+
         //MealPlan
         Task<List<MealPlan>> GetMealPlansAsync();
         Task CreateMealPlanAsync(MealPlan mealPlan);
         Task UpdateMealPlanAsync(MealPlan mealPlan);
         Task DeleteMealPlanAsync(int id);
 
+        //reservationStatus
+        Task<List<ReservationStatus>> GetReservationStatusesAsync();
+        Task CreateReservationStatusAsync(ReservationStatus reservationStatus);
+        Task UpdateReservationStatusAsync(ReservationStatus reservationStatus);
+        Task DeleteReservationStatusAsync(int id);
+
 
 
         Task<List<Reservation>> GetReservationsByCustomerIdAsync(int customerId);
-        Task<List<ReservationStatus>> GetReservationStatusesAsync();
         Task<bool> IsRoomAvailableAsync(int roomId, DateTime checkIn, DateTime checkOut);
         Task<List<DateTime>> GetOccupiedDatesForRoomAsync(int roomId);
 
+
+        Task<List<int>> GetMonthlyReservations();
     }
 }

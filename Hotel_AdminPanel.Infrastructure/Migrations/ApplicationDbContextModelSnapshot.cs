@@ -30,8 +30,20 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -47,6 +59,13 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     b.Property<int>("InsuranceCompanyId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsEmployed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -83,12 +102,22 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ProfilePicture")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Salary")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -122,15 +151,21 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Country")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("datetime2");
@@ -143,11 +178,280 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PersonalIdentificationNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlaceOfBirth")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "Hlavní 123",
+                            City = "Praha",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5301),
+                            DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2030, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "123456789",
+                            Email = "jan.novak@example.com",
+                            FirstName = "Jan",
+                            LastName = "Novák",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ1234567890",
+                            Phone = "+420123456789",
+                            PlaceOfBirth = "Praha",
+                            PostalCode = "11000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5302)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Address = "Náměstí 456",
+                            City = "Brno",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5311),
+                            DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2029, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2019, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "987654321",
+                            Email = "petr.svoboda@example.com",
+                            FirstName = "Petr",
+                            LastName = "Svoboda",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ0987654321",
+                            Phone = "+420987654321",
+                            PlaceOfBirth = "Brno",
+                            PostalCode = "60200",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5312)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Address = "Sokolská 789",
+                            City = "Ostrava",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5318),
+                            DateOfBirth = new DateTime(1992, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2031, 7, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2021, 7, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "456789123",
+                            Email = "marie.cerna@example.com",
+                            FirstName = "Marie",
+                            LastName = "Černá",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ4567891234",
+                            Phone = "+420654789123",
+                            PlaceOfBirth = "Ostrava",
+                            PostalCode = "70200",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5319)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Address = "Jasná 321",
+                            City = "Plzeň",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5325),
+                            DateOfBirth = new DateTime(1988, 8, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2032, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2022, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "321654987",
+                            Email = "anna.havlickova@example.com",
+                            FirstName = "Anna",
+                            LastName = "Havlíčková",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ3216549870",
+                            Phone = "+420321654987",
+                            PlaceOfBirth = "Plzeň",
+                            PostalCode = "30100",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5325)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Address = "Květná 159",
+                            City = "Liberec",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5331),
+                            DateOfBirth = new DateTime(1995, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2031, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2021, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "159753468",
+                            Email = "tomas.prochazka@example.com",
+                            FirstName = "Tomáš",
+                            LastName = "Procházka",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ1597534680",
+                            Phone = "+420159753468",
+                            PlaceOfBirth = "Liberec",
+                            PostalCode = "46000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5332)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Address = "Lípa 753",
+                            City = "Ústí nad Labem",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5338),
+                            DateOfBirth = new DateTime(1998, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2030, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2020, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "753951852",
+                            Email = "petra.dvorakova@example.com",
+                            FirstName = "Petra",
+                            LastName = "Dvořáková",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ7539518520",
+                            Phone = "+420753951852",
+                            PlaceOfBirth = "Ústí nad Labem",
+                            PostalCode = "40000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5339)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Address = "Březová 852",
+                            City = "Hradec Králové",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5344),
+                            DateOfBirth = new DateTime(1987, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2031, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2021, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "852456789",
+                            Email = "jakub.novotny@example.com",
+                            FirstName = "Jakub",
+                            LastName = "Novotný",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ8524567890",
+                            Phone = "+420852456789",
+                            PlaceOfBirth = "Hradec Králové",
+                            PostalCode = "50000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5345)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Address = "Růžová 258",
+                            City = "Zlín",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5351),
+                            DateOfBirth = new DateTime(1993, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2031, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2021, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "258963147",
+                            Email = "lucie.krejcova@example.com",
+                            FirstName = "Lucie",
+                            LastName = "Krejčová",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ2589631470",
+                            Phone = "+420258963147",
+                            PlaceOfBirth = "Zlín",
+                            PostalCode = "76000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5352)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Address = "Modrá 369",
+                            City = "Karlovy Vary",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5358),
+                            DateOfBirth = new DateTime(1980, 9, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2028, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2018, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "369258147",
+                            Email = "martin.fiala@example.com",
+                            FirstName = "Martin",
+                            LastName = "Fiala",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ3692581470",
+                            Phone = "+420369258147",
+                            PlaceOfBirth = "Karlovy Vary",
+                            PostalCode = "36000",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5358)
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Address = "Violetová 741",
+                            City = "Jihlava",
+                            Country = "Česká republika",
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5364),
+                            DateOfBirth = new DateTime(1991, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfExpiry = new DateTime(2031, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DateOfIssue = new DateTime(2021, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DocumentNumber = "741852963",
+                            Email = "barbora.kovarova@example.com",
+                            FirstName = "Barbora",
+                            LastName = "Kovářová",
+                            Nationality = "Česká republika",
+                            PersonalIdentificationNumber = "CZ7418529630",
+                            Phone = "+420741852963",
+                            PlaceOfBirth = "Jihlava",
+                            PostalCode = "58601",
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5365)
+                        });
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Guest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DocumentNumber")
+                        .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -157,25 +461,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PersonalIdentificationNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PlaceOfBirth")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.InsuranceCompany", b =>
@@ -208,7 +501,226 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InsuranceCompany");
+                    b.ToTable("InsuranceCompanies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Address = "Ulice 1, Praha",
+                            Email = "kontakt@pojistovnaA.cz",
+                            Name = "Pojišťovna A",
+                            PhoneNumber = "+420123456789",
+                            Website = "www.pojistovnaA.cz"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Address = "Náměstí 2, Brno",
+                            Email = "kontakt@pojistovnaB.cz",
+                            Name = "Pojišťovna B",
+                            PhoneNumber = "+420987654321",
+                            Website = "www.pojistovnaB.cz"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Address = "Kavárenská 3, Ostrava",
+                            Email = "kontakt@pojistovnaC.cz",
+                            Name = "Pojišťovna C",
+                            PhoneNumber = "+420654321987",
+                            Website = "www.pojistovnaC.cz"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Address = "Chata 4, Plzeň",
+                            Email = "kontakt@pojistovnaD.cz",
+                            Name = "Pojišťovna D",
+                            PhoneNumber = "+420321654987",
+                            Website = "www.pojistovnaD.cz"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Address = "Dlouhá 5, Hradec Králové",
+                            Email = "kontakt@pojistovnaE.cz",
+                            Name = "Pojišťovna E",
+                            PhoneNumber = "+420147258369",
+                            Website = "www.pojistovnaE.cz"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Address = "Zelená 6, Liberec",
+                            Email = "kontakt@pojistovnaF.cz",
+                            Name = "Pojišťovna F",
+                            PhoneNumber = "+420369258147",
+                            Website = "www.pojistovnaF.cz"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Address = "Modrá 7, Zlín",
+                            Email = "kontakt@pojistovnaG.cz",
+                            Name = "Pojišťovna G",
+                            PhoneNumber = "+420258369147",
+                            Website = "www.pojistovnaG.cz"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Address = "Křižíkova 8, Karlovy Vary",
+                            Email = "kontakt@pojistovnaH.cz",
+                            Name = "Pojišťovna H",
+                            PhoneNumber = "+420852456123",
+                            Website = "www.pojistovnaH.cz"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Address = "Zimní 9, Jihlava",
+                            Email = "kontakt@pojistovnaI.cz",
+                            Name = "Pojišťovna I",
+                            PhoneNumber = "+420951753486",
+                            Website = "www.pojistovnaI.cz"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Address = "Květná 10, Pardubice",
+                            Email = "kontakt@pojistovnaJ.cz",
+                            Name = "Pojišťovna J",
+                            PhoneNumber = "+420741852963",
+                            Website = "www.pojistovnaJ.cz"
+                        });
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Prepayment")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReservationId");
+
+                    b.ToTable("Invoices");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5432),
+                            Currency = "CZK",
+                            Description = "",
+                            Discount = 0.0m,
+                            DueDate = new DateTime(2024, 11, 26, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5425),
+                            IsPaid = false,
+                            IssueDate = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5424),
+                            Prepayment = 0.0m,
+                            Price = 1500.00m,
+                            ReservationId = 1,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5434)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5438),
+                            Currency = "CZK",
+                            Description = "",
+                            Discount = 0.0m,
+                            DueDate = new DateTime(2024, 11, 26, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5437),
+                            IsPaid = true,
+                            IssueDate = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5437),
+                            Prepayment = 0.0m,
+                            Price = 2500.00m,
+                            ReservationId = 2,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5439)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5443),
+                            Currency = "CZK",
+                            Description = "",
+                            Discount = 0.0m,
+                            DueDate = new DateTime(2024, 11, 26, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5442),
+                            IsPaid = false,
+                            IssueDate = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5442),
+                            Prepayment = 0.0m,
+                            Price = 1200.00m,
+                            ReservationId = 3,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5444)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5449),
+                            Currency = "CZK",
+                            Description = "",
+                            Discount = 0.0m,
+                            DueDate = new DateTime(2024, 11, 26, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5448),
+                            IsPaid = true,
+                            IssueDate = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5447),
+                            Prepayment = 0.0m,
+                            Price = 2000.00m,
+                            ReservationId = 4,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5449)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5454),
+                            Currency = "CZK",
+                            Description = "",
+                            Discount = 0.0m,
+                            DueDate = new DateTime(2024, 11, 26, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5453),
+                            IsPaid = false,
+                            IssueDate = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5452),
+                            Prepayment = 0.0m,
+                            Price = 1700.00m,
+                            ReservationId = 5,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5455)
+                        });
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.MealPlan", b =>
@@ -219,7 +731,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Plan")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -234,33 +746,79 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Plan = "Snídaně",
-                            Price = 150.00m
+                            Name = "Snídaně",
+                            Price = 100.00m
                         },
                         new
                         {
                             Id = 2,
-                            Plan = "Polopenze",
-                            Price = 350.00m
+                            Name = "Polopenze",
+                            Price = 250.00m
                         },
                         new
                         {
                             Id = 3,
-                            Plan = "Plná penze",
-                            Price = 500.00m
+                            Name = "Plná penze",
+                            Price = 400.00m
                         },
                         new
                         {
                             Id = 4,
-                            Plan = "All-Inclusive",
-                            Price = 750.00m
+                            Name = "Bez stravy",
+                            Price = 0.00m
                         },
                         new
                         {
                             Id = 5,
-                            Plan = "Večeře pouze",
-                            Price = 200.00m
+                            Name = "Vegetariánský",
+                            Price = 300.00m
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Bezlepkový",
+                            Price = 350.00m
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Dětský",
+                            Price = 150.00m
                         });
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Reservation", b =>
@@ -270,6 +828,10 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminNote")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Adults")
                         .HasColumnType("int");
@@ -282,6 +844,9 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     b.Property<int>("Children")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
@@ -302,6 +867,9 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -313,6 +881,93 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.HasIndex("RoomId");
 
                     b.ToTable("Reservations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AdminNote = "",
+                            Adults = 1,
+                            CheckIn = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOut = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Children = 0,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5474),
+                            CustomerId = 1,
+                            MealPlanId = 1,
+                            ReservationStatusId = 1,
+                            RoomId = 1,
+                            SpecialRequest = "",
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5476)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AdminNote = "",
+                            Adults = 2,
+                            CheckIn = new DateTime(2022, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOut = new DateTime(2022, 1, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Children = 0,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5479),
+                            CustomerId = 2,
+                            MealPlanId = 2,
+                            ReservationStatusId = 2,
+                            RoomId = 2,
+                            SpecialRequest = "",
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5480)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AdminNote = "",
+                            Adults = 3,
+                            CheckIn = new DateTime(2022, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOut = new DateTime(2022, 1, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Children = 0,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5496),
+                            CustomerId = 3,
+                            MealPlanId = 3,
+                            ReservationStatusId = 3,
+                            RoomId = 3,
+                            SpecialRequest = "",
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5497)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AdminNote = "",
+                            Adults = 4,
+                            CheckIn = new DateTime(2022, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOut = new DateTime(2022, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Children = 0,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5500),
+                            CustomerId = 4,
+                            MealPlanId = 4,
+                            ReservationStatusId = 4,
+                            RoomId = 4,
+                            SpecialRequest = "",
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5501)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AdminNote = "",
+                            Adults = 2,
+                            CheckIn = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CheckOut = new DateTime(2022, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Children = 2,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5504),
+                            CustomerId = 5,
+                            MealPlanId = 5,
+                            ReservationStatusId = 1,
+                            RoomId = 5,
+                            SpecialRequest = "",
+                            TotalPrice = 0m,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5505)
+                        });
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.ReservationStatus", b =>
@@ -323,7 +978,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("RStatus")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -335,28 +990,61 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            RStatus = "Čekající"
+                            Name = "Pending"
                         },
                         new
                         {
                             Id = 2,
-                            RStatus = "Potvrzená"
+                            Name = "Confirmed"
                         },
                         new
                         {
                             Id = 3,
-                            RStatus = "Zrušená"
+                            Name = "Checked-in"
                         },
                         new
                         {
                             Id = 4,
-                            RStatus = "Dokončená"
+                            Name = "Checked-out"
                         },
                         new
                         {
                             Id = 5,
-                            RStatus = "Odmítnutá"
+                            Name = "Cancelled"
                         });
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Room", b =>
@@ -366,6 +1054,9 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -394,6 +1085,9 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Property<int>("RoomTypeId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RoomStatusId");
@@ -401,6 +1095,134 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.HasIndex("RoomTypeId");
 
                     b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5188),
+                            Description = "Single Room",
+                            Image = "",
+                            MaxAdults = 1,
+                            MaxChildren = 0,
+                            Price = 100m,
+                            RoomNumber = "101",
+                            RoomStatusId = 1,
+                            RoomTypeId = 1,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5239)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5247),
+                            Description = "Double Room",
+                            Image = "",
+                            MaxAdults = 2,
+                            MaxChildren = 0,
+                            Price = 150m,
+                            RoomNumber = "102",
+                            RoomStatusId = 1,
+                            RoomTypeId = 2,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5248)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5249),
+                            Description = "Triple Room",
+                            Image = "",
+                            MaxAdults = 3,
+                            MaxChildren = 0,
+                            Price = 200m,
+                            RoomNumber = "103",
+                            RoomStatusId = 1,
+                            RoomTypeId = 3,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5250)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5252),
+                            Description = "Quad Room",
+                            Image = "",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
+                            Price = 250m,
+                            RoomNumber = "104",
+                            RoomStatusId = 1,
+                            RoomTypeId = 4,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5252)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5254),
+                            Description = "Queen Room",
+                            Image = "",
+                            MaxAdults = 2,
+                            MaxChildren = 2,
+                            Price = 300m,
+                            RoomNumber = "105",
+                            RoomStatusId = 1,
+                            RoomTypeId = 5,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5255)
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5256),
+                            Description = "King Room",
+                            Image = "",
+                            MaxAdults = 2,
+                            MaxChildren = 2,
+                            Price = 350m,
+                            RoomNumber = "106",
+                            RoomStatusId = 1,
+                            RoomTypeId = 6,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5257)
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5259),
+                            Description = "Twin Room",
+                            Image = "",
+                            MaxAdults = 2,
+                            MaxChildren = 2,
+                            Price = 400m,
+                            RoomNumber = "107",
+                            RoomStatusId = 1,
+                            RoomTypeId = 7,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5259)
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5261),
+                            Description = "Double-double Room",
+                            Image = "",
+                            MaxAdults = 4,
+                            MaxChildren = 0,
+                            Price = 450m,
+                            RoomNumber = "108",
+                            RoomStatusId = 1,
+                            RoomTypeId = 8,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5262)
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CreatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5263),
+                            Description = "Studio Room",
+                            Image = "",
+                            MaxAdults = 2,
+                            MaxChildren = 2,
+                            Price = 500m,
+                            RoomNumber = "109",
+                            RoomStatusId = 1,
+                            RoomTypeId = 9,
+                            UpdatedAt = new DateTime(2024, 10, 27, 8, 22, 1, 694, DateTimeKind.Local).AddTicks(5264)
+                        });
                 });
 
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.RoomStatus", b =>
@@ -411,7 +1233,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Status")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -423,22 +1245,17 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Status = "Volný"
+                            Name = "Available"
                         },
                         new
                         {
                             Id = 2,
-                            Status = "Obsazený"
+                            Name = "Booked"
                         },
                         new
                         {
                             Id = 3,
-                            Status = "Údržba"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Status = "Čištění"
+                            Name = "Maintenance"
                         });
                 });
 
@@ -450,7 +1267,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -462,52 +1279,62 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Type = "Standardní jednolůžkový"
+                            Name = "Single"
                         },
                         new
                         {
                             Id = 2,
-                            Type = "Standardní dvojlůžkový"
+                            Name = "Double"
                         },
                         new
                         {
                             Id = 3,
-                            Type = "Luxusní apartmán s vířivkou"
+                            Name = "Triple"
                         },
                         new
                         {
                             Id = 4,
-                            Type = "Rodinný pokoj s kuchyňkou"
+                            Name = "Quad"
                         },
                         new
                         {
                             Id = 5,
-                            Type = "Business pokoj"
+                            Name = "Queen"
                         },
                         new
                         {
                             Id = 6,
-                            Type = "Pokoj pro hosty se zvířaty"
+                            Name = "King"
                         },
                         new
                         {
                             Id = 7,
-                            Type = "Ekonomický pokoj"
+                            Name = "Twin"
                         },
                         new
                         {
                             Id = 8,
-                            Type = "Penthouse"
+                            Name = "Double-double"
                         },
                         new
                         {
                             Id = 9,
-                            Type = "Pokoj s výhledem na moře"
+                            Name = "Studio"
                         },
                         new
                         {
                             Id = 10,
-                            Type = "Pokoj s terasou"
+                            Name = "Master Suite"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Mini Suite"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "President Suite"
                         });
                 });
 
@@ -519,21 +1346,29 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Deadline")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmployeeId1")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId1");
 
                     b.ToTable("TaskItems");
                 });
@@ -682,10 +1517,43 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Navigation("InsuranceCompany");
                 });
 
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Guest", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.Reservation", "Reservation")
+                        .WithMany("Guests")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.Reservation", "Reservation")
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reservation");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.Invoice", "Invoice")
+                        .WithMany("Payments")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+                });
+
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Reservation", b =>
                 {
                     b.HasOne("Hotel_AdminPanel.Domain.Entities.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Reservations")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -717,6 +1585,25 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Navigation("Room");
                 });
 
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Review", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.Room", "Room")
+                        .WithMany("Reviews")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Room", b =>
                 {
                     b.HasOne("Hotel_AdminPanel.Domain.Entities.RoomStatus", "RoomStatus")
@@ -734,6 +1621,15 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     b.Navigation("RoomStatus");
 
                     b.Navigation("RoomType");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.TaskItem", b =>
+                {
+                    b.HasOne("Hotel_AdminPanel.Domain.Entities.AppUser", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId1");
+
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -785,6 +1681,26 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Customer", b =>
+                {
+                    b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Invoice", b =>
+                {
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Reservation", b =>
+                {
+                    b.Navigation("Guests");
+                });
+
+            modelBuilder.Entity("Hotel_AdminPanel.Domain.Entities.Room", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618
         }

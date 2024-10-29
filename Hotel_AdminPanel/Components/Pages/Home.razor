@@ -3,91 +3,98 @@
 @inject IRoomService RoomService
 @inject ICustomerService CustomerService
 @inject IReservationService ReservationService
-@attribute [Authorize]
+@rendermode InteractiveServer
 
 <PageTitle>Dashboard - Hotel Management</PageTitle>
-
-
-<div class="container my-4">
-    <div class="d-grid gap-3">
-        <!-- První řádek gridu s malými widgety -->
-        <div class="d-grid gap-3 d-md-flex">
-            <div class="card flex-fill p-3">
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
-                    <h5 class="card-title">Emails Sent</h5>
-                    <p class="card-text">12,361</p>
+                    <p>
+                        <i class="bi bi-people-fill"></i>
+                        Počet zákazníků
+                    </p>
+                    <h3>@TotalCustomers</h3>
                 </div>
             </div>
-            <div class="card flex-fill p-3">
+        </div>
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
-                    <h5 class="card-title">Sales Obtained</h5>
-                    <p class="card-text">431,225</p>
+                    <p>
+                        <i class="bi bi-calendar-check"></i>
+                        Počet rezervací
+                    </p>
+                    <h3>@TotalReservations</h3>
                 </div>
             </div>
-            <div class="card flex-fill p-3">
+        </div>
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
-                    <h5 class="card-title">New Clients</h5>
-                    <p class="card-text">32,441</p>
+                    <p>
+                        <i class="bi bi-house-door"></i>
+                        Počet pokojů
+                    </p>
+                    <h3>@TotalRooms</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mx-auto">
+                <div class="card-body">
+                    <p>
+                        <i class="bi bi-percent"></i>
+                        Vytíženost hotelu
+                    </p>
+                    <h3>@HotelOccupancy.ToString("0.00") %</h3>
                 </div>
             </div>
         </div>
 
-        <!-- Druhý řádek gridu s většími widgety -->
-        <div class="d-grid gap-3 d-md-flex">
-            <div class="card flex-fill p-3" style="height: 300px;">
-                <div class="card-header">
-                    Revenue Generated
-                </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
-                    <!-- Zde můžeš vložit graf -->
-                    <p>$59,342.32</p>
-                </div>
-            </div>
-            <div class="card flex-fill p-3" style="height: 300px;">
-                <div class="card-header">
-                    Recent Transactions
-                </div>
-                <div class="card-body">
-                    <!-- Zde můžeš vložit seznam transakcí -->
                 </div>
             </div>
         </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mx-auto">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <!-- Třetí řádek gridu s dalšími widgety -->
-        <div class="d-grid gap-3 d-md-flex">
-            <div class="card flex-fill p-3" style="height: 200px;">
-                <div class="card-header">
-                    Campaign
-                </div>
+    <div class="row mt-5">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
-                    <!-- Další obsah -->
-                </div>
-            </div>
-            <div class="card flex-fill p-3" style="height: 200px;">
-                <div class="card-header">
-                    Sales Quantity
-                </div>
-                <div class="card-body">
-                    <!-- Další graf -->
-                </div>
-            </div>
-            <div class="card flex-fill p-3" style="height: 200px;">
-                <div class="card-header">
-                    Geography Based Traffic
-                </div>
-                <div class="card-body">
-                    <!-- Mapa -->
+                    <h3 class="text-center mb-4 page-title">Rezervace</h3>
+                    <div class="table-responsive">
+                        <table class="w-100">
+                            <QuickGrid Items="reservations.AsQueryable()" Pagination="paginationState" Class=" w-100">
+                                <PropertyColumn Title="Zákazník" Property="@(x => x.Customer.FirstName + " " + x.Customer.LastName)" Sortable="true" />
+                                <PropertyColumn Title="CheckIn" Property="@(x => x.CheckIn.ToShortDateString())" Sortable="true" />
+                                <PropertyColumn Title="CheckOut" Property="@(x => x.CheckOut.ToShortDateString())" Sortable="true" />
+                                <PropertyColumn Title="Pokoj" Property="@(x => x.Room.RoomNumber)" Sortable="true" />
+                                <PropertyColumn Title="Cena" Property="@(x => x.TotalPrice)" Sortable="true" />
+                                <PropertyColumn Title="Dospělí" Property="@(x => x.Adults)" Sortable="true" />
+                                <PropertyColumn Title="Děti" Property="@(x => x.Children)" Sortable="true" />
+                                <PropertyColumn Title="Stravování" Property="@(x => x.MealPlan.Name)" Sortable="true" />
+                            </QuickGrid>
+                            <Paginator State="paginationState" />
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .container {
-        max-width: 1500px;
-    }
-</style>
  
 @code {
     private int TotalReservations;
@@ -97,8 +104,12 @@
     private int occupiedRooms;
     private List<Reservation> reservationsLastMonth = new List<Reservation>();
     private List<Reservation> upcomingReservations = new List<Reservation>();
+    private List<Reservation> reservations = new List<Reservation>();
+    private PaginationState paginationState = new PaginationState() { ItemsPerPage = 5 };
     private List<Room> maintenanceRooms = new List<Room>();
     private decimal TotalRevenue;
+
+
 
 
 
@@ -109,7 +120,11 @@
         TotalReservations = (await ReservationService.GetReservationsAsync()).Count;
         TotalRooms = (await RoomService.GetRooomsAsync()).Count;
 
-        occupiedRooms = (await RoomService.GetRooomsAsync()).Where(r => r.RoomStatus.Status == "Obsazeno").Count();
+        reservations = await ReservationService.GetReservationsAsync();
+
+
+
+        occupiedRooms = (await RoomService.GetRooomsAsync()).Where(r => r.RoomStatus.Name == "Obsazeno").Count();
         reservationsLastMonth = (await ReservationService.GetReservationsAsync()).Where(r => r.CheckIn.Month == DateTime.Now.AddMonths(-1).Month).ToList();
 
         TotalRevenue = reservationsLastMonth.Sum(r => r.TotalPrice);
@@ -118,5 +133,7 @@
 
         // Vytíženost hotelu
         HotelOccupancy = ((double)occupiedRooms / TotalRooms) * 100;
+
+
     }
 }

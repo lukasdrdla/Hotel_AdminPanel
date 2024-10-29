@@ -1,19 +1,36 @@
-﻿@using Blazored.LocalStorage
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
-<div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-        <main>
-            <article class="content px-4">
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <div class="page">
+                <div class="sidebar">
+                    <NavMenu />
+                </div>
+                <main>
+                    <article class="content">
+                        <TopBar />
+
+                        @Body
+                    </article>
+                </main>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            @if (!IsLoginPage)
+            {
+                <RedirectToLogin />
+            }
+            else
+            {
                 @Body
-            </article>
-        </main>
-</div>
+            }
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
@@ -21,51 +38,8 @@
     <a class="dismiss">🗙</a>
 </div>
 
-<style>
-    .user-info {
-        background-color: #f8f9fa;
-        border-radius: 5px;
-        padding: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .user-name {
-        font-weight: bold;
-        color: #222;
-    }
-
-</style>
-
 @code {
-    private string userName;
-    private bool isAuthenticated;
 
     private bool IsLoginPage => NavigationManager.Uri.Contains("/login");
 
-
-    private List<DropdownMenu.DropdownLink> reservationLinks = new()
-    {
-        new DropdownMenu.DropdownLink("/pridat-rezervaci", "Vytvořit Rezervaci"),
-        new DropdownMenu.DropdownLink("/pridat-zakaznika", "Vytvořit Zakazníka"),
-        new DropdownMenu.DropdownLink("/pridat-pokoj", "Vytvořit Pokoj")
-    };
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        isAuthenticated = user.Identity.IsAuthenticated;
-        userName = isAuthenticated ? user.Identity.Name : string.Empty;
-
-
-    }
-
-  
-
-  
 }
-
-

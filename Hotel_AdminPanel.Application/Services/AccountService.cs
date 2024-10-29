@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Hotel_AdminPanel.Application.Services
 {
     public class AccountService : IAccountService
@@ -27,10 +26,55 @@ namespace Hotel_AdminPanel.Application.Services
             _context = context;
         }
 
-        public async Task<List<AppUser>> GetAllUsersAsync()
+        public Task<IdentityResult> AddToRoleAsync(AppUser user, string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public Task<IdentityResult> CreateRoleAsync(RoleViewModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IdentityResult> DeleteRoleAsync(string id)
+        {
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Role not found" });
+            }
+
+            var result = await _roleManager.DeleteAsync(role);
+            if (result.Succeeded) {
+                return IdentityResult.Success;
+            }
+            return IdentityResult.Failed(new IdentityError { Description = "Failed to delete role" });
+
+        }
+
+        public async Task<List<IdentityRole>> GetAllRolesAsync()
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            return roles;
+        }
+
+        public async Task<List<UserWithRolesViewModel>> GetAllUsersAsync()
         {
             var users = await _userManager.Users.ToListAsync();
-            return users;
+            var usersWithRoles = new List<UserWithRolesViewModel>();
+
+            foreach (var user in users) {
+                var roles = await _userManager.GetRolesAsync(user);
+                var userWithRoles = new UserWithRolesViewModel
+                {
+                    User = user,
+                    Roles = roles.ToList()
+                };
+                usersWithRoles.Add(userWithRoles);
+            }
+
+            return usersWithRoles;
         }
 
         public Task<AppUser> GetCurrentUserAsync()
@@ -41,6 +85,11 @@ namespace Hotel_AdminPanel.Application.Services
                 return _userManager.GetUserAsync(currentUser);
             }
             return null;
+        }
+
+        public Task<IList<string>> GetUserRolesAsync(AppUser user)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
@@ -79,7 +128,16 @@ namespace Hotel_AdminPanel.Application.Services
                 PlaceOfBirth = model.PlaceOfBirth,
                 ProfilePicture = model.ProfilePicture,
                 InsuranceCompanyId = model.InsuranceCompanyId,
+                Address = model.Address,
+                City = model.City,
+                PostalCode = model.PostalCode,
+                Country = model.Country,
+                JobTitle = model.JobTitle,
+                StartDate = model.StartDate,
+                Salary = model.Salary,
+                IsEmployed = model.IsEmployed
             };
+
 
             // Vytvoření uživatele
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -112,6 +170,25 @@ namespace Hotel_AdminPanel.Application.Services
             }
 
             return IdentityResult.Failed(new IdentityError { Description = "User creation failed" });
+
+        }
+
+        public Task<IdentityResult> RemoveFromRoleAsync(AppUser user, string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IdentityResult> UpdateRoleAsync(IdentityRole model)
+        {
+            var existingRole = await _roleManager.FindByIdAsync(model.Id);
+            if (existingRole == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Role not found" });
+            }
+
+            existingRole.Name = model.Name;
+            var updateResult = await _roleManager.UpdateAsync(existingRole);
+            return updateResult;
 
         }
 

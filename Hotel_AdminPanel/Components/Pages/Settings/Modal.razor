@@ -1,0 +1,46 @@
+﻿@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Message { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string ActionType { get; set; } // Přidáno pro určení akce
+
+    private async Task CloseModal(bool result)
+    {
+        await OnClose.InvokeAsync(result);
+    }
+
+    private string GetMessage()
+    {
+        return ActionType switch
+        {
+            "DeleteMealPlan" => "Opravdu chcete smazat tento jídelní plán?",
+            "DeleteRoomType" => "Opravdu chcete smazat tento typ pokoje?",
+            "DeleteRoomStatus" => "Opravdu chcete smazat tento status pokoje?",
+            "DeleteReservationStatus" => "Opravdu chcete smazat tento status rezervace?",
+            "DeleteRole" => "Opravdu chcete smazat tuto roli?",
+            _ => "Opravdu chcete pokračovat?"
+        };
+    }
+}
+
+@if (IsVisible)
+{
+    <div class="modal fade show" style="display: block; background-color: rgba(0,0,0,0.5);" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Title</h5>
+                    <button type="button" class="btn-close" @onclick="() => CloseModal(false)"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@GetMessage()</p> <!-- Dynamický text -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="() => CloseModal(false)">Zrušit</button>
+                    <button type="button" class="btn btn-danger" @onclick="() => CloseModal(true)">Smazat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

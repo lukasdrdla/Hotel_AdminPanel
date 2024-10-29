@@ -1,0 +1,152 @@
+﻿@page "/pridat-fakturu"
+@inject IInvoiceService InvoiceService
+@inject NavigationManager NavigationManager
+@inject ICustomerService CustomerService
+@inject IReservationService ReservationService
+@rendermode InteractiveServer
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4 page-title">Přidat Fakturu</h3>
+            <EditForm Model="invoice" OnValidSubmit="HandleValidSubmit" FormName="AddInvoice">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="customerSearch" class="form-label">Zákazník</label>
+                    <button type="button" class="btn btn-primary" @onclick="ShowAllCustomers">Zobrazit všechny zákazníky</button>
+                    <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @oninput="OnInputChange" />
+
+                    @if (filteredReservations != null && filteredReservations.Any())
+                    {
+                        <ul class="list-group mt-2">
+                            @foreach (var reservation in filteredReservations)
+                            {
+                                <li class="list-group-item" @onclick="() => SelectCustomer(reservation)">
+                                    @reservation.Customer.FirstName @reservation.Customer.LastName - @reservation.Customer.Email - @reservation.Customer.City @reservation.Customer.Address - @reservation.Customer.DocumentNumber
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="issueDate" class="form-label">Datum vystavení</label>
+                        <InputDate id="issueDate" class="form-control" @bind-Value="invoice.IssueDate" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="dueDate" class="form-label">Datum splatnosti</label>
+                        <InputDate id="dueDate" class="form-control" @bind-Value="invoice.DueDate" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-3">
+                        <label for="discount" class="form-label">Sleva</label>
+                        <InputNumber id="discount" class="form-control" @bind-Value="invoice.Discount" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="currency" class="form-label">Měna</label>
+                        <InputText id="currency" class="form-control" @bind-Value="invoice.Currency" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="prepayment" class="form-label">Záloha</label>
+                        <InputNumber id="prepayment" class="form-control" @bind-Value="invoice.Prepayment" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="price" class="form-label">Cena</label>
+                        <InputNumber id="price" class="form-control" @bind-Value="invoice.Price" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="isPaid" class="form-label">Zaplaceno</label>
+                    <InputCheckbox id="isPaid" class="form-check-input" @bind-Value="invoice.IsPaid" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Popis</label>
+                    <InputTextArea id="description" class="form-control" @bind-Value="invoice.Description" />
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <a href="/faktury" class="btn btn-outline-secondary">Zpět na seznam</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Invoice invoice { get; set; } = new Invoice();
+
+    private List<Reservation> reservations { get; set; } = new List<Reservation>();
+    private string searchTerm { get; set; }
+    private List<Reservation> filteredReservations { get; set; } = new List<Reservation>();
+
+    private async Task OnInputChange(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+
+            var avaibleReservations = await GetAvailableReservationsAsync();
+
+            filteredReservations = avaibleReservations
+                .Where(r => r.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                             r.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+        else
+        {
+            filteredReservations.Clear();
+        }
+    }
+
+    private void SelectCustomer(Reservation reservation)
+    {
+        invoice.ReservationId = reservation.Id; // Uložení ReservationId do faktury
+        searchTerm = $"{reservation.Customer.FirstName} {reservation.Customer.LastName}"; // Aktualizace pole pro vyhledávání
+        filteredReservations.Clear(); // Vymazání filtrovaného seznamu
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        reservations = await ReservationService.GetReservationsAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await InvoiceService.CreateInvoiceAsync(invoice);
+        NavigationManager.NavigateTo("/faktury");
+    }
+
+    private async Task ShowAllCustomers()
+    {
+        filteredReservations = await GetAvailableReservationsAsync(); // Načtení všech dostupných zákazníků
+
+    }
+
+    private async Task<List<Reservation>> GetAvailableReservationsAsync()
+    {
+        var allReservations = await ReservationService.GetReservationsAsync();
+        var availableReservations = new List<Reservation>();
+
+        foreach (var reservation in allReservations)
+        {
+            var hasInvoice = await InvoiceService.CheckIfInvoiceExistsForReservation(reservation.Id);
+            if (!hasInvoice)
+            {
+                availableReservations.Add(reservation);
+            }
+        }
+
+        return availableReservations;
+    }
+}

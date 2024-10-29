@@ -34,7 +34,7 @@
                                 <InputSelect class="form-control" @bind-Value="room.RoomTypeId" id="roomType">
                                     @foreach (var type in roomTypes)
                                     {
-                                        <option value="@type.Id">@type.Type</option>
+                                        <option value="@type.Id">@type.Name</option>
                                     }
                                 </InputSelect>
                                 
@@ -46,7 +46,7 @@
                                 <InputSelect class="form-control" @bind-Value="room.RoomStatusId" id="roomStatus">
                                     @foreach (var status in roomStatuses)
                                     {
-                                        <option value="@status.Id">@status.Status</option>
+                                        <option value="@status.Id">@status.Name</option>
                                     }
                                 </InputSelect>
                             </div>

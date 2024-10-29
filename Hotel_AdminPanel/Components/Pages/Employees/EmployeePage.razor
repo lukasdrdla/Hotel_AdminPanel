@@ -1,45 +1,132 @@
 ﻿@page "/zamestnanci"
 @inject IAccountService AccountService
+@inject IJSRuntime jsRuntime
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-<h3>Zaměstnanci</h3>
 
-@if (pagedEmployees.Count == 0)
-{
-    <p>Nejsou zde žádní zaměstnanci.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Jméno</th>
-                <th>Email</th>
-                <th>Telefon</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var employee in pagedEmployees)
+
+
+<div class="container mt-5">
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="text-center mb-4 page-title">Zaměstnanci</h3>
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" placeholder="Hledat..." @oninput="SearchEmployee" />
+                <button class="btn btn-outline-secondary" type="button">Hledat</button>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Přidat zaměstnace
+                </button>
+            </div>
+            @if (employees == null || employees.Count == 0)
             {
-                <tr>
-                    <td>@employee.FirstName</td>
-                    <td>@employee.Email</td>
-                    <td>@employee.PhoneNumber</td>
-                </tr>
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <p class="mt-2">Načítám zaměstnance...</p>
+                </div>
             }
-        </tbody>
-    </table>
+            else
+            {
+                <div class="table-responsive">
+                    <table class="w-100">
+                        <QuickGrid Items="filteredEmployees.AsQueryable()" Pagination="pagginationState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(r => r.User.Id)" Sortable="true" />
+                            <PropertyColumn Title="Jméno" Property="@(r => r.User.FirstName)" Sortable="true" />
+                            <PropertyColumn Title="Příjmení" Property="@(r => r.User.LastName)" Sortable="true" />
+                            <PropertyColumn Title="Email" Property="@(r => r.User.Email)" Sortable="true" />
+                            <PropertyColumn Title="Telefon" Property="@(r => r.User.PhoneNumber)" Sortable="true" />
 
-}
+                            <TemplateColumn Title="Role">
+                                @foreach (var role in context.Roles)
+                                {
+                                    <span class="badge bg-primary">@role</span>
+                                }
+                            </TemplateColumn>
+
+
+
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    <button class="btn text-primary" @onclick="() => NavigateToEmployeeDetail(context.User.Id)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn text-danger" @onclick="() => DeleteEmployee(context.User.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </TemplateColumn>
+
+                        </QuickGrid>
+
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
 
 @code {
-    private List<AppUser> employees = new();
-    private List<AppUser> pagedEmployees = new();
+    private PaginationState pagginationState = new PaginationState() { ItemsPerPage = 10 };
+    private List<UserWithRolesViewModel> employees = new List<UserWithRolesViewModel>();
+    private List<UserWithRolesViewModel> filteredEmployees = new List<UserWithRolesViewModel>();
 
+    private string? searchTerm;
+
+
+
+    private async Task DeleteEmployee(string id)
+    {
+        var employee = employees.FirstOrDefault(r => r.User.Id == id );
+        if (employee != null)
+        {
+            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat platbu?");
+            if (confirmResult)
+            {
+
+
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         employees = await AccountService.GetAllUsersAsync();
+        filteredEmployees = employees;
+
     }
+
+
+
+    private void SearchEmployee(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+
+        @if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+
+            filteredEmployees = employees.Where(r => r.User.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || r.User.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+
+   
+        }
+        else
+        {
+            filteredEmployees = employees;
+        }
+
+
+    }
+
+    private void NavigateToEmployeeDetail(string id)
+    {
+        NavigationManager.NavigateTo($"/zamestnanec/{id}");
+    }
+
 
 
 }

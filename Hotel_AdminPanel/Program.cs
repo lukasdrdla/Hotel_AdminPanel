@@ -37,7 +37,10 @@ builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
-
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IGuestService, GuestService>();
 
 builder.Services.AddBlazoredLocalStorage();
 

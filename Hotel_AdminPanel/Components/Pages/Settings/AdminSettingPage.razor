@@ -1,0 +1,465 @@
+﻿@page "/admin-nastaveni"
+@inject IReservationService ReservationService
+@inject IRoomService RoomService
+@inject IAccountService AccountService
+@inject IJSRuntime JSRuntime
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<h3 class="text-center mb-4 page-title">Admin Nastavení</h3>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Nastavení jídel</h3>
+                    <div class="table-responsive">
+                        <QuickGrid Items="MealPlans.AsQueryable()" Pagination="paginationState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
+                            <TemplateColumn Title="Plán">
+                                @if (editMealPlanId == context.Id)
+                                {
+                                    <input @bind="context.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Name
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Cena">
+                                @if (editMealPlanId == context.Id)
+                                {
+                                    <input @bind="context.Price" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Price
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    @if (editMealPlanId == context.Id)
+                                    {
+                                        <button class="btn btn-success" @onclick="() => SaveMealPlan(context)">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="CancelEdit">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn text-primary" @onclick="() => EditMealPlan(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => OpenDeleteMealPlanConfirmation(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator State="paginationState" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Nastavení statusů rezervace</h3>
+                    <div class="table-responsive">
+                        <QuickGrid Items="ReservationStatuses.AsQueryable()" Pagination="paginationReservationStatusState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
+                            <TemplateColumn Title="Status">
+                                @if (editReservationStatusId == context.Id)
+                                {
+                                    <input @bind="context.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Name
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    @if (editReservationStatusId == context.Id)
+                                    {
+                                        <button class="btn btn-success" @onclick="() => SaveRStatus(context)">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="CancelEdit">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn text-primary" @onclick="() => EditReservationStatus(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => OpenDeleteReservationStatusConfirmation(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator State="paginationReservationStatusState" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Nastavení typu pokojů</h3>
+                    <div class="table-responsive">
+                        <QuickGrid Items="RoomTypes.AsQueryable()" Pagination="paginationRoomTypeState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
+                            <TemplateColumn Title="Typ pokoje">
+                                @if (editRoomTypeId == context.Id)
+                                {
+                                    <input @bind="context.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Name
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    @if (editRoomTypeId == context.Id)
+                                    {
+                                        <button class="btn btn-success" @onclick="() => SaveRoomType(context)">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="CancelEdit">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn text-primary" @onclick="() => EditRoomType(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => OpenDeleteRoomTypeConfirmation(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator State="paginationRoomTypeState" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Nastavení statusů pokojů</h3>
+                    <div class="table-responsive">
+                        <QuickGrid Items="RoomStatuses.AsQueryable()" Pagination="paginationRoomStatusState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
+                            <TemplateColumn Title="Status">
+                                @if (editRoomStatusId == context.Id)
+                                {
+                                    <input @bind="context.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Name
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    @if (editRoomStatusId == context.Id)
+                                    {
+                                        <button class="btn btn-success" @onclick="() => SaveRoomStatus(context)">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="CancelEdit">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn text-primary" @onclick="() => EditRoomStatus(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => OpenDeleteRoomStatusConfirmation(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator State="paginationRoomStatusState" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mt-5">
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Nastavení rolí</h3>
+                    <div class="table-responsive">
+                        <QuickGrid Items="Roles.AsQueryable()" Pagination="paginationRoleTypeState" Class="w-100">
+                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
+                            <TemplateColumn Title="Role">
+                                @if (editRoleId == context.Id)
+                                {
+                                    <input @bind="context.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @context.Name
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    @if (editRoleId == context.Id)
+                                    {
+                                        <button class="btn btn-success" @onclick="() => SaveRole(context)">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger" @onclick="CancelEdit">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn text-primary" @onclick="() => EditRole(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => OpenDeleteRoleConfirmation(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                        <Paginator State="paginationRoleTypeState" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<Modal Title="@Title" IsVisible="@isModalVisible" ActionType="@ActionType" OnClose="HandleModalClose" />
+
+
+@code {
+    private PaginationState paginationState = new() { ItemsPerPage = 3 };
+    private PaginationState paginationRoomTypeState = new() { ItemsPerPage = 3 };
+    private PaginationState paginationRoomStatusState = new() { ItemsPerPage = 3 };
+    private PaginationState paginationReservationStatusState = new() { ItemsPerPage = 3 };
+    private PaginationState paginationRoleTypeState = new() { ItemsPerPage = 3 };
+
+    //modal
+    private bool isModalVisible;
+    private string Title;
+    private string modalMessage;
+    private string ActionType;
+
+
+
+    private List<MealPlan> MealPlans = new();
+    private int? editMealPlanId;
+    private int? deleteMealPlanId;
+
+    private List<RoomType> RoomTypes = new List<RoomType>();
+    private int? editRoomTypeId;
+    private int? deleteRoomTypeId;
+
+
+    private List<RoomStatus> RoomStatuses = new List<RoomStatus>();
+    private int? editRoomStatusId;
+    private int? deleteRoomStatusId;
+
+    private List<ReservationStatus> ReservationStatuses = new List<ReservationStatus>();
+    private int? editReservationStatusId;
+    private int? deleteReservationStatusId;
+
+    private List<IdentityRole> Roles = new List<IdentityRole>();
+    private string? editRoleId;
+    private string? deleteRoleId;
+
+
+    private void EditRole(string roleId)
+    {
+        editRoleId = roleId;
+    }
+
+    private void EditReservationStatus(int reservationStatusId)
+    {
+        editReservationStatusId = reservationStatusId;
+    }
+
+    private void EditRoomType(int roomTypeId)
+    {
+        editRoomTypeId = roomTypeId;
+    }
+
+    private void EditRoomStatus(int roomStatusId)
+    {
+        editRoomStatusId = roomStatusId;
+    }
+
+
+    private void EditMealPlan(int mealPlanId)
+    {
+        editMealPlanId = mealPlanId;
+
+    }
+
+    private void CancelEdit()
+    {
+        editRoomTypeId = null;
+        editMealPlanId = null;
+        editRoomStatusId = null;
+        editReservationStatusId = null;
+        editRoleId = null;
+    }
+
+    private async Task SaveMealPlan(MealPlan mealPlan)
+    {
+        await ReservationService.UpdateMealPlanAsync(mealPlan);
+        editMealPlanId = null;
+        MealPlans = await ReservationService.GetMealPlansAsync();
+    }
+
+    private async Task SaveRole(IdentityRole role)
+    {
+        await AccountService.UpdateRoleAsync(role);
+        editRoleId = null;
+    }
+
+    private async Task SaveRStatus(ReservationStatus reservationStatus)
+    {
+        await ReservationService.UpdateReservationStatusAsync(reservationStatus);
+        editReservationStatusId = null;
+        ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
+    }
+
+    private async Task SaveRoomType(RoomType roomType)
+    {
+        await RoomService.UpdateRoomTypeAsync(roomType);
+        editRoomTypeId = null;
+        RoomTypes = await RoomService.GetRoomTypesAsync();
+    }
+
+    private async Task SaveRoomStatus(RoomStatus roomStatus)
+    {
+        await RoomService.UpdateRoomStatusBySettingsAsync(roomStatus);
+        editRoomStatusId = null;
+        RoomStatuses = await RoomService.GetRoomStatusesAsync();
+    }
+
+    private void OpenDeleteRoleConfirmation(string roleId)
+    {
+        isModalVisible = true;
+        Title = "Smazání role";
+        modalMessage = "Opravdu chcete smazat tuto roli?";
+        ActionType = "DeleteRole";
+        deleteRoleId = roleId;
+    }
+
+    private void OpenDeleteRoomStatusConfirmation(int roomStatusId)
+    {
+        isModalVisible = true;
+        Title = "Smazání statusu pokoje";
+        modalMessage = "Opravdu chcete smazat tento status pokoje?";
+        ActionType = "DeleteRoomStatus";
+        deleteRoomStatusId = roomStatusId;
+    }
+
+    private void OpenDeleteRoomTypeConfirmation(int roomTypeId)
+    {
+        isModalVisible = true;
+        Title = "Smazání typu pokoje";
+        modalMessage = "Opravdu chcete smazat tento typ pokoje?";
+        ActionType = "DeleteRoomType";
+        deleteRoomTypeId = roomTypeId;
+    }
+
+    private void OpenDeleteReservationStatusConfirmation(int reservationStatusId)
+    {
+        isModalVisible = true;
+        Title = "Smazání statusu rezervace";
+        modalMessage = "Opravdu chcete smazat tento status rezervace?";
+        ActionType = "DeleteReservationStatus";
+        deleteReservationStatusId = reservationStatusId;
+    }
+
+    private void OpenDeleteMealPlanConfirmation(int mealPlanId)
+    {
+        isModalVisible = true;
+        Title = "Smazání jídelního plánu";
+        modalMessage = "Opravdu chcete smazat tento jídelní plán?";
+        ActionType = "DeleteMealPlan";
+        deleteMealPlanId = mealPlanId;
+    }
+
+    private async Task HandleModalClose(bool confirmed)
+    {
+        isModalVisible = false;
+        if (confirmed)
+        {
+            switch (ActionType)
+            {
+                case "DeleteRole":
+                    await AccountService.DeleteRoleAsync(deleteRoleId);
+                    Roles = await AccountService.GetAllRolesAsync();
+                    break;
+                case "DeleteMealPlan":
+                    await ReservationService.DeleteMealPlanAsync(deleteMealPlanId.Value);
+                    MealPlans = await ReservationService.GetMealPlansAsync();
+                    break;
+                case "DeleteRoomType":
+                    await RoomService.DeleteRoomTypeAsync(deleteRoomTypeId.Value);
+                    RoomTypes = await RoomService.GetRoomTypesAsync();
+                    break;
+                case "DeleteRoomStatus":
+                    await RoomService.DeleteRoomStatusAsync(deleteRoomStatusId.Value);
+                    RoomStatuses = await RoomService.GetRoomStatusesAsync();
+                    break;
+                case "DeleteReservationStatus":
+                    await ReservationService.DeleteReservationStatusAsync(deleteReservationStatusId.Value);
+                    ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
+                    break;
+            }
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        MealPlans = await ReservationService.GetMealPlansAsync();
+        ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
+        RoomTypes = await RoomService.GetRoomTypesAsync();
+        RoomStatuses = await RoomService.GetRoomStatusesAsync();
+        Roles = await AccountService.GetAllRolesAsync();
+
+
+
+    }
+}

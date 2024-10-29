@@ -1,0 +1,179 @@
+﻿@page "/faktury"
+@inject IInvoiceService InvoiceService
+@inject IJSRuntime jsRuntime
+@inject ICustomerService CustomerService
+@inject NavigationManager NavigationManager
+@inject IReservationService ReservationService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+@* <InvoiceAddModal IsVisible="isInvoiceModalVisible" OnClose="HandleModalClose" reservations="@reservations" />
+ *@
+<div class="container mt-5">
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="text-center mb-4 page-title">Faktury</h3>
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" placeholder="Hledat..." @oninput="SearchInvoices" />
+                <button class="btn btn-outline-secondary" type="button">Hledat</button>
+            </div>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" @onclick="ShowAddInvoiceModal">
+                    <i class="bi bi-plus"></i> Přidat fakturu
+                </button>
+            </div>
+            @if (invoices == null || invoices.Count == 0)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <p class="mt-2">Načítám faktury...</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="w-100">
+                        <QuickGrid Items="filteredInvoices.AsQueryable()" Pagination="pagginationState" Class="w-100">
+                            <PropertyColumn Title="Datum vystavení" Property="@(r => r.IssueDate.ToShortDateString())" Sortable="true" />
+                            <PropertyColumn Title="Datum splatnosti" Property="@(r => r.DueDate.ToShortDateString())" Sortable="true" />
+                            <TemplateColumn Title="Zákazník">
+                                @if (context.Reservation != null && context.Reservation.Customer.FirstName != null)
+                                {
+                                    <span>@context.Reservation.Customer.FirstName - @context.Reservation.Customer.LastName - RČ: @context.Reservation.Customer.PersonalIdentificationNumber </span>
+                                }
+                                else
+                                {
+                                    <span>N/A</span>
+                                }
+                            </TemplateColumn>
+                            <PropertyColumn Title="Celková cena" Property="@(r => r.Price.ToString("C"))" Sortable="true" />
+                            <TemplateColumn Title="Rezervace">
+                                @if (context.Reservation != null && context.Reservation.Id != 0)
+                                {
+                                    <span>@context.Reservation.Id</span>
+                                }
+                                else
+                                {
+                                    <span>N/A</span>
+                                }
+                            </TemplateColumn>
+                            <TemplateColumn Title="Zaplaceno">
+                                @if (context.IsPaid)
+                                {
+                                    <span class="badge bg-success">Ano</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Ne</span>
+                                }
+                            </TemplateColumn>
+
+
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    <button class="btn text-primary" @onclick="() => NavigateToInvoiceDetail(context.Id)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn text-danger" @onclick="() => DeleteInvoice(context.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </TemplateColumn>
+
+                        </QuickGrid>
+
+                        <Paginator State="pagginationState" />
+
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private PaginationState pagginationState = new PaginationState() { ItemsPerPage = 10 };
+    private List<Invoice> invoices = new List<Invoice>();
+    private List<Invoice> filteredInvoices = new List<Invoice>();
+    private List<Reservation> reservations = new List<Reservation>();
+    private string? searchTerm;
+    private bool isInvoiceModalVisible = false;
+
+    private void ShowAddInvoiceModal()
+    {
+        isInvoiceModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        isInvoiceModalVisible = false;
+
+        if (result)
+        {
+            invoices = await InvoiceService.GetInvoicesAsync();
+            filteredInvoices = invoices;
+        }
+
+    }
+
+    private async Task DeleteInvoice(int id)
+    {
+        var invoice = invoices.FirstOrDefault(r => r.Id == id);
+        if (invoice != null)
+        {
+            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat fakturu?");
+            if (confirmResult)
+            {
+                await InvoiceService.DeleteInvoiceAsync(id);
+                invoices.Remove(invoice);
+                filteredInvoices = invoices;
+
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        invoices = await InvoiceService.GetInvoicesAsync();
+        filteredInvoices = invoices;
+
+        reservations = await ReservationService.GetReservationsAsync();
+
+    }
+
+
+
+    private void SearchInvoices(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+
+        @if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredInvoices = invoices.Where(r => r.IssueDate.ToShortDateString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.DueDate.ToShortDateString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Price.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.IsPaid.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        else
+        {
+            filteredInvoices = invoices;
+        }
+
+
+    }
+
+    private void NavigateToInvoiceDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/faktura/{id}");
+    }
+
+
+
+}

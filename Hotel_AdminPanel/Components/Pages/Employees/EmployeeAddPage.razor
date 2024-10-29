@@ -1,1 +1,148 @@
 ﻿@page "/pridat-zamestnance"
+@inject IAccountService AccountService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4 page-title">Přidat Zaměstnance</h3>
+            <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="AddCustomer">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="profilePicture" class="form-label">Profilový obrázek</label>
+                        <InputText id="profilePicture" class="form-control" @bind-Value="customer.ProfilePicture" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="Email" class="form-label">Email</label>
+                        <InputText id="Email" class="form-control" @bind-Value="customer.Email" />
+                    </div>
+                </div>
+
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Heslo</label>
+                        <InputText id="password" class="form-control" type="password" @bind-Value="customer.Password" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="confirmPassword" class="form-label">Potvrďte heslo</label>
+                        <InputText id="confirmPassword" class="form-control" type="password" @bind-Value="customer.ConfirmPassword" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label">Jméno</label>
+                        <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label">Příjmení</label>
+                        <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="personalId" class="form-label">Osobní číslo</label>
+                        <InputText id="personalId" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="placeOfBirth" class="form-label">Místo narození</label>
+                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="insuranceCompanyId" class="form-label">Pojišťovna</label>
+                        <InputNumber id="insuranceCompanyId" class="form-control" @bind-Value="customer.InsuranceCompanyId" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="address" class="form-label">Adresa</label>
+                        <InputText id="address" class="form-control" @bind-Value="customer.Address" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="city" class="form-label">Město</label>
+                        <InputText id="city" class="form-control" @bind-Value="customer.City" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="postalCode" class="form-label">PSČ</label>
+                        <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="country" class="form-label">Země</label>
+                        <InputText id="country" class="form-control" @bind-Value="customer.Country" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="jobTitle" class="form-label">Pozice</label>
+                        <InputText id="jobTitle" class="form-control" @bind-Value="customer.JobTitle" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="startDate" class="form-label">Datum začátku</label>
+                        <InputDate id="startDate" class="form-control" @bind-Value="customer.StartDate" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="salary" class="form-label">Plat</label>
+                        <InputNumber id="salary" class="form-control" @bind-Value="customer.Salary" />
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-check-label">
+                        <InputCheckbox class="form-check-input" @bind-Value="customer.IsEmployed" />
+                        Zaměstnán
+                    </label>
+                </div>
+
+
+
+
+
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <a href="/zamestnanci" class="btn btn-outline-secondary">Zpět na seznam</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    [SupplyParameterFromForm]
+    private RegisterViewModel customer { get; set; } = new RegisterViewModel();
+
+    private async Task HandleValidSubmit()
+    {
+        await AccountService.RegisterAsync(customer);
+        NavigationManager.NavigateTo("/zamestnanci");
+    }
+
+}

@@ -1,0 +1,27 @@
+﻿@page "/roles"
+@inject IAccountService AccountService
+
+<h3>Seznam Rolí</h3>
+
+@if (Roles == null || !Roles.Any())
+{
+    <p>Nebyly nalezeny žádné role.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var role in Roles)
+        {
+            <li class="list-group-item">@role.Name</li>
+        }
+    </ul>
+}
+
+@code {
+    private List<IdentityRole> Roles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = await AccountService.GetAllRolesAsync();
+    }
+}

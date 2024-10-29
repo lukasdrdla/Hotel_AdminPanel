@@ -2,12 +2,11 @@
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-@attribute [Authorize]
 
 <div class="container mt-2">
-    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm mx-auto">
         <div class="card-body">
-            <h3 class="card-title text-center mb-4 page-title">Přidat Rezervaci</h3>
+            <h3 class="card-title text-center mb-4 page-title">Přidat Zákazníka</h3>
             <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="AddCustomer">
 
                 <DataAnnotationsValidator />
@@ -26,6 +25,50 @@
                         <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
                     </div>
                 </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <label for="documentNumber" class="form-label">Číslo Dokladu</label>
+                        <InputText id="documentNumber" class="form-control" @bind-Value="customer.DocumentNumber" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="dateOfIssue" class="form-label">Datum vydání</label>
+                        <InputDate id="dateOfIssue" class="form-control" @bind-Value="customer.DateOfIssue" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="dateOfExpiry" class="form-label">Datum expirace</label>
+                        <InputDate id="dateOfExpiry" class="form-control" @bind-Value="customer.DateOfExpiry" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="placeOfBirth" class="form-label">Místo narození</label>
+                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="dateOfBirth" class="form-label">Datum narození</label>
+                        <InputDate id="dateOfBirth" class="form-control" @bind-Value="customer.DateOfBirth" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="personalIdentificationNumber" class="form-label">Rodné číslo</label>
+                        <InputText id="personalIdentificationNumber" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="national" class="form-label">Národnost</label>
+                        <InputText id="national" class="form-control" @bind-Value="customer.Nationality" />
+                    </div>
+                </div>
+
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
@@ -60,6 +103,18 @@
                     <div class="col-md-6">
                         <label for="postalCode" class="form-label">PSČ</label>
                         <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="createdAt" class="form-label">Vytvořeno</label>
+                        <InputDate id="createdAt" class="form-control" @bind-Value="customer.CreatedAt" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="updatedAt" class="form-label">Aktualizováno</label>
+                        <InputDate id="updatedAt" class="form-control" @bind-Value="customer.UpdatedAt" />
                     </div>
                 </div>
 

@@ -1,19 +1,24 @@
 ﻿@page "/zakaznici"
+@using Hotel_AdminPanel.Components.Pages.Settings
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-@attribute [Authorize]
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4 page-title">Zákazníci</h3>
-    <div class="d-flex justify-content-between mb-3">
-        <div></div> <!-- Placeholder for alignment -->
-        <button class="btn btn-primary" @onclick="ShowAddCustomerModal">Přidat Zákazníka</button>
-    </div>
-
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchCustomers">
+    <div class="row">
+        <div class="col-md-12 d-flex flex-fill">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body">
+                    <h3 class="text-center mb-4 page-title">Zakazníci</h3>
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" placeholder="Hledat..." @oninput="SearchCustomers" />
+                <button class="btn btn-outline-secondary" type="button">Hledat</button>
+            </div>
+    <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary" @onclick="OpenAddCustomerModal">
+            <i class="bi bi-plus"></i> Přidat zákazníka
+        </button>
     </div>
 
     @if (customers == null || customers.Count == 0)
@@ -27,139 +32,58 @@
     }
     else
     {
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Jméno</th>
-                        <th scope="col">Přijmení</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Telefon</th>
-                        <th scope="col">Adresa</th>
-                        <th scope="col">Město</th>
-                        <th scope="col">PSČ</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var customer in filteredCustomers)
-                    {
-                        <tr>
-                            @if (editCustomerId == customer.Id)
-                            {
-                                <!-- Inputy pro úpravu zákazníka -->
-                                <td><input @bind="customer.FirstName" class="form-control" /></td>
-                                <td><input @bind="customer.LastName" class="form-control" /></td>
-                                <td><input @bind="customer.Email" class="form-control" /></td>
-                                <td><input @bind="customer.Phone" class="form-control" /></td>
-                                <td><input @bind="customer.Address" class="form-control" /></td>
-                                <td><input @bind="customer.City" class="form-control" /></td>
-                                <td><input @bind="customer.PostalCode" class="form-control" /></td>
-                                <td>
-                                    <button class="btn btn-success btn-sm" @onclick="() => SaveCustomer(customer)">
-                                        <i class="bi bi-check"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" @onclick="CancelEdit">
-                                        <i class="bi bi-x"></i>
-                                    </button>
-                                </td>
-                            }
-                            else
-                            {
-                                <!-- Zobrazení zákazníka -->
-                                <td>@customer.FirstName</td>
-                                <td>@customer.LastName</td>
-                                <td>@customer.Email</td>
-                                <td>@customer.Phone</td>
-                                <td>@customer.Address</td>
-                                <td>@customer.City</td>
-                                <td>@customer.PostalCode</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" @onclick="() => EditCustomer(customer.Id)">
+
+                <div class="table-responsive">
+                    <table class="w-100">
+                        <QuickGrid Items="filteredCustomers.AsQueryable()" Pagination="paginationState" Class=" w-100">
+                            <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true" />
+                            <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true" />
+                            <PropertyColumn Title="Číslo Dokladu" Property="@(x => x.DocumentNumber)" Sortable="true" />
+                            <PropertyColumn Title="Email" Property="@(x => x.Email)" Sortable="true" />
+                            <PropertyColumn Title="Telefon" Property="@(x => x.Phone)" Sortable="true" />
+                            <PropertyColumn Title="Adresa" Property="@(x => x.Address)" Sortable="true" />
+                            <PropertyColumn Title="Město" Property="@(x => x.City)" Sortable="true" />
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    <button class="btn text-primary" @onclick="() => NavigateToCustomerDetail(context.Id)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-
-                                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteCustomer(customer.Id)">
+                                    <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
 
-                                    <button class="btn btn-success btn-sm" @onclick="() => NavigateToCustomerDetail(customer.Id)">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </td>
+                                </div>
+                            </TemplateColumn>
+                        </QuickGrid>
+                    </table>
+            
 
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+
+        
+
+        <Paginator State="paginationState" />
+                </div>
     }
+        </div>
+
+    </div>
+</div>
+</div>
 </div>
 
-<AddCustomerModal OnCustomerAdded="AddCustomer" isVisible="isAddCustomerModalVisible" OnClose="() => isAddCustomerModalVisible = false" />
-
+<Modal Title="Potvrzení smazání" Message="Opravdu chcete smazat tohoto zákazníka?" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
+<CustomerAddModal IsVisible="@isAddModalVisible" OnClose="HandleAddModalClose" />
 
 @code {
     private List<Customer> customers;
-    private string searchTerm;
     private List<Customer> filteredCustomers;
+    private bool isModalVisible = false;
+    private int customerIdToDelete;
 
-    private int? editCustomerId = null;
-    private bool isAddCustomerModalVisible = false;
-    private Customer newCustomer = new Customer();
+    private bool isAddModalVisible = false;
 
-    private void ShowAddCustomerModal()
-    {
-        isAddCustomerModalVisible = true;
-        newCustomer = new Customer(); // Reset new customer
-    }
-
-    private void CloseAddCustomerModal()
-    {
-        isAddCustomerModalVisible = false;
-    }
-
-    private async Task AddCustomer()
-    {
-        await CustomerService.CreateCustomerAsync(newCustomer);
-        customers = await CustomerService.GetCustomersAsync();
-        filteredCustomers = customers;
-        CloseAddCustomerModal();
-    }
-
-    private void EditCustomer(int id)
-    {
-        editCustomerId = id;
-    }
-
-    private void CancelEdit()
-    {
-        editCustomerId = null;
-    }
-
-    private async Task SaveCustomer(Customer customer)
-    {
-        await CustomerService.UpdateCustomerAsync(customer);
-        editCustomerId = null;
-    }
-
-    private async Task DeleteCustomer(int id)
-    {
-        var customer = customers.FirstOrDefault(c => c.Id == id);
-
-        if (customer != null)
-        {
-            var result = await JSRuntime.InvokeAsync<bool>("confirm", $"Opravdu chcete smazat zákazníka {customer.FirstName} {customer.LastName}?");
-
-            if (result == true)
-            {
-                await CustomerService.DeleteCustomerAsync(id);
-                customers = await CustomerService.GetCustomersAsync();
-                filteredCustomers = customers;
-            }
-        }
-    }
+    private string searchTerm = string.Empty;
+    private PaginationState paginationState = new PaginationState { ItemsPerPage = 20 };
 
     protected override async Task OnInitializedAsync()
     {
@@ -167,22 +91,73 @@
         filteredCustomers = customers;
     }
 
+    private void OpenAddCustomerModal()
+    {
+        isAddModalVisible = true;
+    }
+
+    private async Task HandleAddModalClose(bool result)
+    {
+        isAddModalVisible = false;
+
+        if (result)
+        {
+            customers = await CustomerService.GetCustomersAsync();
+            filteredCustomers = customers;
+        }
+    }
+
+    private void NavigateToAddCustomer()
+    {
+        NavigationManager.NavigateTo("/pridat-zakaznika");
+    }
+
     private void SearchCustomers(ChangeEventArgs e)
     {
         searchTerm = e.Value.ToString();
-        if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
-            filteredCustomers = customers
-                .Where(c => c.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            c.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                            c.Phone.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-        else
+        FilterCustomers();
+    }
+
+    private void FilterCustomers()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
         {
             filteredCustomers = customers;
         }
+        else
+        {
+            filteredCustomers = customers.Where(x => x.FirstName.ToLower().Contains(searchTerm.ToLower())
+            || x.LastName.ToLower().Contains(searchTerm.ToLower())
+            || x.DocumentNumber.ToLower().Contains(searchTerm.ToLower())
+            || x.Email.ToLower().Contains(searchTerm.ToLower())
+            || x.Phone.ToLower().Contains(searchTerm.ToLower())
+            || x.Address.ToLower().Contains(searchTerm.ToLower())
+            || x.City.ToLower().Contains(searchTerm.ToLower())
+            ).ToList();
+        }
+    }
+
+    private void OpenDeleteConfirmation(int customerId)
+    {
+        customerIdToDelete = customerId;
+        isModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        isModalVisible = false;
+
+        if (result)
+        {
+            await DeleteCustomer(customerIdToDelete);
+        }
+    }
+
+    private async Task DeleteCustomer(int customerId)
+    {
+        await CustomerService.DeleteCustomerAsync(customerId);
+        customers = await CustomerService.GetCustomersAsync();
+        FilterCustomers();
     }
 
     private void NavigateToCustomerDetail(int id)

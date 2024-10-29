@@ -1,0 +1,103 @@
+﻿@inherits OwningComponentBase<IReservationService>
+@inject ICustomerService CustomerService
+@inject IRoomService RoomService
+@inject IReservationService ReservationService
+
+<EditForm Model="reservation" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Přidat Rezervaci</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="CustomerId" class="form-label">Zákazník</label>
+                            <InputNumber id="CustomerId" class="form-control" @bind-Value="CustomerId" readonly />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="RoomId" class="form-label">Pokoj</label>
+                            <InputSelect id="RoomId" class="form-control" @bind-Value="reservation.RoomId">
+                                <option value="">Vyber pokoj</option>
+                                @foreach (var room in rooms)
+                                {
+                                    <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="CheckIn" class="form-label">Check In</label>
+                            <InputDate id="CheckIn" class="form-control" @bind-Value="reservation.CheckIn" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="CheckOut" class="form-label">Check Out</label>
+                            <InputDate id="CheckOut" class="form-control" @bind-Value="reservation.CheckOut" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="TotalPrice" class="form-label">Celková Cena</label>
+                            <InputNumber id="TotalPrice" class="form-control" @bind-Value="reservation.TotalPrice" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="ReservationStatusId" class="form-label">Status</label>
+                            <InputSelect id="ReservationStatusId" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                                <option value="">Vyber status</option>
+                                @foreach (var status in reservationStatuses)
+                                {
+                                    <option value="@status.Id">@status.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-12">
+                            <label for="SpecialRequest" class="form-label">Speciální Požadavky</label>
+                            <InputTextArea id="SpecialRequest" class="form-control" @bind-Value="reservation.SpecialRequest" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public List<Room> rooms { get; set; }
+    [Parameter] public List<ReservationStatus> reservationStatuses { get; set; }
+    [Parameter] public int CustomerId { get; set; } // Nový parametr
+
+    private Reservation reservation = new Reservation();
+
+    private async Task HandleValidSubmit()
+    {
+        reservation.CustomerId = CustomerId; // Nastavení ID zákazníka do rezervace
+        await ReservationService.CreateReservationAsync(reservation);
+        await OnClose.InvokeAsync(false);
+    }
+
+
+
+    private Task Close() => OnClose.InvokeAsync(false);
+}

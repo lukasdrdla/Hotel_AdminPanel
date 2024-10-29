@@ -1,8 +1,10 @@
 ﻿@page "/login"
+@attribute [AllowAnonymous]
+
 @inject IAccountService AccountService
 @inject NavigationManager NavigationManager
 
-<div class="container d-flex align-items-center justify-content-center min-vh-100" style="flex-direction: column;">
+<div class="container d-flex align-items-center justify-content-center vh-100 " style="flex-direction: column;">
     <div style="width: 100%; max-width: 400px;">
         <div class="card-body">
             <h3 class="card-title text-center">Přihlášení</h3>
@@ -36,6 +38,22 @@
         </div>
     </div>
 </div>
+
+<style>
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .content{
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sidebar {
+        display: none;
+    }
+</style>
 
 @code {
     [SupplyParameterFromForm]

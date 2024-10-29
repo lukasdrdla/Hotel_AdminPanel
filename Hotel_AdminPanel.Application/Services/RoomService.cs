@@ -41,7 +41,7 @@ namespace Hotel_AdminPanel.Application.Services
         {
             var newRoomStatus = new RoomStatus
             {
-                Status = roomStatus.Status
+                Name = roomStatus.Name
             };
 
 
@@ -54,7 +54,7 @@ namespace Hotel_AdminPanel.Application.Services
         {
             var newRoomType = new RoomType
             {
-                Type = roomType.Type
+                Name = roomType.Name
             };
 
             await _context.RoomTypes.AddAsync(newRoomType);
@@ -179,7 +179,7 @@ namespace Hotel_AdminPanel.Application.Services
                 throw new Exception("Room status not found");
             }
 
-            exisingRoomStatus.Status = roomStatus.Status;
+            exisingRoomStatus.Name = roomStatus.Name;
 
             await _context.SaveChangesAsync();
 
@@ -193,7 +193,7 @@ namespace Hotel_AdminPanel.Application.Services
                 throw new Exception("Room type not found");
             }
 
-            existingRoomType.Type = roomType.Type;
+            existingRoomType.Name = roomType.Name;
 
             await _context.SaveChangesAsync();
 

@@ -2,36 +2,50 @@
 @inject IRoomService RoomService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-@attribute [Authorize]
+
 
 
 <div class="container mt-2">
-    <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm mx-auto">
         <div class="card-body">
             <h3 class="card-title text-center mb-4 page-title">Přidat Pokoj</h3>
             <EditForm Model="room" OnValidSubmit="HandleValidSubmit" FormName="AddRoom">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div class="form-group mb-3">
-                    <label for="RoomImg" class="form-label">Obrázek</label>
-                    <InputText id="RoomImg" class="form-control" @bind-Value="room.Image" />
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="RoomImg" class="form-label">Obrázek</label>
+                        <InputText id="RoomImg" class="form-control" @bind-Value="room.Image" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="RoomNumber" class="form-label">Číslo pokoje</label>
+                        <InputText id="RoomNumber" class="form-control" @bind-Value="room.RoomNumber" />
+                    </div>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label for="RoomNumber" class="form-label">Číslo pokoje</label>
-                    <InputText id="RoomNumber" class="form-control" @bind-Value="room.RoomNumber" />
-                </div>
+                    <div class="form-group mb-3">
 
-                <div class="form-group mb-3">
-                    <label for="RoomType" class="form-label">Typ pokoje</label>
-                    <InputSelect id="RoomType" class="form-control" @bind-Value="room.RoomTypeId">
-                        <option value="">Vyberte typ pokoje</option>
-                        @foreach (var type in roomTypes)
+                        <label for="RoomType" class="form-label">Room Type</label>
+                        <input type="text" class="form-control" placeholder="Hledat typ pokoje" @bind="searchTerm" @oninput="OnInputChange" />
+
+                        @if (filteredRoomTypes != null && filteredRoomTypes.Any())
                         {
-                            <option value="@type.Id">@type.Type</option>
+                            <ul class="list-group mt-2">
+                                @foreach (var roomType in filteredRoomTypes)
+                                {
+                                    <li class="list-group-item" @onclick="() => SelectRoomType(roomType)">
+                                        @roomType.Name
+                                    </li>
+                                    
+                                }
+                            </ul>
                         }
-                    </InputSelect>
+
+
+                    </div>
                 </div>
 
                 <div class="form-group mb-3">
@@ -40,25 +54,28 @@
                         <option value="">Vyberte status</option>
                         @foreach (var status in roomStatuses)
                         {
-                            <option value="@status.Id">@status.Status</option>
+                            <option value="@status.Id">@status.Name</option>
                         }
                     </InputSelect>
                 </div>
+
+                 <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="MaxAdults" class="form-label">Max Dospělí</label>
+                        <InputNumber id="MaxAdults" class="form-control" @bind-Value="room.MaxAdults" />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="MaxChildren" class="form-label">Max Děti</label>
+                        <InputNumber id="MaxChildren" class="form-control" @bind-Value="room.MaxChildren" />
+                    </div>
+
+                  </div>
 
                 <div class="form-group mb-3">
                     <label for="Price" class="form-label">Cena</label>
                     <InputNumber id="Price" class="form-control" @bind-Value="room.Price" />
                 </div>
 
-                <div class="form-group mb-3">
-                    <label for="MaxAdults" class="form-label">Max Dospělí</label>
-                    <InputNumber id="MaxAdults" class="form-control" @bind-Value="room.MaxAdults" />
-                </div>
-
-                <div class="form-group mb-3">
-                    <label for="MaxChildren" class="form-label">Max Děti</label>
-                    <InputNumber id="MaxChildren" class="form-control" @bind-Value="room.MaxChildren" />
-                </div>
 
                 <div class="form-group mb-3">
                     <label for="Description" class="form-label">Popis</label>
@@ -81,7 +98,14 @@
     [SupplyParameterFromForm]
     private Room room { get; set; } = new Room();
 
+    private string searchTerm;
+
+
+
     private List<RoomType> roomTypes = new List<RoomType>();
+
+    private List<RoomType> filteredRoomTypes = new List<RoomType>();
+
     private List<RoomStatus> roomStatuses = new List<RoomStatus>();
 
     protected override async Task OnInitializedAsync()
@@ -89,6 +113,29 @@
         roomTypes = await RoomService.GetRoomTypesAsync();
         roomStatuses = await RoomService.GetRoomStatusesAsync();
 
+        filteredRoomTypes = new List<RoomType>();
+
+    }
+
+    private async Task OnInputChange(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            filteredRoomTypes = new List<RoomType>();
+        }
+        else
+        {
+            filteredRoomTypes = roomTypes.Where(rt => rt.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+           
+        }
+    }
+
+    private void SelectRoomType(RoomType roomType)
+    {
+        room.RoomTypeId = roomType.Id;
+        searchTerm = $"{roomType.Name}";
+        filteredRoomTypes = new List<RoomType>();
     }
 
     private async void HandleValidSubmit()

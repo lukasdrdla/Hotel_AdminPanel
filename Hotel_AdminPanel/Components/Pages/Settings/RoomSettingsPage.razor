@@ -29,14 +29,14 @@
                     {
                         <div class="mb-3">
                             <label for="roomTypeName" class="form-label">Název Typu</label>
-                            <input id="roomTypeName" @bind="NewRoomType.Type" class="form-control" />
+                            <input id="roomTypeName" @bind="NewRoomType.Name" class="form-control" />
                         </div>
                     }
                     else if (currentModalType == ModalType.RoomStatus)
                     {
                         <div class="mb-3">
                             <label for="roomStatusName" class="form-label">Název Statusu</label>
-                            <input id="roomStatusName" @bind="NewRoomStatus.Status" class="form-control" />
+                            <input id="roomStatusName" @bind="NewRoomStatus.Name" class="form-control" />
                         </div>
                     }
                 </form>
@@ -72,7 +72,7 @@
                              @if(editRoomTypeId == roomType.Id)
                              {
                                  <td class="w-25"><input @bind="roomType.Id" class="form-control" disabled /></td>
-                                 <td><input @bind="roomType.Type" class="form-control w-100" /></td>
+                                 <td><input @bind="roomType.Name" class="form-control w-100" /></td>
                                  <td>
                                      <button class="btn btn-success btn-sm" @onclick="() => SaveRoomType(roomType)">
                                          <i class="bi bi-check"></i>
@@ -85,7 +85,7 @@
                              else
                              {
                                  <td>@roomType.Id</td>
-                                 <td>@roomType.Type</td>
+                                 <td>@roomType.Name</td>
                                  <td>
                                      <button class="btn btn-primary btn-sm" @onclick="() => EditRoomType(roomType.Id)">
                                          <i class="bi bi-pencil"></i>
@@ -126,7 +126,7 @@
                             @if (editRoomStatusId == roomStatus.Id)
                             {
                                 <td class="w-25"><input @bind="roomStatus.Id" class="form-control" disabled /></td>
-                                <td><input @bind="roomStatus.Status" class="form-control w-100" /></td>
+                                <td><input @bind="roomStatus.Name" class="form-control w-100" /></td>
                                 <td>
                                     <button class="btn btn-success btn-sm" @onclick="() => SaveRoomStatus(roomStatus)">
                                         <i class="bi bi-check"></i>
@@ -139,7 +139,7 @@
                             else
                             {
                                 <td>@roomStatus.Id</td>
-                                <td>@roomStatus.Status</td>
+                                <td>@roomStatus.Name</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" @onclick="() => EditRoomStatus(roomStatus.Id)">
                                         <i class="bi bi-pencil"></i>

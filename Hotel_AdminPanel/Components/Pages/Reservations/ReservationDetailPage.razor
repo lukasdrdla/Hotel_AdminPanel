@@ -1,7 +1,11 @@
 ﻿@page "/rezervace/{id:int}"
+@using Hotel_AdminPanel.Components.Pages.Invoices
+@using Hotel_AdminPanel.Components.Pages.Modals
 @inject IReservationService ReservationService
+@inject IInvoiceService InvoiceService
+@inject IRoomService RoomService
 @inject NavigationManager NavigationManager
-@attribute [Authorize]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="container mt-2">
     @if (reservation == null)
@@ -15,49 +19,203 @@
     }
     else
     {
-        <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
-            <div class="card-body">
-                <h3 class="card-title text-center mb-4 page-title">Upravit Rezervaci</h3>
-                <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit" FormName="EditReservation">
-                    <div class="mb-3">
-                        <label for="room" class="form-label">Pokoj</label>
-                        <InputNumber id="room" class="form-control" @bind-Value="reservation.RoomId" />
-                    </div>
-@* 
-                    <div class="mb-3">
-                        <label for="customer" class="form-label">Zákazník</label>
-                        <InputText id="customer" class="form-control" @bind-Value="reservation.Customer.FirstName" />
-                    </div> *@
 
-                    <div class="mb-3">
-                        <label for="checkIn" class="form-label">Datum příjezdu</label>
-                        <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4 page-title">Rezervace č.@reservation.Id</h3>
+                        <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit" FormName="EditReservation">
+
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3">
+                                @if (reservation.Customer != null)
+                                {
+                                   
+                                    <h4>Zákazník</h4>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <a @onclick="NavigateToCustomerDetail" style="cursor:pointer;">@reservation.Customer.FirstName @reservation.Customer.LastName - @reservation.Customer.DateOfBirth.ToShortDateString() - Číslo dokladu: @reservation.Customer.DocumentNumber</a>
+                                        </li>
+                                    </ul>
+
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Zákazník nebyl nalezen.</span>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id" class="form-label">Id</label>
+                                <InputNumber id="id" class="form-control" @bind-Value="reservation.Id" disabled />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="room" class="form-label">Pokoj</label>
+                                <InputSelect id="room" class="form-control" @bind-Value="reservation.RoomId">
+                                    <option value="">Vyber pokoj</option>
+                                    @foreach (var room in rooms)
+                                    {
+                                        <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            
+
+                            <div class="mb-3">
+                                <label for="checkIn" class="form-label">Datum příjezdu</label>
+                                <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="checkOut" class="form-label">Datum odjezdu</label>
+                                <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Cena</label>
+                                <InputNumber id="price" class="form-control" @bind-Value="reservation.TotalPrice" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <InputSelect id="status" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                                    @foreach (var status in reservationStatuses)
+                                    {
+                                        <option value="@status.Id">@status.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="adults" class="form-label">Dospělí</label>
+                                <InputNumber id="adults" class="form-control" @bind-Value="reservation.Adults" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="children" class="form-label">Děti</label>
+                                <InputNumber id="children" class="form-control" @bind-Value="reservation.Children" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="mealPlan" class="form-label">Stravování</label>
+                                <InputSelect id="mealPlan" class="form-control" @bind-Value="reservation.MealPlanId">
+                                    @foreach (var mealPlan in MealPlans)
+                                    {
+                                        <option value="@mealPlan.Id">@mealPlan.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="specialRequest" class="form-label">Speciální požadavek</label>
+                                <InputTextArea id="specialRequest" class="form-control" @bind-Value="reservation.SpecialRequest" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="adminNote" class="form-label">Poznámka zaměstnance</label>
+                                <InputTextArea id="adminNote" class="form-control" @bind-Value="reservation.AdminNote" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="createdAt" class="form-label">Vytvořeno</label>
+                                <InputDate id="createdAt" class="form-control" @bind-Value="reservation.CreatedAt" disabled />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="updatedAt" class="form-label">Aktualizováno</label>
+                                <InputDate id="updatedAt" class="form-control" @bind-Value="reservation.UpdatedAt" />
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary">Uložit</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" @onclick="OpenAddGuestModal">
+                            <i class="bi bi-plus"></i> Přidat hosta
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Hosté</h3>
+                        @if (guests != null && guests.Any())
+                        {
+                            <div class="table-container">
+                                <table>
+                                    <QuickGrid Items="guests.AsQueryable()" Pagination="paginationGuestState">
+                                        <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true"/>
+                                        <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true"/>
+                                        <PropertyColumn Title="Datum narození" Property="@(x => x.DateOfBirth.ToShortDateString())" Sortable="true"/>
+                                        <PropertyColumn Title="Číslo dokladu" Property="@(x => x.DocumentNumber)" Sortable="true"/>
+
+                                    </QuickGrid>
+                                    <Paginator State="paginationGuestState" />
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Žádní hosté nejsou přiřazeni.</p>
+                        }
+                    </div>
+                </div>
+                <div class="card border-0 shadow-sm mx-auto mt-5">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" @onclick="OpenAddInvoiceModal">
+                            <i class="bi bi-plus"></i> Přidat Fakturu
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Faktury</h3>
+                        @if (invoices != null)
+                        {
+                            <div class="table-container">
+                                <table>
+                                    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationInvoiceState">
+                                        <PropertyColumn Title="Datum vystavení" Property="@(x => x.IssueDate.ToShortDateString())" Sortable="true"/>
+                                        <PropertyColumn Title="Datum splatnosti" Property="@(x => x.DueDate.ToShortDateString())" Sortable="true"/>
+                                        <PropertyColumn Title="Měna" Property="@(x => x.Currency)" Sortable="true"/>
+                                        <PropertyColumn Title="Cena" Property="@(x => x.Price)" Sortable="true"/>
+                                        <TemplateColumn Title="Akce">
+                                            <div class="d-inline-flex">
+                                                <button class="btn text-primary" @onclick="() => NavigateToInvoiceDetail(context.Id)">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            </div>
+                                        </TemplateColumn>
+                                    </QuickGrid>
+                                    <Paginator State="paginationInvoiceState" />
+                                </table>
+                            </div>
+                        }
+
+                        else
+                        {
+                            <p class="text-muted">Žádná faktura není přiřazena k této rezervaci.</p>
+                        }
                     </div>
 
-                    <div class="mb-3">
-                        <label for="checkOut" class="form-label">Datum odjezdu</label>
-                        <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" />
-                    </div>
+                </div>
+            </div>
 
-                    <div class="mb-3">
-                        <label for="price" class="form-label">Cena</label>
-                        <InputNumber id="price" class="form-control" @bind-Value="reservation.TotalPrice" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <InputSelect id="status" class="form-control" @bind-Value="reservation.ReservationStatusId">
-                            @foreach (var status in reservationStatuses)
-                            {
-                                <option value="@status.Id">@status.RStatus</option>
-                            }
-                        </InputSelect>
-                    </div>
-                </EditForm>
-             </div>
         </div>
+   
     }
 </div>
+
+<GuestAddModal IsVisible="@isAddGuestModalVisible" OnClose="CloseAddGuestModal" ReservationId="Id" />
+<InvoiceAddModal IsVisible="@isAddInvoiceModalVisible" OnClose="CloseAddInvoiceModal" ReservationId="Id" />
 
 
 
@@ -65,20 +223,68 @@
     [Parameter]
     public int Id { get; set; }
 
-    [SupplyParameterFromForm]
-    private Reservation reservation { get; set; } = new Reservation();
+    private Reservation reservation = new Reservation();
+    
 
     private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
+    private List<MealPlan> MealPlans = new List<MealPlan>();
+    private List<Room> rooms = new List<Room>();
+    private List<Invoice> invoices = new List<Invoice>();
+    private PaginationState paginationInvoiceState = new PaginationState() { ItemsPerPage = 5 };
+
+    private List<Guest> guests = new List<Guest>();
+    private PaginationState paginationGuestState = new PaginationState() { ItemsPerPage = 5 };
+
+
+
+    private bool isAddGuestModalVisible = false;
+    private bool isAddInvoiceModalVisible = false;
+
+    private void OpenAddInvoiceModal()
+    {
+        isAddInvoiceModalVisible = true;
+    }
+
+    private void OpenAddGuestModal()
+    {
+        isAddGuestModalVisible = true;
+    }
+
+    private void CloseAddGuestModal()
+    {
+        isAddGuestModalVisible = false;
+        //handle refresh
+    }
+
+    private void CloseAddInvoiceModal()
+    {
+        isAddInvoiceModalVisible = false;
+        //handle refresh
+    }
 
     protected override async Task OnInitializedAsync()
     {
         reservation = await ReservationService.GetReservationByIdAsync(Id);
         reservationStatuses = await ReservationService.GetReservationStatusesAsync();
+        MealPlans = await ReservationService.GetMealPlansAsync();
+        guests = await ReservationService.GetGuestsByReservationIdAsync(Id);
+        rooms = await RoomService.GetRooomsAsync();
+        invoices = await InvoiceService.GetInvoiceByReservationIdAsync(Id);
     }
 
     private async Task HandleValidSubmit()
     {
         await ReservationService.UpdateReservationAsync(reservation);
         NavigationManager.NavigateTo("/reservations");
+    }
+
+    private void NavigateToCustomerDetail()
+    {
+        NavigationManager.NavigateTo($"/zakaznik/{reservation.CustomerId}");
+    }
+
+    private void NavigateToInvoiceDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/faktura/{id}");
     }
 }

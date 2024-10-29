@@ -1,11 +1,12 @@
 ﻿@page "/zakaznik/{Id:int}"
+@using Hotel_AdminPanel.Components.Pages.Reservations
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
+@inject IRoomService RoomService
 @inject IReservationService ReservationService
-@attribute [Authorize]
+@inject IReviewService ReviewService
 
 @rendermode InteractiveServer
-
 
 <div class="container mt-2">
     @if (customer == null)
@@ -19,132 +20,133 @@
     }
     else
     {
-        <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
-            <div class="card-body">
-                <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
-
-                <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="EditCustomer">
-
-                    <div class="mb-3">
-                        <label for="customerId" class="form-label">Číslo Zákazníka</label>
-                        <InputNumber id="customerId" class="form-control" @bind-Value="customer.Id" disabled />
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
+                        <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="EditCustomer">
+                            <div class="mb-3">
+                                <label for="customerId" class="form-label">Číslo Zákazníka</label>
+                                <InputNumber id="customerId" class="form-control" @bind-Value="customer.Id" disabled />
+                            </div>
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">Jméno</label>
+                                <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Příjmení</label>
+                                <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="documentNumber" class="form-label">Číslo Dokladu</label>
+                                <InputText id="documentNumber" class="form-control" @bind-Value="customer.DocumentNumber" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="placeOfBirth" class="form-label">Místo Narození</label>
+                                <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="dateOfBirth" class="form-label">Datum Narození</label>
+                                <InputDate id="dateOfBirth" class="form-control" @bind-Value="customer.DateOfBirth" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="dateOfIssue" class="form-label">Datum Vydání (dokladu)</label>
+                                <InputDate id="dateOfIssue" class="form-control" @bind-Value="customer.DateOfIssue" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="dateOfExpiry" class="form-label">Datum Expirace (dokladu)</label>
+                                <InputDate id="dateOfExpiry" class="form-control" @bind-Value="customer.DateOfExpiry" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="personalIdentificationNumber" class="form-label">Rodné Číslo</label>
+                                <InputText id="personalIdentificationNumber" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <InputText id="email" type="email" class="form-control" @bind-Value="customer.Email" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Telefon</label>
+                                <InputText id="phone" class="form-control" @bind-Value="customer.Phone" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Adresa</label>
+                                <InputText id="address" class="form-control" @bind-Value="customer.Address" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">Město</label>
+                                <InputText id="city" class="form-control" @bind-Value="customer.City" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="country" class="form-label">Země</label>
+                                <InputText id="country" class="form-control" @bind-Value="customer.Country" />
+                            </div>
+                            <div class="mb-3">
+                                <label for="postalCode" class="form-label">PSČ</label>
+                                <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
+                            </div>
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">Uložit</button>
+                                <a href="/zakaznici" class="btn btn-outline-secondary">Zpět na seznam</a>
+                                <button type="button" class="btn btn-danger" @onclick="HandleRemoveCustomer">Odstranit</button>
+                            </div>
+                        </EditForm>
                     </div>
+                </div>
+            </div>
 
-                    <div class="mb-3">
-                        <label for="firstName" class="form-label">Jméno</label>
-                        <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" @onclick="OpenAddModalReservation">Přidat Rezervaci</button>
+                        <h3 class="card-title">Rezervace</h3>
+                        <div class="table-container">
+                            <table>
+                                <QuickGrid Items="customerReservations.AsQueryable()" Pagination="customerReservationsPaggination">
+                                    <PropertyColumn Title="Číslo Rezervace" Property="@(r => r.Id)" Sortable="true" />
+                                    <PropertyColumn Title="Check In" Property="@(r => r.CheckIn.ToShortDateString())" Sortable="true" />
+                                    <PropertyColumn Title="Check Out" Property="@(r => r.CheckOut.ToShortDateString())" Sortable="true" />
+                                    <PropertyColumn Title="Pokoj" Property="@(r => r.Room.RoomNumber)" Sortable="true" />
+                                    <PropertyColumn Title="Cena" Property="@(r => r.TotalPrice.ToString("C"))" Sortable="true" />
+                                </QuickGrid>
+
+                                <Paginator State="customerReservationsPaggination" />
+                            </table>
+                        </div>
                     </div>
+                </div>
+                <div class="card border-0 shadow-sm mx-auto mt-5">
+                    <div class="card-body">
+                        <h3 class="card-title">Hodnocení</h3>
+                        <div class="table-container">
+                            <table class="w-100">
+                                <QuickGrid Items="customerReviews.AsQueryable()" Pagination="customerReviewPaggination">
+                                    <PropertyColumn Title="Hodnocení" Property="@(r => r.Rating)" Sortable="true" />
+                                    <PropertyColumn Title="Komentář" Property="@(r => r.Comment)" Sortable="true" />
+                                    <PropertyColumn Title="Datum" Property="@(r => r.CreatedAt.ToShortDateString())" Sortable="true" />
 
-                    <div class="mb-3">
-                        <label for="lastName" class="form-label">Příjmení</label>
-                        <InputText id="lastName" class="form-control" @bind-Value="customer.LastName" />
+                               </QuickGrid>
+
+                               <Paginator State="customerReviewPaggination" />
+                            </table>
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                         <label for="documentNumber" class="form-label">Číslo Dokladu</label>
-                         <InputText id="documentNumber" class="form-control" @bind-Value="customer.DocumentNumber" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="placeOfBirth" class="form-label">Místo Narození</label>
-                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="dateOfBirth" class="form-label">Datum Narození</label>
-                        <InputDate id="dateOfBirth" class="form-control" @bind-Value="customer.DateOfBirth" />
-                    </div>
-
-
-                    <div class="mb-3">
-                        <label for="dateOfIssue" class="form-label">Datum Vydání (dokladu)</label>
-                        <InputDate id="dateOfIssue" class="form-control" @bind-Value="customer.DateOfIssue" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="dateOfExpiry" class="form-label">Datum Expirace (dokladu)</label>
-                        <InputDate id="dateOfExpiry" class="form-control" @bind-Value="customer.DateOfExpiry" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="personalIdentificationNumber" class="form-label">Rodné Číslo</label>
-                        <InputText id="personalIdentificationNumber" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <InputText id="email" type="email" class="form-control" @bind-Value="customer.Email" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Telefon</label>
-                        <InputText id="phone" class="form-control" @bind-Value="customer.Phone" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Adresa</label>
-                        <InputText id="address" class="form-control" @bind-Value="customer.Address" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="city" class="form-label">Město</label>
-                        <InputText id="city" class="form-control" @bind-Value="customer.City" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="country" class="form-label">Země</label>
-                        <InputText id="country" class="form-control" @bind-Value="customer.Country" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="postalCode" class="form-label">PSČ</label>
-                        <InputText id="postalCode" class="form-control" @bind-Value="customer.PostalCode" />
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary">Uložit</button>
-                        <a href="/zakaznici" class="btn btn-outline-secondary">Zpět na seznam</a>
-                        <button type="button" class="btn btn-danger" @onclick="HandleRemoveCustomer">Odstranit</button>
-                    </div>
-                </EditForm>
+                </div>
             </div>
         </div>
 
-
-         <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
+        <div class="card border-0 shadow-sm mt-4">
             <div class="card-body">
-
-                <h3 class="card-title">Rezervace</h3>
-
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Číslo Rezervace</th>
-                                <th scope="col">Datum Od</th>
-                                <th scope="col">Datum Do</th>
-                                <th scope="col">Pokoj</th>
-                                <th scope="col">Cena</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var reservation in customerReservations)
-                            {
-                                <tr @onclick="() => NavigateToReservationDetail(reservation.Id)" style="cursor:pointer;">
-                                    <td>@reservation.Id</td>
-                                    <td>@reservation.CheckIn.ToShortDateString()</td>
-                                    <td>@reservation.CheckOut.ToShortDateString()</td>
-                                    <td>@reservation.Room.RoomNumber</td>
-                                    <td>@reservation.TotalPrice.ToString("C")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                  </div>
+                <h5 class="card-title">Další Informace</h5>
+                <p class="card-text">Zde můžete přidat další obsah nebo informace související se zákazníkem nebo rezervací.</p>
+                <!-- Přidání libovolného obsahu, například další tlačítka nebo detaily -->
             </div>
-         </div>
+        </div>
     }
 </div>
+
+<ReservationAddModal IsVisible="IsAddModalVisible" OnClose="CloseAddModal" CustomerId="Id" reservationStatuses="reservationStatuses" rooms="rooms"/>
 
 @code {
     [Parameter]
@@ -154,15 +156,41 @@
     private Customer customer { get; set; } = new Customer();
 
     private List<Reservation> customerReservations = new List<Reservation>();
+    private PaginationState customerReservationsPaggination = new PaginationState { ItemsPerPage = 5 };
+
+    private List<Review> customerReviews = new List<Review>();
+    private PaginationState customerReviewPaggination = new PaginationState { ItemsPerPage = 5 };
+
+
+    private bool IsAddModalVisible = false;
+    private List<Room> rooms = new List<Room>();
+    private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
+
+
+
+
+
 
     protected override async Task OnInitializedAsync()
     {
         customer = await CustomerService.GetCustomerByIdAsync(Id);
-
         if (customer != null)
         {
             customerReservations = await ReservationService.GetReservationsByCustomerIdAsync(Id);
         }
+
+        rooms = await RoomService.GetRooomsAsync();
+        reservationStatuses = await ReservationService.GetReservationStatusesAsync();
+    }
+
+    private void OpenAddModalReservation()
+    {
+        IsAddModalVisible = true;
+    }
+
+    private async Task CloseAddModal()
+    {
+        IsAddModalVisible = false;
     }
 
     private void NavigateToReservationDetail(int id)

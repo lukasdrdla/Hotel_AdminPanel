@@ -2,11 +2,6 @@
 using Hotel_AdminPanel.Domain.Entities;
 using Hotel_AdminPanel.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hotel_AdminPanel.Application.Services
 {
@@ -44,7 +39,11 @@ namespace Hotel_AdminPanel.Application.Services
                 ReservationStatusId = reservation.ReservationStatusId,
                 Adults = reservation.Adults,
                 Children = reservation.Children,
-                SpecialRequest = reservation.SpecialRequest
+                SpecialRequest = reservation.SpecialRequest,
+                AdminNote = reservation.AdminNote,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                Guests = reservation.Guests
 
             };
 
@@ -82,7 +81,7 @@ namespace Hotel_AdminPanel.Application.Services
 
 
         public async Task<Reservation> GetReservationByIdAsync(int id)
-        {
+            {
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Room)
@@ -90,6 +89,7 @@ namespace Hotel_AdminPanel.Application.Services
                 .Include(r => r.ReservationStatus).FirstOrDefaultAsync(r => r.Id == id);
 
             return reservation;
+
         }
 
         public Task UpdateReservationAsync(Reservation reservation)
@@ -97,9 +97,20 @@ namespace Hotel_AdminPanel.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task DeleteReservationAsync(int id)
+        public async Task DeleteReservationAsync(int id)
         {
-            throw new NotImplementedException();
+            var reservation = await _context.Reservations.FindAsync(id);
+
+            if (reservation == null)
+            {
+                throw new InvalidOperationException("Reservation not found");
+            }
+            else
+            {
+                _context.Reservations.Remove(reservation);
+                await _context.SaveChangesAsync();
+            }
+
         }
 
         public async Task<List<Reservation>> GetReservationsByCustomerIdAsync(int customerId)
@@ -151,7 +162,7 @@ namespace Hotel_AdminPanel.Application.Services
 
             else
             {
-                exisitngMealPlan.Plan = mealPlan.Plan;
+                exisitngMealPlan.Name = mealPlan.Name;
                 exisitngMealPlan.Price = mealPlan.Price;
 
                 await _context.SaveChangesAsync();
@@ -170,6 +181,72 @@ namespace Hotel_AdminPanel.Application.Services
             {
                 _context.MealPlans.Remove(mealPlan);
                 await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Guest>> GetGuestsByReservationIdAsync(int reservationId)
+        {
+            var guests = await _context.Guests
+                .Where(g => g.ReservationId == reservationId)
+                .ToListAsync();
+            return guests;
+        }
+
+
+        public async Task<List<int>> GetMonthlyReservations()
+        {
+            var reservationsByMonth = new List<int>(new int[12]); // seznam o délce 12 pro každý měsíc
+            var reservations = await _context.Reservations.ToListAsync();
+
+            foreach (var reservation in reservations)
+            {
+                int month = reservation.CreatedAt.Month - 1; // měsíce v DateTime začínají od 1, proto odečítáme 1
+                reservationsByMonth[month]++;
+            }
+
+            return reservationsByMonth;
+        }
+
+        public Task CreateReservationStatusAsync(ReservationStatus reservationStatus)
+        {
+            var newReservationStatus = new ReservationStatus
+            {
+                Name = reservationStatus.Name
+            };
+
+            _context.ReservationStatuses.Add(newReservationStatus);
+            return _context.SaveChangesAsync();
+
+        }
+
+        public async Task UpdateReservationStatusAsync(ReservationStatus reservationStatus)
+        {
+            var existingReservationStatus = await _context.ReservationStatuses.FirstOrDefaultAsync(rs => rs.Id == reservationStatus.Id);
+
+            if (existingReservationStatus == null)
+            {
+                throw new InvalidOperationException("Reservation Status not found");
+            }
+            else
+            {
+                existingReservationStatus.Name = reservationStatus.Name;
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteReservationStatusAsync(int id)
+        {
+            var reservationStatus = await _context.ReservationStatuses.FindAsync(id);
+
+            if (reservationStatus == null)
+            {
+                throw new InvalidOperationException("Reservation Status not found");
+            }
+            else
+            {
+                _context.ReservationStatuses.Remove(reservationStatus);
+                await _context.SaveChangesAsync();
+
             }
         }
     }

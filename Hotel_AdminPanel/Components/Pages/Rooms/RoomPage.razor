@@ -9,121 +9,62 @@
 
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4 page-title">Pokoje</h3>
-
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-primary me-3" @onclick="NavigateToAddRoom" style="justify-content:flex-end;">Přidat Pokoj</button>
-        <button class="btn btn-primary" @onclick="NavigateToSettingRoomPage" style="justify-content:flex-end;"><i class="bi bi-gear"></i></button>
-    </div>
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchRooms">
-    </div>
-    @if (rooms == null || rooms.Count == 0)
-    {
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only"></span>
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="text-center mb-4 page-title">Pokoje</h3>
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" placeholder="Hledat..." @oninput="SearchRooms" />
+                <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
-            <p class="mt-2">Načítám pokoje...</p>
-        </div>
-    }
-    else
-    {
-        <div class="">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Číslo Pokoje</th>
-                        <th scope="col">Typ Pokoje</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Cena</th>
-                        <th scope="col">Děti</th>
-                        <th scope="col">Dospělí</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var room in filteredRooms)
-                    {
-
-
-                        <tr>
-                            @if(editRoomId == room.Id)
-                            {
-                                <td><input @bind="room.RoomNumber" class="form-control" /></td>
-                                <td>
-                                    
-                                    <InputSelect @bind-Value="room.RoomTypeId" class="form-control">
-                                        @foreach (var roomType in RoomTypes)
-                                        {
-                                            <option value="@roomType.Id">@roomType.Type</option>
-                                        }
-                                    </InputSelect>
-                                </td>
-                                <td>
-
-                                    <InputSelect @bind-Value="room.RoomStatusId" class="form-control">
-                                        @foreach (var roomStatus in RoomStatuses)
-                                        {
-                                            <option value="@roomStatus.Id">@roomStatus.Status</option>
-                                        }
-                                    </InputSelect>
-                                    
-                                </td>
-                                <td><input @bind="room.Price" class="form-control" /></td>
-                                <td><input @bind="room.MaxChildren" class="form-control" /></td>
-                                <td><input @bind="room.MaxAdults" class="form-control" /></td>
-                                <td>
-                                    <button class="btn btn-success btn-sm" @onclick="() => SaveRoom(room)">
-                                        <i class="bi bi-check"></i>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary">
+                    <i class="bi bi-plus"></i> Přidat pokoj
+                </button>
+            </div>
+            @if (rooms == null || rooms.Count == 0)
+            {
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <p class="mt-2">Načítám pokoje...</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="w-100">
+                        <QuickGrid Items="filteredRooms.AsQueryable()" Pagination="pagginationState" Class="w-100">
+                            <PropertyColumn Title="Číslo pokoje" Property="@(r => r.RoomNumber)" Sortable="true" />
+                            <PropertyColumn Title="Typ pokoje" Property="@(r => r.RoomType.Name)" Sortable="true" />
+                            <PropertyColumn Title="Status" Property="@(r => r.RoomStatus.Name)" Sortable="true" />
+                            <PropertyColumn Title="Cena" Property="@(r => r.Price)" Sortable="true" />
+                            <PropertyColumn Title="Max Dospělí" Property="@(r => r.MaxAdults)" Sortable="true" />
+                            <PropertyColumn Title="Max Děti" Property="@(r => r.MaxChildren)" Sortable="true" />
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    <button class="btn text-primary" @onclick="() => NavigateToRoomDetail(context.Id)">
+                                        <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" @onclick="CancelEdit">
-                                        <i class="bi bi-x"></i>
+                                    <button class="btn text-danger" @onclick="() => DeleteRoom(context.Id)">
+                                        <i class="bi bi-trash"></i>
                                     </button>
-                                </td>
-                            }
- 
-                            else
-                            {
-                                
-                            
+                                </div>
+                            </TemplateColumn>
 
+                        </QuickGrid>
 
-                            <td>@room.RoomNumber</td>
-                            <td>@room.RoomType.Type</td>
-                            <td>@room.RoomStatus.Status</td>
-                            <td>@room.Price.ToString("C")</td>
-                            <td>@room.MaxChildren</td>
-                            <td>@room.MaxAdults</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" @onclick="() => EditRoom(room.Id)">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteRoom(room.Id)">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-
-                                <button class="btn btn-success btn-sm" @onclick="() => NavigateToRoomDetail(room.Id)">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                    
-
-
-
-                            </td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
+                    </table>
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
 
 
 
 @code {
+    private PaginationState pagginationState = new PaginationState() { ItemsPerPage = 10 };
 
     private ICollection<Room> rooms;
     private string searchTerm;
@@ -132,27 +73,6 @@
     private ICollection<Room> filteredRooms;
     private bool isAvailable;
 
-
-
-
-    private int? editRoomId;
-
-
-    private void EditRoom(int id)
-    {
-        editRoomId = id;
-    }
-
-    private void CancelEdit()
-    {
-        editRoomId = null;
-    }
-
-    private async Task SaveRoom(Room room)
-    {
-        await RoomService.UpdateRoomAsync(room);
-        editRoomId = null;
-    }
 
     private void NavigateToSettingRoomPage()
     {
@@ -198,8 +118,8 @@
             filteredRooms = rooms.Where(r => r.RoomNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 || r.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 || r.Price.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                || r.RoomType.Type.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                || r.RoomStatus.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.RoomType.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || r.RoomStatus.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 || r.MaxAdults.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                 || r.MaxChildren.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
             ).ToList();

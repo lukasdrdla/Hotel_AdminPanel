@@ -11,39 +11,30 @@
     background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
 }
 
-.navbar-toggler:checked {
-    background-color: rgba(255, 255, 255, 0.5);
-}
+    .navbar-toggler:checked {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
 
 .top-row {
     height: 3.5rem;
-}
-.poppins-black {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-}
-nav {
-    margin-top: 50px;
+    background-color: #FEFEFE;
 }
 
 .navbar-brand {
-    font-size: 2rem;
-    font-weight: bold;
-    letter-spacing: 0.02rem; 
-    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #023216 !important;
 }
 
-    .navbar-brand:hover {
-        color: rgba(255, 255, 255, 0.8);
-        transform: scale(1.05);
-        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    }
+.navbar-brand svg {
+    fill: #14A872;
+}
 
 .bi {
     display: inline-block;
     position: relative;
     width: 1.25rem;
-    height: 1.2rem;
+    height: 1.25rem;
     margin-right: 0.75rem;
     top: -1px;
     background-size: cover;
@@ -62,12 +53,8 @@ nav {
 }
 
 .nav-item {
-    font-size: 1rem;
-    padding-bottom: 1.2rem;
-}
-
-.nav-item i {
-    padding-bottom: 0.2rem !important;
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
 }
 
     .nav-item:first-of-type {
@@ -78,23 +65,34 @@ nav {
         padding-bottom: 1rem;
     }
 
-.nav-item ::deep .nav-link {
+    .nav-item ::deep .nav-link {
+        color: #71887F;
         background: none;
         border: none;
         border-radius: 4px;
-        height: 2rem;
+        height: 2rem !important;
         display: flex;
         align-items: center;
-        line-height: 1rem;
         width: 100%;
-}
-
-    .nav-item ::deep a.active {
-        color: #5558D8;
     }
 
+    .nav-item ::deep a.active {
+        background-color: #E2F0ED;
+        color: #023216;
+    }
+
+
+
+        .nav-item ::deep a.active .bi {
+            fill: #14A872;
+        }
+
+
+
+
     .nav-item ::deep .nav-link:hover {
-        color: #5558D8;
+        background-color: #E2F0ED;
+        color: #023216;
     }
 
 .nav-scrollable {
@@ -105,7 +103,7 @@ nav {
     display: block;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 900px) {
     .navbar-toggler {
         display: none;
     }
@@ -113,7 +111,6 @@ nav {
     .nav-scrollable {
         /* Never collapse the sidebar for wide screens */
         display: block;
-
         /* Allow sidebar to scroll for tall menus */
         height: calc(100vh - 3.5rem);
         overflow-y: auto;

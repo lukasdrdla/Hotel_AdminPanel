@@ -1,0 +1,73 @@
+﻿<!-- CustomerModal.razor -->
+@inherits OwningComponentBase<IGuestService>
+@inject IGuestService GuestService
+
+<EditForm Model="guest" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Přidat zákazníka</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <label for="reservationId" class="form-label">Rezervace</label>
+                    <InputNumber id="reservationId" class="form-control" @bind-Value="ReservationId" readonly />
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">Jméno</label>
+                            <InputText id="firstName" class="form-control" @bind-Value="guest.FirstName" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Přijmení</label>
+                            <InputText id="lastName" class="form-control" @bind-Value="guest.LastName" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="documentNumber" class="form-label">Číslo Dokladu</label>
+                            <InputNumber id="documentNumber" class="form-control" @bind-Value="guest.DocumentNumber" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="dateOfBirth" class="form-label">Datum narození</label>
+                            <InputDate id="dateOfBirth" class="form-control" @bind-Value="guest.DateOfBirth" />
+                        </div>
+                    </div>
+
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public int ReservationId { get; set; }
+
+    private Guest guest = new Guest();
+
+    private async Task HandleValidSubmit()
+    {
+        guest.ReservationId = ReservationId;
+        await GuestService.CreateGuestAsync(guest);
+        await OnClose.InvokeAsync(false); // Zavřít modal po uložení
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
+}

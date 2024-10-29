@@ -1,78 +1,100 @@
 ﻿@page "/rezervace"
+@using Hotel_AdminPanel.Components.Pages.Settings
 @inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
-@attribute [Authorize]
+
 
 <div class="container mt-5">
-    <h3 class="text-center mb-4">Rezervace</h3>
-    <div class="d-flex justify-content-between mb-3">
-        <div></div><button class="btn btn-primary" @onclick="NavigateToAddReservation">Přidat Rezervaci</button>
-    </div>
-
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Vyhledat..." @bind="searchTerm" @oninput="SearchReservations" />
-    </div>
-
-    @if (reservations == null || reservations.Count == 0)
-    {
-        <div class="text-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only"></span>
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="text-center mb-4 page-title">Rezervace</h3>
+            <div class="input-group mb-4">
+                <input type="text" class="form-control" placeholder="Hledat..." @oninput="SearchReservations" />
+                <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
-            <p class="mt-2">Načítám rezervace...</p>
+            <div class="d-flex justify-content-between mb-3">
+                <div></div> <!-- Placeholder for alignment -->
+                <button class="btn btn-primary" @onclick="NavigateToAddReservation">
+                    <i class="bi bi-plus"></i> Přidat rezervaci
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="w-100">
+                    <QuickGrid Items="filteredReservations.AsQueryable()" Pagination="paginationState" Class=" w-100">
+                        <PropertyColumn Title="Zákazník" Property="@(x => x.Customer.FirstName + " " + x.Customer.LastName)" Sortable="true" />
+                        <PropertyColumn Title="CheckIn" Property="@(x => x.CheckIn.ToShortDateString())" Sortable="true" />
+                        <PropertyColumn Title="CheckOut" Property="@(x => x.CheckOut.ToShortDateString())" Sortable="true" />
+                        <PropertyColumn Title="Pokoj" Property="@(x => x.Room.RoomNumber)" Sortable="true" />
+                        <PropertyColumn Title="Cena" Property="@(x => x.TotalPrice)" Sortable="true" />
+                        <PropertyColumn Title="Dospělí" Property="@(x => x.Adults)" Sortable="true" />
+                        <PropertyColumn Title="Děti" Property="@(x => x.Children)" Sortable="true" />
+                        <PropertyColumn Title="Stravování" Property="@(x => x.MealPlan.Name)" Sortable="true" />
+
+                        <TemplateColumn Title="Akce">
+                            <div class="d-inline-flex">
+                                <button class="btn text-primary" @onclick="() => NavigateToReservationDetail(context.Id)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+
+                                <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.Id)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </TemplateColumn>
+
+                    </QuickGrid>
+                    <Paginator State="paginationState" />
+                </table>
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Pokoj</th>
-                        <th>Zákazník</th>
-                        <th>Check In</th>
-                        <th>Check Out</th>
-                        <th>Cena</th>
-                        <th>Status</th>
-                        <th>Dospělí</th>
-                        <th>Děti</th>
-                        <th>Stravování</th>
-                        <th>Speciální Požadavky</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var reservation in filteredReservations)
-                    {
-                        <tr @onclick="() => NavigateToRoomDetail(reservation.Id)" style="cursor:pointer;">
-
-                            <td>@reservation.Room.RoomNumber</td>
-                            <td>@reservation.Customer.FirstName @reservation.Customer.LastName</td>
-                            <td>@reservation.CheckIn.ToString("dd/MM/yyyy")</td>
-                            <td>@reservation.CheckOut.ToString("dd/MM/yyyy")</td>
-                            <td>@reservation.TotalPrice.ToString("C")</td>
-                            <td><span class="@GetReservationStatus(reservation.ReservationStatus.RStatus)">@reservation.ReservationStatus.RStatus</span></td>
-                            <td>@reservation.Adults</td>
-                            <td>@reservation.Children</td>
-                            <td>@reservation.MealPlan.Plan</td>
-                            <td>@reservation.SpecialRequest</td>
-
-                        </tr>
-
-                    }
-
-                </tbody>
-            </table>
-        </div>
-    }
+    </div>
 </div>
+
+<Modal Title="Potvrzení smazání" Message="Opravdu chcete smazat tuhle rezervaci?" IsVisible="@isDeleteModalVisible" OnClose="HandleModalClose"/>
+
+
 
 @code {
 
     private List<Reservation> reservations ;
-    private List<Reservation> filteredReservations;
+    private List<Reservation> filteredReservations = new List<Reservation>();
     private string? searchTerm;
 
+    private Reservation reservation = new Reservation();
+    private bool isReservationModalVisible = false;
+
+
+
+    private int reservationIdToDelete;
+    private bool isDeleteModalVisible = false;
+
+    private PaginationState paginationState = new PaginationState(){ItemsPerPage = 20};
+
+    private async Task OpenDeleteConfirmation(int reservationId)
+    {
+        reservationIdToDelete = reservationId;
+        isDeleteModalVisible = true;
+    }
+
+
+    private void OpenAddReservationModal()
+    {
+        isReservationModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        isDeleteModalVisible = false;
+
+        if (result)
+        {
+            await ReservationService.DeleteReservationAsync(reservationIdToDelete);
+            reservations = await ReservationService.GetReservationsAsync();
+            filteredReservations = reservations;
+        }
+    }
 
     private void SearchReservations(ChangeEventArgs e)
     {
@@ -86,10 +108,10 @@
             r.CheckIn.ToString("dd/MM/yyyy").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
             r.CheckOut.ToString("dd/MM/yyyy").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
             r.TotalPrice.ToString("C").Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            r.ReservationStatus.RStatus.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.ReservationStatus.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
             r.Adults.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
             r.Children.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            r.MealPlan.Plan.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            r.MealPlan.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
             r.SpecialRequest.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
         }
         else
@@ -107,14 +129,15 @@
         filteredReservations = reservations;
     }
 
-    private void NavigateToRoomDetail(int id)
+
+    private void NavigateToReservationDetail(int id)
     {
-        NavigationManager.NavigateTo($"/reservation/{id}");
+        NavigationManager.NavigateTo($"/rezervace/{id}");
     }
 
     private void NavigateToAddReservation()
     {
-        NavigationManager.NavigateTo("/reservation/add");
+        NavigationManager.NavigateTo("/pridat-rezervaci");
     }
 
 

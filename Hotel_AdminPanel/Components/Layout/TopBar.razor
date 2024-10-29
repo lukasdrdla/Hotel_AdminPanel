@@ -1,4 +1,62 @@
-﻿
-<div class="alert-primary alert">
-    <span class="bi bi-exclamation-triangle"></span>
+﻿@* @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IAccountService AccountService
+@inject SignInManager<AppUser> SignInManager
+
+
+<div class="top-bar fixed-top d-flex justify-content-between align-items-center p-2 shadow bg-primary text-white">
+    <div class="user-info d-flex align-items-center">
+        @if (isUserAuthenticated)
+        {
+            <span class="me-3">
+                Přihlášený uživatel: <strong>@userName</strong>
+            </span>
+            <EditForm Model="loginModel" OnValidSubmit="Logout" FormName="logout">
+                <button type="submit" class="btn btn-outline-light btn-sm">Odhlásit</button>
+            </EditForm>
+        }
+        else
+        {
+            <button class="btn btn-outline-light btn-sm" @onclick="NavigateToLogin">Přihlásit se</button>
+        }
+    </div>
 </div>
+
+<style>
+    .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+</style>
+
+@code {
+    private bool isUserAuthenticated;
+    private string userName;
+
+    private LoginViewModel loginModel { get; set; } = new LoginViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isUserAuthenticated = user.Identity.IsAuthenticated;
+        userName = isUserAuthenticated ? user.Identity.Name : string.Empty;
+    }
+
+    private async Task Logout()
+    {
+        await SignInManager.SignOutAsync();
+        NavigationManager.NavigateTo("/login", forceLoad: true);
+    }
+
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+}
+ *@

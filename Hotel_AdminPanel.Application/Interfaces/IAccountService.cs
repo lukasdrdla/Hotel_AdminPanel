@@ -12,7 +12,17 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task LogoutAsync();
         Task<AppUser> GetCurrentUserAsync();
 
-        Task<List<AppUser>> GetAllUsersAsync();
+        Task<List<UserWithRolesViewModel>> GetAllUsersAsync();
         Task<IdentityResult> UpdateUserProfileAsync(AppUser model);
+
+        // Role methods
+        Task<IdentityResult> AddToRoleAsync(AppUser user, string roleName);
+        Task<IdentityResult> RemoveFromRoleAsync(AppUser user, string roleName);
+        Task<IList<string>> GetUserRolesAsync(AppUser user);
+        //get all roles
+        Task<List<IdentityRole>> GetAllRolesAsync();
+        Task<IdentityResult> CreateRoleAsync(RoleViewModel model);
+        Task<IdentityResult> UpdateRoleAsync(IdentityRole model);
+        Task<IdentityResult> DeleteRoleAsync(string id);
     }
 }
