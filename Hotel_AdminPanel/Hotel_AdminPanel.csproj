@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Pages\NováSložka\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 

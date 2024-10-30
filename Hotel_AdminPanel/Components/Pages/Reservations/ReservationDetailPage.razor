@@ -1,6 +1,4 @@
 ﻿@page "/rezervace/{id:int}"
-@using Hotel_AdminPanel.Components.Pages.Invoices
-@using Hotel_AdminPanel.Components.Pages.Modals
 @inject IReservationService ReservationService
 @inject IInvoiceService InvoiceService
 @inject IRoomService RoomService
@@ -181,10 +179,17 @@
                         @if (invoices != null)
                         {
                             <div class="table-container">
-                                <table>
-                                    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationInvoiceState">
-                                        <PropertyColumn Title="Datum vystavení" Property="@(x => x.IssueDate.ToShortDateString())" Sortable="true"/>
-                                        <PropertyColumn Title="Datum splatnosti" Property="@(x => x.DueDate.ToShortDateString())" Sortable="true"/>
+                                <table class="w-100">
+                                    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationInvoiceState" Class="w-100">
+                                        <TemplateColumn Title="Stav">
+                                            <div class="d-inline-flex">
+                                                <span class="badge bg-@(context.IsPaid ? "success" : "danger")">
+                                                    @(context.IsPaid ? "Zaplacena" : "Nezaplacena")
+                                                </span>
+                                            </div>
+                                        </TemplateColumn>
+
+                                        <PropertyColumn Title="Splatnosti" Property="@(x => x.DueDate.ToShortDateString())" Sortable="true"/>
                                         <PropertyColumn Title="Měna" Property="@(x => x.Currency)" Sortable="true"/>
                                         <PropertyColumn Title="Cena" Property="@(x => x.Price)" Sortable="true"/>
                                         <TemplateColumn Title="Akce">

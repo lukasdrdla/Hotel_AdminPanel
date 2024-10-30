@@ -1,5 +1,7 @@
 ﻿@page "/pridat-zamestnance"
+@using Microsoft.EntityFrameworkCore
 @inject IAccountService AccountService
+@inject RoleManager<IdentityRole> RoleManager
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
@@ -52,22 +54,22 @@
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label for="personalId" class="form-label">Osobní číslo</label>
-                        <InputText id="personalId" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
+                    <label for="personalId" class="form-label">Osobní číslo</label>
+                    <InputText id="personalId" class="form-control" @bind-Value="customer.PersonalIdentificationNumber" />
                     </div>
 
                     <div class="col-md-6">
-                        <label for="placeOfBirth" class="form-label">Místo narození</label>
-                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
+                        <label for="phoneNumber" class="form-label">Telefon</label>
+                        <InputText id="phoneNumber" class="form-control" @bind-Value="customer.PhoneNumber" />
                     </div>
+
                 </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
-                        <label for="insuranceCompanyId" class="form-label">Pojišťovna</label>
-                        <InputNumber id="insuranceCompanyId" class="form-control" @bind-Value="customer.InsuranceCompanyId" />
+                        <label for="placeOfBirth" class="form-label">Místo narození</label>
+                        <InputText id="placeOfBirth" class="form-control" @bind-Value="customer.PlaceOfBirth" />
                     </div>
-
                     <div class="col-md-6">
                         <label for="address" class="form-label">Adresa</label>
                         <InputText id="address" class="form-control" @bind-Value="customer.Address" />
@@ -118,6 +120,33 @@
                     </label>
                 </div>
 
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="role" class="form-label">Role</label>
+                        <InputSelect id="role" class="form-control" @bind-Value="customer.Role">
+                            <option value="">-- Vyberte roli --</option>
+                            @foreach (var role in roles)
+                            {
+                                <option value="@role">@role</option>
+                            }
+                    
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="insurenceCompanyId" class="form-label">Pojištovna</label>
+                        <InputSelect id="insurenceCompanyId" class="form-control" @bind-Value="customer.InsuranceCompanyId">
+                            <option value="">-- Vyberte pojišťovnu --</option>
+                            @foreach (var insuranceCompany in insuranceCompanies)
+                            {
+                                <option value="@insuranceCompany.Id">@insuranceCompany.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                </div>
+
+
 
 
 
@@ -138,6 +167,17 @@
 @code {
     [SupplyParameterFromForm]
     private RegisterViewModel customer { get; set; } = new RegisterViewModel();
+
+    private List<IdentityRole> roles = new List<IdentityRole>();
+    private List<InsuranceCompany> insuranceCompanies = new List<InsuranceCompany>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        roles = await RoleManager.Roles.ToListAsync();
+
+        insuranceCompanies = await AccountService.GetAllInsuranceCompaniesAsync();
+    }
 
     private async Task HandleValidSubmit()
     {

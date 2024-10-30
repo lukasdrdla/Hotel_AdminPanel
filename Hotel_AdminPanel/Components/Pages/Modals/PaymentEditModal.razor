@@ -1,0 +1,73 @@
+﻿@inherits OwningComponentBase<IPaymentService>
+@inject IPaymentService PaymentService
+@inject NavigationManager NavigationManager
+
+<EditForm Model="payment" OnValidSubmit="HandleValidSubmit">
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upravit Platbu</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="paymentDate" class="form-label">Datum platby</label>
+                            <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
+                            <ValidationMessage For="@(() => payment.PaymentDate)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label">Částka</label>
+                            <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
+                            <ValidationMessage For="@(() => payment.TotalAmount)" />
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="paymentMethod" class="form-label">Způsob platby</label>
+                            <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
+                            <ValidationMessage For="@(() => payment.PaymentMethod)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="invoiceId" class="form-label">Faktura</label>
+                            <InputNumber id="invoiceId" class="form-control" @bind-Value="payment.InvoiceId" />
+                            <ValidationMessage For="@(() => payment.InvoiceId)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public int PaymentId { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    private Payment payment = new Payment();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && PaymentId > 0)
+        {
+            payment = await PaymentService.GetPaymentByIdAsync(PaymentId) ?? new Payment();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await PaymentService.UpdatePaymentAsync(payment);
+        await OnClose.InvokeAsync(false);
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false);
+}

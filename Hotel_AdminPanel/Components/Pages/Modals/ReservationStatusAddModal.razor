@@ -1,0 +1,53 @@
+﻿<!-- CustomerModal.razor -->
+@inherits OwningComponentBase<IReservationService>
+@inject IReservationService ReservationService
+
+<EditForm Model="reservationStatus" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Přidat status rezervace</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3 form-group">
+                        <label for="name" class="form-label">Název</label>
+                        <InputText id="name" class="form-control" @bind-Value="reservationStatus.Name" />
+                    </div>
+
+
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    private ReservationStatus reservationStatus = new ReservationStatus();
+
+
+    private async Task HandleValidSubmit()
+    {
+
+        await ReservationService.CreateReservationStatusAsync(reservationStatus);
+        await OnClose.InvokeAsync(false);
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false);
+}

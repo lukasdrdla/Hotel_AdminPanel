@@ -1,5 +1,4 @@
 ﻿@page "/rezervace"
-@using Hotel_AdminPanel.Components.Pages.Settings
 @inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -52,7 +51,7 @@
     </div>
 </div>
 
-<Modal Title="Potvrzení smazání" Message="Opravdu chcete smazat tuhle rezervaci?" IsVisible="@isDeleteModalVisible" OnClose="HandleModalClose"/>
+<DeleteModal Title="Smazání rezervace" ActionType="DeleteReservation" IsVisible="@isDeleteModalVisible" OnClose="HandleModalClose"/>
 
 
 
@@ -86,12 +85,13 @@
 
     private async Task HandleModalClose(bool result)
     {
+        var reservation = reservations.FirstOrDefault(r => r.Id == reservationIdToDelete);
         isDeleteModalVisible = false;
 
         if (result)
         {
             await ReservationService.DeleteReservationAsync(reservationIdToDelete);
-            reservations = await ReservationService.GetReservationsAsync();
+            reservations.Remove(reservation);
             filteredReservations = reservations;
         }
     }

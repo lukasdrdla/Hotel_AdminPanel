@@ -17,7 +17,7 @@
                 <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @onclick="NavigateToAddRoom">
                     <i class="bi bi-plus"></i> Přidat pokoj
                 </button>
             </div>
@@ -46,7 +46,7 @@
                                     <button class="btn text-primary" @onclick="() => NavigateToRoomDetail(context.Id)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn text-danger" @onclick="() => DeleteRoom(context.Id)">
+                                    <button class="btn text-danger" @onclick="() => OpenDeleteRoomConfirmation(context.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -61,6 +61,7 @@
     </div>
 </div>
 
+<DeleteModal IsVisible="@isModalVisible" Title="Smazání pokoje" ActionType="DeleteRoom" OnClose="CloseModal" />
 
 
 @code {
@@ -74,26 +75,40 @@
     private bool isAvailable;
 
 
+    private bool isModalVisible = false;
+    private int? deleteRoomId;
+    private string Title;
+    private string modalMessage;
+    private string ActionType;
+
+
     private void NavigateToSettingRoomPage()
     {
         NavigationManager.NavigateTo("/nastaveni-pokoju");
     }
 
 
-    private async Task DeleteRoom(int id)
+    private void OpenDeleteRoomConfirmation(int roomId)
     {
-        var room = rooms.FirstOrDefault(r => r.Id == id);
-        if (room != null)
+        isModalVisible = true;
+        deleteRoomId = roomId;
+
+    }
+
+    private async Task CloseModal(bool result)
+    {
+        var room = rooms.FirstOrDefault(r => r.Id == deleteRoomId.Value);
+        isModalVisible = false;
+
+        if (result)
         {
-            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat tento pokoj?");
-            if (confirmResult)
-            {
-                await RoomService.DeleteRoomAsync(id);
-                rooms.Remove(room);
-                filteredRooms = rooms;
-            }
+            await RoomService.DeleteRoomAsync(deleteRoomId.Value);
+            rooms.Remove(room);
+            filteredRooms = rooms;
         }
     }
+
+
 
     protected override async Task OnInitializedAsync()
     {

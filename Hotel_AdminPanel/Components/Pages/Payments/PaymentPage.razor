@@ -53,10 +53,10 @@
 
                             <TemplateColumn Title="Akce">
                                 <div class="d-inline-flex">
-                                    <button class="btn text-primary" @onclick="() => NavigateToPaymentDetail(context.Id)">
+                                    <button class="btn text-primary" @onclick="() => OpenEditModal(context.Id)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn text-danger" @onclick="() => DeletePayment(context.Id)">
+                                    <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -71,6 +71,9 @@
     </div>
 </div>
 
+<PaymentEditModal IsVisible="@isEditModalVisible" PaymentId="@selectedPaymentId" OnClose="CloseEditModal" />
+<DeleteModal Title="Smazaní platby" ActionType="DeletePayment" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
+
 
 
 @code {
@@ -79,24 +82,53 @@
     private List<Payment> filteredPayments = new List<Payment>();
 
     private string? searchTerm;
+    private bool isEditModalVisible = false;
+    private int selectedPaymentId;
 
+    private bool isModalVisible = false;
+    private int paymentIdToDelete;
 
-
-    private async Task DeletePayment(int id)
+    private void OpenEditModal(int id)
     {
-        var payment = payments.FirstOrDefault(r => r.Id == id);
-        if (payment != null)
-        {
-            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat platbu?");
-            if (confirmResult)
-            {
-                await PaymentService.DeletePaymentAsync(id);
-                payments.Remove(payment);
-                filteredPayments = payments;
+        selectedPaymentId = id;
+        isEditModalVisible = true;
+    }
 
-            }
+    private void OpenDeleteConfirmation(int id)
+    {
+        paymentIdToDelete = id;
+        isModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        var payment = payments.FirstOrDefault(r => r.Id == paymentIdToDelete);
+        isModalVisible = false;
+
+        if (result)
+        {
+            await PaymentService.DeletePaymentAsync(paymentIdToDelete);
+            payments.Remove(payment);
+            filteredPayments = payments;
         }
     }
+
+
+
+    private async void CloseEditModal(bool result)
+    {
+        var payment = payments.FirstOrDefault(r => r.Id == selectedPaymentId);
+        isEditModalVisible = false;
+
+        if (result)
+        {
+            payments = await PaymentService.GetPaymentsAsync();
+            filteredPayments = payments;
+
+        }
+    }
+
+
 
     protected override async Task OnInitializedAsync()
     {

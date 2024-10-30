@@ -11,6 +11,11 @@
     <div class="row">
         <div class="col-md-6 d-flex flex-fill">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" @onclick="OpenAddMealPlanModal">
+                        <i class="bi bi-plus"></i> Přidat plán stravování
+                    </button>
+                </div>
                 <div class="card-body">
                     <h3 class="text-center mb-4 page-title">Nastavení jídel</h3>
                     <div class="table-responsive">
@@ -67,6 +72,11 @@
 
         <div class="col-md-6 d-flex flex-fill">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" @onclick="OpenAddReservationStatusModal">
+                        <i class="bi bi-plus"></i> Přidat status rezervace
+                    </button>
+                </div>
                 <div class="card-body">
                     <h3 class="text-center mb-4 page-title">Nastavení statusů rezervace</h3>
                     <div class="table-responsive">
@@ -117,6 +127,11 @@
     <div class="row mt-5">
         <div class="col-md-6 d-flex flex-fill">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" @onclick="OpenAddRoomTypeModal">
+                        <i class="bi bi-plus"></i> Přidat typ pokoje
+                    </button>
+                </div>
                 <div class="card-body">
                     <h3 class="text-center mb-4 page-title">Nastavení typu pokojů</h3>
                     <div class="table-responsive">
@@ -162,6 +177,11 @@
         </div>
         <div class="col-md-6 d-flex flex-fill">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" @onclick="OpenAddRoomStatusModal">
+                        <i class="bi bi-plus"></i> Přidat status pokoje
+                    </button>
+                </div>
                 <div class="card-body">
                     <h3 class="text-center mb-4 page-title">Nastavení statusů pokojů</h3>
                     <div class="table-responsive">
@@ -211,6 +231,11 @@
     <div class="row mt-5">
         <div class="col-md-6 d-flex flex-fill">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary" @onclick="OpenAddRoleModal">
+                        <i class="bi bi-plus"></i> Přidat roli
+                    </button>
+                </div>
                 <div class="card-body">
                     <h3 class="text-center mb-4 page-title">Nastavení rolí</h3>
                     <div class="table-responsive">
@@ -264,8 +289,12 @@
     </div>
 </div>
 
-<Modal Title="@Title" IsVisible="@isModalVisible" ActionType="@ActionType" OnClose="HandleModalClose" />
-
+<DeleteModal Title="@Title" IsVisible="@isModalVisible" ActionType="@ActionType" OnClose="HandleModalClose" />
+<MealPlanAddModal IsVisible="@isAddMealPlanModalVisible" OnClose="HandleAddMealPlanModalClose" />
+<ReservationStatusAddModal IsVisible="@isAddReservationStatusModalVisible" OnClose="HandleAddReservationStatusModalClose" />
+<RoomTypeAddModal IsVisible="@isAddRoomTypeModalVisible" OnClose="HandleAddRoomTypeModalClose" />
+<RoomStatusAddModal IsVisible="@isAddRoomStatusModalVisible" OnClose="HandleAddRoomStatusModalClose" />
+<UserRoleAddModal IsVisible="@isAddRoleModalVisible" OnClose="HandleAddRoleModalClose" />
 
 @code {
     private PaginationState paginationState = new() { ItemsPerPage = 3 };
@@ -274,11 +303,18 @@
     private PaginationState paginationReservationStatusState = new() { ItemsPerPage = 3 };
     private PaginationState paginationRoleTypeState = new() { ItemsPerPage = 3 };
 
-    //modal
+    //modal for delete
     private bool isModalVisible;
     private string Title;
     private string modalMessage;
     private string ActionType;
+
+    //modal for add
+    private bool isAddMealPlanModalVisible = false;
+    private bool isAddRoomTypeModalVisible = false;
+    private bool isAddReservationStatusModalVisible = false;
+    private bool isAddRoomStatusModalVisible = false;
+    private bool isAddRoleModalVisible = false;
 
 
 
@@ -302,6 +338,84 @@
     private List<IdentityRole> Roles = new List<IdentityRole>();
     private string? editRoleId;
     private string? deleteRoleId;
+
+
+    //Add modals
+    private void OpenAddMealPlanModal()
+    {
+        isAddMealPlanModalVisible = true;
+    }
+
+    private async Task HandleAddMealPlanModalClose(bool result)
+    {
+        isAddMealPlanModalVisible = false;
+        if (result)
+        {
+            MealPlans = await ReservationService.GetMealPlansAsync();
+        }
+    }
+
+    private void OpenAddReservationStatusModal()
+    {
+        isAddReservationStatusModalVisible = true;
+    }
+
+    private async Task HandleAddReservationStatusModalClose(bool result)
+    {
+        isAddReservationStatusModalVisible = false;
+        if (result)
+        {
+            ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
+        }
+    }
+
+    private void OpenAddRoomTypeModal()
+    {
+        isAddRoomTypeModalVisible = true;
+    }
+
+
+    private async Task HandleAddRoomTypeModalClose(bool result)
+    {
+        isAddRoomTypeModalVisible = false;
+        if (result)
+        {
+            RoomTypes = await RoomService.GetRoomTypesAsync();
+        }
+    }
+
+    private void OpenAddRoomStatusModal()
+    {
+        isAddRoomStatusModalVisible = true;
+    }
+
+    private async Task HandleAddRoomStatusModalClose(bool result)
+    {
+        isAddRoomStatusModalVisible = false;
+        if (result)
+        {
+            RoomStatuses = await RoomService.GetRoomStatusesAsync();
+        }
+    }
+
+
+    private void OpenAddRoleModal()
+    {
+        isAddRoleModalVisible = true;
+    }
+
+    private async Task HandleAddRoleModalClose(bool result)
+    {
+        isAddRoleModalVisible = false;
+        if (result)
+        {
+            Roles = await AccountService.GetAllRolesAsync();
+        }
+    }
+
+
+
+
 
 
     private void EditRole(string roleId)

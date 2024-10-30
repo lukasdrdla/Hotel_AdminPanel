@@ -92,6 +92,13 @@ namespace Hotel_AdminPanel.Application.ViewModels
         [Display(Name = "Zaměstnán")]
         public bool IsEmployed { get; set; }
 
+        //role
+
+        [Display(Name = "Role")]
+        public string Role { get; set; }
+
+        public List<string> Roles { get; set; }
+
 
 
 

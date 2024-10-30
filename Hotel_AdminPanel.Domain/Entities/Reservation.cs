@@ -9,8 +9,8 @@ namespace Hotel_AdminPanel.Domain.Entities
         public int Id { get; set; }
         public int RoomId { get; set; }
         public Room Room { get; set; }
-        public DateTime CheckIn { get; set; }
-        public DateTime CheckOut { get; set; }
+        public DateTime CheckIn { get; set; } = DateTime.Now;
+        public DateTime CheckOut { get; set; } = DateTime.Now.AddDays(3);
         public decimal TotalPrice { get; set; }
         public int ReservationStatusId { get; set; }
         public ReservationStatus ReservationStatus { get; set; }

@@ -44,14 +44,21 @@
                 <!-- Hosté -->
                 <div class="d-flex justify-content-between">
                     <label for="Guests" class="form-label">Hosté</label>
-                    <button type="button" class="btn btn-primary" @onclick="AddGuest">Přidat hosta</button>
+                    <button type="button" class="btn btn-primary mb-3" @onclick="AddGuest">Přidat hosta</button>
                 </div>
                 <div class="form-group mb-3">
                     @foreach (var guest in reservation.Guests)
                     {
                         <div class="d-flex mb-2">
                             <input type="text" class="form-control me-2" placeholder="Jméno hosta" @bind="guest.FirstName" />
-                            <input type="text" class="form-control" placeholder="Příjmení hosta" @bind="guest.LastName" />
+                            <input type="text" class="form-control me-2" placeholder="Příjmení hosta" @bind="guest.LastName" />
+                            <input type="date" class="form-control me-2" placeholder="Datum narození hosta" @bind="guest.DateOfBirth" />
+                            <input type="number" class="form-control" placeholder="Rodné číslo hosta" @bind="guest.DocumentNumber" />
+
+                            <button type="button" class="btn btn-danger ms-2" @onclick="() => reservation.Guests.Remove(guest)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
                         </div>
                     }
                 </div>

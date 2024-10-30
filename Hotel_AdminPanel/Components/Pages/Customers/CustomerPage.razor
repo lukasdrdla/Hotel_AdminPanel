@@ -1,5 +1,4 @@
 ﻿@page "/zakaznici"
-@using Hotel_AdminPanel.Components.Pages.Settings
 @inject ICustomerService CustomerService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
@@ -71,7 +70,7 @@
 </div>
 </div>
 
-<Modal Title="Potvrzení smazání" Message="Opravdu chcete smazat tohoto zákazníka?" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
+<DeleteModal Title="Smazaní zákazníka" ActionType="DeleteCustomer" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
 <CustomerAddModal IsVisible="@isAddModalVisible" OnClose="HandleAddModalClose" />
 
 @code {
@@ -145,11 +144,14 @@
 
     private async Task HandleModalClose(bool result)
     {
+        var customer = customers.FirstOrDefault(r => r.Id == customerIdToDelete);
         isModalVisible = false;
 
         if (result)
         {
-            await DeleteCustomer(customerIdToDelete);
+            await CustomerService.DeleteCustomerAsync(customerIdToDelete);
+            customers.Remove(customer);
+            filteredCustomers = customers;
         }
     }
 

@@ -146,9 +146,17 @@ namespace Hotel_AdminPanel.Application.Services
 
         }
 
-        public Task CreateMealPlanAsync(MealPlan mealPlan)
+        public async Task CreateMealPlanAsync(MealPlan mealPlan)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _context.MealPlans.AddAsync(mealPlan);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new InvalidOperationException("Error creating meal plan");
+            }
         }
 
         public async Task UpdateMealPlanAsync(MealPlan mealPlan)
@@ -209,13 +217,16 @@ namespace Hotel_AdminPanel.Application.Services
 
         public Task CreateReservationStatusAsync(ReservationStatus reservationStatus)
         {
-            var newReservationStatus = new ReservationStatus
+            try
             {
-                Name = reservationStatus.Name
-            };
-
-            _context.ReservationStatuses.Add(newReservationStatus);
-            return _context.SaveChangesAsync();
+                _context.ReservationStatuses.Add(reservationStatus);
+                _context.SaveChanges();
+                return Task.CompletedTask;
+            }
+            catch (Exception)
+            {
+                throw new InvalidOperationException("Error creating reservation status");
+            }
 
         }
 

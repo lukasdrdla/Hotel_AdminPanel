@@ -11,6 +11,9 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<SignInResult> LoginAsync(LoginViewModel model);
         Task LogoutAsync();
         Task<AppUser> GetCurrentUserAsync();
+        //DeleteUserAsync
+        Task<IdentityResult> DeleteUserAsync(string Id);
+
 
         Task<List<UserWithRolesViewModel>> GetAllUsersAsync();
         Task<IdentityResult> UpdateUserProfileAsync(AppUser model);
@@ -24,5 +27,8 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<IdentityResult> CreateRoleAsync(RoleViewModel model);
         Task<IdentityResult> UpdateRoleAsync(IdentityRole model);
         Task<IdentityResult> DeleteRoleAsync(string id);
+
+        //insurance company methods
+        Task<List<InsuranceCompany>> GetAllInsuranceCompaniesAsync();
     }
 }

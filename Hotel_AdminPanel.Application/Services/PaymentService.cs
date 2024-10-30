@@ -14,19 +14,58 @@ namespace Hotel_AdminPanel.Application.Services
         {
             _context = context;
         }
-        public Task CreatePaymentAsync(Payment payment)
+        public async Task CreatePaymentAsync(Payment payment)
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _context.Payments.AddAsync(payment);
+                await _context.SaveChangesAsync();
+
+                var invoice = await _context.Invoices
+                    .Include(i => i.Payments)
+                    .FirstOrDefaultAsync(i => i.Id == payment.InvoiceId);
+
+                if (invoice != null)
+                {
+                    invoice.IsPaid = _context.Payments.Any(p => p.InvoiceId == invoice.Id);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při vytváření platby.", ex);
+            }
         }
 
-        public Task DeletePaymentAsync(int id)
+        public async Task DeletePaymentAsync(int id)
         {
-            throw new NotImplementedException();
+            var paymentToDelete = await _context.Payments.FirstOrDefaultAsync(p => p.Id == id);
+            if (paymentToDelete == null)
+            {
+                throw new NullReferenceException("Platba nebyla nalezena.");
+            }
+
+            try
+            {
+                _context.Payments.Remove(paymentToDelete);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při mazání platby.", ex);
+            }
+
         }
 
-        public Task<Payment> GetPaymentByIdAsync(int id)
+        public async Task<Payment> GetPaymentByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var payment = await _context.Payments
+                .Include(p => p.Invoice)
+                .ThenInclude(i => i.Reservation)
+                .ThenInclude(r => r.Customer)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
+            return payment;
         }
 
         public async Task<List<Payment>> GetPaymentsAsync()
@@ -39,9 +78,27 @@ namespace Hotel_AdminPanel.Application.Services
             return payments;
         }
 
-        public Task UpdatePaymentAsync(Payment payment)
+        public async Task UpdatePaymentAsync(Payment payment)
         {
-            throw new NotImplementedException();
+            var existingPayment = await _context.Payments.FirstOrDefaultAsync(p => p.Id == payment.Id);
+            if (existingPayment == null)
+            {
+                throw new NullReferenceException("Platba nebyla nalezena.");
+            }
+
+            try
+            {
+                existingPayment.InvoiceId = payment.InvoiceId;
+                existingPayment.TotalAmount = payment.TotalAmount;
+                existingPayment.PaymentDate = payment.PaymentDate;
+                existingPayment.PaymentMethod = payment.PaymentMethod;
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při aktualizaci platby.", ex);
+            }
         }
     }
 }

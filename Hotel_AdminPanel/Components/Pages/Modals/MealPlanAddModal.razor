@@ -1,0 +1,61 @@
+﻿<!-- CustomerModal.razor -->
+@inherits OwningComponentBase<IReservationService>
+@inject IReservationService ReservationService
+
+<EditForm Model="mealPlan" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Přidat plán stravování</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Název</label>
+                            <InputText id="name" class="form-control" @bind-Value="mealPlan.Name" />
+
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="price" class="form-label">Cena</label>
+                            <InputNumber id="price" class="form-control" @bind-Value="mealPlan.Price" />
+                        </div>
+                    </div>
+
+ 
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+
+    private MealPlan mealPlan = new MealPlan();
+
+
+    private async Task HandleValidSubmit()
+    {
+
+        await ReservationService.CreateMealPlanAsync(mealPlan);
+        await OnClose.InvokeAsync(false);
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false);
+}

@@ -34,7 +34,20 @@ namespace Hotel_AdminPanel.Application.Services
 
         public Task<IdentityResult> CreateRoleAsync(RoleViewModel model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var role = new IdentityRole
+                {
+                    Name = model.Name
+                };
+                var result = _roleManager.CreateAsync(role).Result;
+                return Task.FromResult(result);
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Description = ex.Message }));
+            }
+
         }
 
         public async Task<IdentityResult> DeleteRoleAsync(string id)
@@ -51,6 +64,24 @@ namespace Hotel_AdminPanel.Application.Services
             }
             return IdentityResult.Failed(new IdentityError { Description = "Failed to delete role" });
 
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(string Id)
+        {
+            var existingUser = await _userManager.FindByIdAsync(Id);
+            if (existingUser == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
+
+            var result = await _userManager.DeleteAsync(existingUser);
+            return result;
+        }
+
+        public async Task<List<InsuranceCompany>> GetAllInsuranceCompaniesAsync()
+        {
+            var insuranceCompanies = await _context.InsuranceCompanies.ToListAsync();
+            return insuranceCompanies;
         }
 
         public async Task<List<IdentityRole>> GetAllRolesAsync()
@@ -135,45 +166,43 @@ namespace Hotel_AdminPanel.Application.Services
                 JobTitle = model.JobTitle,
                 StartDate = model.StartDate,
                 Salary = model.Salary,
-                IsEmployed = model.IsEmployed
+                IsEmployed = model.IsEmployed,
+                
             };
 
 
-            // Vytvoření uživatele
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
+            try
             {
-                // Zkontroluj, zda role 'User' existuje, pokud ne, vytvoř ji
-                var userRole = await _roleManager.FindByNameAsync("User");
-                if (userRole == null)
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
                 {
-                    userRole = new IdentityRole("User");
-                    var roleResult = await _roleManager.CreateAsync(userRole);
-                    if (!roleResult.Succeeded)
+                    if (!string.IsNullOrWhiteSpace(model.Role))
                     {
-                        return IdentityResult.Failed(new IdentityError { Description = "Failed to create User role" });
-                    }
-                }
+                        var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
-                // Přiřaď uživateli roli 'User'
-                var addToRoleResult = await _userManager.AddToRoleAsync(user, "User");
-                if (addToRoleResult.Succeeded)
-                {
+                        if (!roleResult.Succeeded)
+                        {
+                            return IdentityResult.Failed(new IdentityError { Description = "Failed to add user to role" });
+
+                        }
+
+
+                    }
+
                     return IdentityResult.Success;
-                }
-                else
-                {
-                    // Pokud přiřazení role selže, smaž uživatele
-                    await _userManager.DeleteAsync(user);
-                    return IdentityResult.Failed(new IdentityError { Description = "Failed to assign User role" });
+
+
                 }
             }
 
-            return IdentityResult.Failed(new IdentityError { Description = "User creation failed" });
-
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = ex.Message });
+            }
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> RemoveFromRoleAsync(AppUser user, string roleName)
+            public Task<IdentityResult> RemoveFromRoleAsync(AppUser user, string roleName)
         {
             throw new NotImplementedException();
         }

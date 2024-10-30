@@ -16,7 +16,7 @@
                 <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @onclick="NavigateToEmployeeAdd">
                     <i class="bi bi-plus"></i> Přidat zaměstnace
                 </button>
             </div>
@@ -54,7 +54,7 @@
                                     <button class="btn text-primary" @onclick="() => NavigateToEmployeeDetail(context.User.Id)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn text-danger" @onclick="() => DeleteEmployee(context.User.Id)">
+                                    <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.User.Id)">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -69,6 +69,8 @@
     </div>
 </div>
 
+<DeleteModal IsVisible="@isModalVisible" Title="Smazání zaměstnance" ActionType="DeleteEmployee" OnClose="HandleModalClose" />
+
 
 
 @code {
@@ -78,27 +80,37 @@
 
     private string? searchTerm;
 
+    private bool isModalVisible = false;
+    private string? deleteEmployeeId;
 
 
-    private async Task DeleteEmployee(string id)
-    {
-        var employee = employees.FirstOrDefault(r => r.User.Id == id );
-        if (employee != null)
-        {
-            var confirmResult = await jsRuntime.InvokeAsync<bool>("confirm", "Opravdu chcete smazat platbu?");
-            if (confirmResult)
-            {
 
 
-            }
-        }
-    }
 
     protected override async Task OnInitializedAsync()
     {
         employees = await AccountService.GetAllUsersAsync();
         filteredEmployees = employees;
 
+    }
+
+    private void OpenDeleteConfirmation(string id)
+    {
+        isModalVisible = true;
+        deleteEmployeeId = id;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        var employee = employees.FirstOrDefault(r => r.User.Id == deleteEmployeeId);
+        isModalVisible = false;
+
+        if (result)
+        {
+            await AccountService.DeleteUserAsync(deleteEmployeeId);
+            employees.Remove(employee);
+            filteredEmployees = employees;
+        }
     }
 
 
@@ -125,6 +137,12 @@
     private void NavigateToEmployeeDetail(string id)
     {
         NavigationManager.NavigateTo($"/zamestnanec/{id}");
+    }
+
+
+    private void NavigateToEmployeeAdd()
+    {
+        NavigationManager.NavigateTo("/pridat-zamestnance");
     }
 
 

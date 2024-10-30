@@ -1,0 +1,78 @@
+﻿@page "/pridat-platbu"
+@inject IPaymentService PaymentService
+@inject IInvoiceService InvoiceService
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
+<div class="container mt-2">
+    <div class="card border-0 shadow-sm mx-auto">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-4 page-title">Přidat Platbu</h3>
+            <EditForm Model="payment" OnValidSubmit="HandleValidSubmit" FormName="AddPayment">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="invoiceId" class="form-label">Faktura</label>
+                        <select class="form-select" @onchange="OnInvoiceChanged">
+                            <option value="">Vyberte fakturu</option>
+                            @foreach (var invoice in invoices)
+                            {
+                                <option value="@invoice.Id">@invoice.Id - @invoice.Reservation.Customer.FirstName - @invoice.Reservation.Customer.LastName - @invoice.Reservation.Customer.PersonalIdentificationNumber - @invoice.Price.ToString("C")</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="amount" class="form-label">Částka</label>
+                        <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="paymentDate" class="form-label">Datum platby</label>
+                        <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="paymentMethod" class="form-label">Způsob platby</label>
+                        <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Uložit</button>
+                    <a href="/faktury" class="btn btn-outline-secondary">Zpět na seznam</a>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Payment payment { get; set; } = new Payment();
+    private List<Invoice> invoices = new List<Invoice>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        invoices = await InvoiceService.GetInvoicesAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await PaymentService.CreatePaymentAsync(payment);
+        NavigationManager.NavigateTo("/platby");
+    }
+
+    private void OnInvoiceChanged(ChangeEventArgs e)
+    {
+        var invoiceId = int.Parse(e.Value.ToString());
+        var invoice = invoices.FirstOrDefault(i => i.Id == invoiceId);
+
+        payment.InvoiceId = invoiceId;
+        payment.TotalAmount = invoice.Price;
+    }
+}
