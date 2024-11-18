@@ -49,9 +49,13 @@ namespace Hotel_AdminPanel.Application.Services
 
         }
 
-        public Task<Invoice> GetInvoiceByIdAsync(int id)
+        public async Task<Invoice> GetInvoiceByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var invoice = await _context.Invoices
+                .Include(i => i.Reservation)
+                .ThenInclude(r => r.Customer)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            return invoice;
         }
 
         public async Task<List<Invoice>> GetInvoiceByReservationIdAsync(int reservationId)
@@ -72,9 +76,43 @@ namespace Hotel_AdminPanel.Application.Services
             return invoices;
         }
 
-        public Task UpdateInvoiceAsync(Invoice invoice)
+        public async Task<List<Invoice>> GetInvoicesByCustomerIdAsync(int customerId)
         {
-            throw new NotImplementedException();
+            var invoices = await _context.Invoices
+                .Include(i => i.Reservation)
+                .ThenInclude(r => r.Customer)
+                .Where(i => i.Reservation.CustomerId == customerId)
+                .ToListAsync();
+            return invoices;
+        }
+
+        public async Task UpdateInvoiceAsync(Invoice invoice)
+        {
+            var existingInvoice = await _context.Invoices.FindAsync(invoice.Id);
+            if (existingInvoice == null)
+            {
+                throw new Exception("Faktura nebyla nalezena.");
+            }
+
+            existingInvoice.ReservationId = invoice.ReservationId;
+            existingInvoice.Price = invoice.Price;
+            existingInvoice.Prepayment = invoice.Prepayment;
+            existingInvoice.IssueDate = invoice.IssueDate;
+            existingInvoice.DueDate = invoice.DueDate;
+            existingInvoice.IsPaid = invoice.IsPaid;
+            existingInvoice.Currency = invoice.Currency;
+            existingInvoice.Discount = invoice.Discount;
+
+            try
+            {
+                _context.Invoices.Update(existingInvoice);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception("Chyba při ukládání faktury do databáze.", ex);
+            }
+
         }
     }
 }

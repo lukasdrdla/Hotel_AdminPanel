@@ -1,5 +1,6 @@
 ﻿@inherits OwningComponentBase<IPaymentService>
 @inject IPaymentService PaymentService
+@inject IInvoiceService InvoiceService
 @inject NavigationManager NavigationManager
 
 <EditForm Model="payment" OnValidSubmit="HandleValidSubmit">
@@ -13,30 +14,56 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="invoiceId" class="form-label">Faktura</label>
+                        <div class="form-group position-relative">
+
+                            <input type="text" class="form-control" placeholder="Hledat fakturu.." @bind="searchTerm" @oninput="SearchInvoice" @onblur="HideInvoices" />
+                            @if (filteredInvoices.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                    @foreach (var invoice in filteredInvoices)
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onmousedown="() => SelectInvoice(invoice)">
+                                            <div>
+                                                <strong>Číslo faktury:</strong> @invoice.Id
+                                            </div>
+                                            <div>
+                                                <strong>Zákazník:</strong> @invoice.Reservation.Customer.FirstName @invoice.Reservation.Customer.LastName (<a>@invoice.Reservation.Customer.Email</a>)
+                                            </div>
+                                            <div>
+                                                <strong>Termín:</strong> @invoice.Reservation.CheckIn.ToShortDateString() - @invoice.Reservation.CheckOut.ToShortDateString()
+                                            </div>
+                                            <div>
+                                                <strong>Cena:</strong> @invoice.Price.ToString("C")
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+
+
+                        </div>
+                    </div>
                     <div class="mb-3 row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="paymentDate" class="form-label">Datum platby</label>
                             <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
                             <ValidationMessage For="@(() => payment.PaymentDate)" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="amount" class="form-label">Částka</label>
                             <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
                             <ValidationMessage For="@(() => payment.TotalAmount)" />
                         </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="paymentMethod" class="form-label">Způsob platby</label>
                             <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
                             <ValidationMessage For="@(() => payment.PaymentMethod)" />
                         </div>
-                        <div class="col-md-6">
-                            <label for="invoiceId" class="form-label">Faktura</label>
-                            <InputNumber id="invoiceId" class="form-control" @bind-Value="payment.InvoiceId" />
-                            <ValidationMessage For="@(() => payment.InvoiceId)" />
-                        </div>
                     </div>
+                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
@@ -54,13 +81,40 @@
     [Parameter] public EventCallback<bool> OnClose { get; set; }
 
     private Payment payment = new Payment();
+    private List<Invoice> invoices = new List<Invoice>();
+    private List<Invoice> filteredInvoices = new List<Invoice>();
+
+    private string searchTerm = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
         if (IsVisible && PaymentId > 0)
         {
             payment = await PaymentService.GetPaymentByIdAsync(PaymentId) ?? new Payment();
+            invoices = await InvoiceService.GetInvoicesAsync();
+            searchTerm = $"{payment.Invoice.Reservation.Customer.FirstName} {payment.Invoice.Reservation.Customer.LastName}";
+
         }
+    }
+
+    private void HideInvoices()
+    {
+        filteredInvoices.Clear();
+    }
+
+    private void SearchInvoice(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredInvoices = invoices.Where(x => x.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        
+    }
+
+    private void SelectInvoice(Invoice invoice)
+    {
+        searchTerm = $"{invoice.Reservation.Customer.FirstName} {invoice.Reservation.Customer.LastName}";
+        payment.InvoiceId = invoice.Id;
+        payment.TotalAmount = invoice.Price;
+        filteredInvoices.Clear();
     }
 
     private async Task HandleValidSubmit()

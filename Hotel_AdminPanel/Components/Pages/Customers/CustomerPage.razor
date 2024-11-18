@@ -15,7 +15,7 @@
                 <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
     <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary" @onclick="OpenAddCustomerModal">
+                <button class="btn btn-primary" @onclick="NavigateToAddCustomer">
             <i class="bi bi-plus"></i> Přidat zákazníka
         </button>
     </div>
@@ -71,15 +71,12 @@
 </div>
 
 <DeleteModal Title="Smazaní zákazníka" ActionType="DeleteCustomer" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
-<CustomerAddModal IsVisible="@isAddModalVisible" OnClose="HandleAddModalClose" />
 
 @code {
     private List<Customer> customers;
     private List<Customer> filteredCustomers;
     private bool isModalVisible = false;
     private int customerIdToDelete;
-
-    private bool isAddModalVisible = false;
 
     private string searchTerm = string.Empty;
     private PaginationState paginationState = new PaginationState { ItemsPerPage = 20 };
@@ -90,21 +87,7 @@
         filteredCustomers = customers;
     }
 
-    private void OpenAddCustomerModal()
-    {
-        isAddModalVisible = true;
-    }
 
-    private async Task HandleAddModalClose(bool result)
-    {
-        isAddModalVisible = false;
-
-        if (result)
-        {
-            customers = await CustomerService.GetCustomersAsync();
-            filteredCustomers = customers;
-        }
-    }
 
     private void NavigateToAddCustomer()
     {

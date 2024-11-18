@@ -1,0 +1,173 @@
+﻿@page "/calculator"
+@using System.Data
+@rendermode InteractiveServer
+
+<h3 class="mb-4 page-title">Kalkulačka</h3>
+
+<div class="calculator" @onkeydown="OnKeyDown" tabindex="0">
+    <input type="text" class="form-control mb-3" @bind="display" disabled />
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="() => Add('1')">1</button>
+        <button class="btn btn-primary" @onclick="() => Add('2')">2</button>
+        <button class="btn btn-primary" @onclick="() => Add('3')">3</button>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="() => Add('4')">4</button>
+        <button class="btn btn-primary" @onclick="() => Add('5')">5</button>
+        <button class="btn btn-primary" @onclick="() => Add('6')">6</button>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="() => Add('7')">7</button>
+        <button class="btn btn-primary" @onclick="() => Add('8')">8</button>
+        <button class="btn btn-primary" @onclick="() => Add('9')">9</button>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="() => Add('0')">0</button>
+        <button class="btn btn-primary" @onclick="() => Add('+')">+</button>
+        <button class="btn btn-primary" @onclick="() => Add('-')">-</button>
+        <button class="btn btn-primary" @onclick="() => Add('*')">*</button>
+        <button class="btn btn-primary" @onclick="() => Add('/')">/</button>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="() => Add('(')">(</button>
+        <button class="btn btn-primary" @onclick="() => Add(')')">)</button>
+        <button class="btn btn-primary" @onclick="() => Add('.')">.</button>
+        <button class="btn btn-clear" @onclick="() => display = string.Empty">C</button>
+    </div>
+
+    <div class="row">
+        <button class="btn btn-primary" @onclick="Calculate">=</button>
+    </div>
+
+</div>
+
+<style>
+    .calculator {
+        max-width: 250px;
+        margin: 0 auto;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        background-color: #f4f4f4;
+    }
+
+        .calculator .form-control {
+            width: 100%;
+            height: 40px;
+            text-align: right;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .calculator .row {
+            margin-bottom: 10px;
+        }
+
+        .calculator .btn {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin: 5px;
+            padding: 0;
+            text-align: center;
+            border-radius: 5px;
+            border: none;
+            background-color: #3498db;
+            color: #fff;
+        }
+
+            .calculator .btn:hover {
+                background-color: #2980b9;
+            }
+
+            .calculator .btn:active {
+                background-color: #1c5989;
+            }
+
+        .calculator .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+            .calculator .btn-primary:hover {
+                background-color: #2980b9;
+            }
+
+            .calculator .btn-primary:active {
+                background-color: #1c5989;
+            }
+
+        .calculator .btn-clear {
+            background-color: #e74c3c;
+        }
+
+            .calculator .btn-clear:hover {
+                background-color: #c0392b;
+            }
+
+            .calculator .btn-clear:active {
+                background-color: #a93226;
+            }
+
+</style>
+
+
+@code {
+    private string display = "";
+
+    private void Add(char value)
+    {
+        display += value;
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "1" || e.Key == "2" || e.Key == "3" || e.Key == "4" || e.Key == "5" || e.Key == "6" || e.Key == "7" || e.Key == "8" || e.Key == "9" || e.Key == "0" || e.Key == "+" || e.Key == "-" || e.Key == "*" || e.Key == "/" || e.Key == "(" || e.Key == ")" || e.Key == ".")
+        {
+            display += e.Key;
+        }
+        else if (e.Key == "Enter")
+        {
+            Calculate();
+        }
+        else if (e.Key == "Backspace")
+        {
+            //if the there is no more characters to delete, clear the display
+            if (display.Length == 0)
+            {
+                display = string.Empty;
+            }
+            else
+            {
+                display = display.Remove(display.Length - 1);
+            }
+            
+        }
+    }
+
+    private void Calculate()
+    {
+        try
+        {
+            // Použití DataTable pro výpočet matematického výrazu
+            var dataTable = new System.Data.DataTable();
+            var result = dataTable.Compute(display, string.Empty);
+            display = result.ToString(); // Zobrazení výsledku
+        }
+        catch (Exception)
+        {
+            display = "Error"; // Pokud dojde k chybě, zobrazí se "Error"
+        }
+    }
+}
+
+

@@ -17,6 +17,7 @@ namespace Hotel_AdminPanel.Application.Interfaces
 
         //Guests
         Task<List<Guest>> GetGuestsByReservationIdAsync(int reservationId);
+        Task DeleteGuestAsync(int id);
 
         //MealPlan
         Task<List<MealPlan>> GetMealPlansAsync();
@@ -37,6 +38,6 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<List<DateTime>> GetOccupiedDatesForRoomAsync(int roomId);
 
 
-        Task<List<int>> GetMonthlyReservations();
+        Task<int[]> GetReservationsByMonthAsync();
     }
 }

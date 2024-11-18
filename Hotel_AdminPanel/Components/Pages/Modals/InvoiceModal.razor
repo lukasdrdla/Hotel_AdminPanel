@@ -1,0 +1,174 @@
+﻿@inherits OwningComponentBase<IInvoiceService>
+@inject IInvoiceService InvoiceService
+@inject IReservationService ReservationService
+@inject NavigationManager NavigationManager
+
+<EditForm Model="invoice" OnValidSubmit="HandleValidSubmit">
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@ModalTitle</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="modal-body">
+                    <!-- Hledání rezervace -->
+                    <div class="mb-3">
+                        <label for="customerSearch" class="form-label">Rezervace</label>
+                        <div class="form-group position-relative">
+                            <input type="text" class="form-control" placeholder="Hledat rezervaci" @bind="searchTerm" @oninput="SearchReservation" @onblur="HideReservationList" />
+                            @if (filteredReservations.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                    @foreach (var reservation in filteredReservations)
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onmousedown="() => SelectCustomer(reservation)">
+                                            <div>
+                                                <strong>Rezervace:</strong> č. @reservation.Id
+                                            </div>
+                                            <div>
+                                                <strong>Termín:</strong> @reservation.CheckIn.ToShortDateString() - @reservation.CheckOut.ToShortDateString()
+                                            </div>
+                                            <div>
+                                                <strong>Pokoj:</strong> @reservation.Room.RoomNumber
+                                            </div>
+                                            <div>
+                                                <strong>Zákazník:</strong> @reservation.Customer.FirstName @reservation.Customer.LastName
+                                                (<a href="mailto:@reservation.Customer.Email">@reservation.Customer.Email</a>)
+                                            </div>
+                                            <div>
+                                                <strong>Adresa:</strong> @reservation.Customer.City, @reservation.Customer.Address
+                                            </div>
+                                            <div>
+                                                <strong>Číslo dokladu:</strong> @reservation.Customer.DocumentNumber
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="invoiceDate" class="form-label">Datum vystavení faktury</label>
+                            <InputDate id="invoiceDate" class="form-control" @bind-Value="invoice.IssueDate" />
+                            <ValidationMessage For="@(() => invoice.IssueDate)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dueDate" class="form-label">Datum splatnosti</label>
+                            <InputDate id="dueDate" class="form-control" @bind-Value="invoice.DueDate" />
+                            <ValidationMessage For="@(() => invoice.DueDate)" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-4">
+                            <label for="totalAmount" class="form-label">Celková částka</label>
+                            <InputNumber id="totalAmount" class="form-control" @bind-Value="invoice.Price" />
+                            <ValidationMessage For="@(() => invoice.Price)" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="customerId" class="form-label">Záloha</label>
+                            <InputNumber id="customerId" class="form-control" @bind-Value="invoice.Prepayment" />
+                            <ValidationMessage For="@(() => invoice.Prepayment)" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="discount" class="form-label">Sleva</label>
+                            <InputNumber id="discount" class="form-control" @bind-Value="invoice.Discount" />
+                            <ValidationMessage For="@(() => invoice.Discount)" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="currency" class="form-label">Měna</label>
+                            <InputText id="currency" class="form-control" @bind-Value="invoice.Currency" />
+                            <ValidationMessage For="@(() => invoice.Currency)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="isPaid" class="form-label">Zaplaceno</label>
+                            <InputSelect id="isPaid" class="form-control" @bind-Value="invoice.IsPaid">
+                                <option value="true">Ano</option>
+                                <option value="false">Ne</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Popis</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="invoice.Description" />
+                        <ValidationMessage For="@(() => invoice.Description)" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                    <button type="submit" class="btn btn-primary">@ButtonText</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public int InvoiceId { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public List<Reservation> Reservations { get; set; }
+    [Parameter] public bool IsEditMode { get; set; } // Nový parametr pro režim úpravy
+
+    private Invoice invoice = new Invoice();
+    private List<Reservation> filteredReservations = new List<Reservation>();
+    private string searchTerm;
+
+    // Titul modálu a text tlačítka podle režimu
+    private string ModalTitle => IsEditMode ? "Upravit Fakturu" : "Přidat Fakturu";
+    private string ButtonText => IsEditMode ? "Uložit" : "Vytvořit";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && InvoiceId > 0)
+        {
+            invoice = await InvoiceService.GetInvoiceByIdAsync(InvoiceId) ?? new Invoice();
+            Reservations = await ReservationService.GetReservationsAsync();
+            searchTerm = $"{invoice.Reservation.Customer.FirstName} {invoice.Reservation.Customer.LastName} - {invoice.Reservation.CheckIn.ToShortDateString()} až {invoice.Reservation.CheckOut.ToShortDateString()} - Pokoj: {invoice.Reservation.Room.RoomNumber}";
+        }
+    }
+
+    private async Task SearchReservation(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredReservations = Reservations.Where(x => x.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private async void HideReservationList()
+    {
+        filteredReservations.Clear();
+    }
+
+    private void SelectCustomer(Reservation reservation)
+    {
+        invoice.ReservationId = reservation.Id;
+        searchTerm = $"{reservation.Customer.FirstName} {reservation.Customer.LastName} - {reservation.CheckIn.ToShortDateString()} až {reservation.CheckOut.ToShortDateString()} - Pokoj: {reservation.Room.RoomNumber}";
+        filteredReservations.Clear();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsEditMode)
+        {
+            await InvoiceService.UpdateInvoiceAsync(invoice);
+        }
+        else
+        {
+            await InvoiceService.CreateInvoiceAsync(invoice);
+        }
+        await OnClose.InvokeAsync(false);
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false);
+}

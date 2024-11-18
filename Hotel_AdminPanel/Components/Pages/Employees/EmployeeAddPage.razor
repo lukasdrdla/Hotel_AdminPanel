@@ -4,6 +4,7 @@
 @inject RoleManager<IdentityRole> RoleManager
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "Admin")]
 
 
 
@@ -14,6 +15,38 @@
             <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="AddCustomer">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+
+                <div class="mb-3 row">
+                    <div class="col-md-6">
+                        <label for="role" class="form-label">Role</label>
+                        <InputSelect id="role" class="form-control" @bind-Value="customer.Role">
+                            <option value="">-- Vyberte roli --</option>
+                            @foreach (var role in roles)
+                            {
+                                <option value="@role">@role</option>
+                            }
+
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="insurenceId" class="form-label">Pojištovna</label>
+                        <div class="form-group position-relative">
+                            <input type="text" class="form-control" placeholder="Hledat pojištovnu.." @bind="searchTerm" @oninput="OnInputChange" @onblur="HideCompanyList" />
+
+                            @if (filteredInsuranceCompanies.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                    @foreach (var company in filteredInsuranceCompanies)
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onmousedown="@(() => SelectCompany(company))">@company.Name</li>
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </div>
+
+                </div>
 
                 <div class="mb-3 row">
                     <div class="col-md-6">
@@ -120,31 +153,7 @@
                     </label>
                 </div>
 
-                <div class="mb-3 row">
-                    <div class="col-md-6">
-                        <label for="role" class="form-label">Role</label>
-                        <InputSelect id="role" class="form-control" @bind-Value="customer.Role">
-                            <option value="">-- Vyberte roli --</option>
-                            @foreach (var role in roles)
-                            {
-                                <option value="@role">@role</option>
-                            }
-                    
-                        </InputSelect>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="insurenceCompanyId" class="form-label">Pojištovna</label>
-                        <InputSelect id="insurenceCompanyId" class="form-control" @bind-Value="customer.InsuranceCompanyId">
-                            <option value="">-- Vyberte pojišťovnu --</option>
-                            @foreach (var insuranceCompany in insuranceCompanies)
-                            {
-                                <option value="@insuranceCompany.Id">@insuranceCompany.Name</option>
-                            }
-                        </InputSelect>
-                    </div>
-
-                </div>
+                
 
 
 
@@ -162,6 +171,36 @@
 </div>
 
 
+<style>
+    .list-group {
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+    }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+        }
+
+    .form-group {
+        position: relative;
+    }
+
+    input[type="text"] {
+        border-radius: 0.25rem;
+    }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+</style>
+
 
 
 @code {
@@ -171,12 +210,34 @@
     private List<IdentityRole> roles = new List<IdentityRole>();
     private List<InsuranceCompany> insuranceCompanies = new List<InsuranceCompany>();
 
+    private string searchTerm = string.Empty;
+    private List<InsuranceCompany> filteredInsuranceCompanies = new List<InsuranceCompany>();
+
 
     protected override async Task OnInitializedAsync()
     {
         roles = await RoleManager.Roles.ToListAsync();
 
         insuranceCompanies = await AccountService.GetAllInsuranceCompaniesAsync();
+        filteredInsuranceCompanies = new List<InsuranceCompany>();
+    }
+
+    private void OnInputChange(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredInsuranceCompanies = insuranceCompanies.Where(x => x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void HideCompanyList()
+    {
+        filteredInsuranceCompanies.Clear();
+    }
+
+    private void SelectCompany(InsuranceCompany company)
+    {
+        customer.InsuranceCompanyId = company.Id;
+        searchTerm = company.Name;
+        filteredInsuranceCompanies.Clear();
     }
 
     private async Task HandleValidSubmit()

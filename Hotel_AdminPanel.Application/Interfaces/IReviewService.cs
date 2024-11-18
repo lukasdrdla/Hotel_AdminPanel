@@ -16,5 +16,6 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task DeleteReviewAsync(int id);
 
         Task<List<Review>> GetReviewsByCustomerIdAsync(int customerId);
+        Task<List<Review>> GetRoomReviewsAsync(int roomId);
     }
 }

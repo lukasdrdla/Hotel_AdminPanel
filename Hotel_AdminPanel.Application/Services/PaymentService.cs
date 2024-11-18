@@ -78,6 +78,17 @@ namespace Hotel_AdminPanel.Application.Services
             return payments;
         }
 
+        public async Task<List<Payment>> GetPaymentsByReservationIdAsync(int reservationId)
+        {
+            var payments = await _context.Payments
+                .Include(p => p.Invoice)
+                .ThenInclude(i => i.Reservation)
+                .ThenInclude(r => r.Customer)
+                .Where(p => p.Invoice.ReservationId == reservationId)
+                .ToListAsync();
+            return payments;
+        }
+
         public async Task UpdatePaymentAsync(Payment payment)
         {
             var existingPayment = await _context.Payments.FirstOrDefaultAsync(p => p.Id == payment.Id);

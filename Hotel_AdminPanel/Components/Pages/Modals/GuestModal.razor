@@ -1,4 +1,4 @@
-﻿<!-- CustomerModal.razor -->
+﻿<!-- GuestModal.razor -->
 @inherits OwningComponentBase<IGuestService>
 @inject IGuestService GuestService
 
@@ -10,13 +10,12 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Přidat hosta</h5>
+                    <h5 class="modal-title">@ModalTitle</h5>
                     <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
                 </div>
                 <div class="modal-body">
 
-                    <label for="reservationId" class="form-label">Rezervace</label>
-                    <InputNumber id="reservationId" class="form-control" @bind-Value="ReservationId" readonly />
+                    <InputNumber id="reservationId" class="form-control" @bind-Value="ReservationId" hidden />
 
                     <div class="mb-3 row">
                         <div class="col-md-6">
@@ -42,7 +41,6 @@
                         </div>
                     </div>
 
-                    
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
                         <button type="submit" class="btn btn-primary">Uložit</button>
@@ -59,14 +57,46 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> OnClose { get; set; }
     [Parameter] public int ReservationId { get; set; }
+    [Parameter] public int? GuestId { get; set; } // GuestId je nullable, aby bylo snadné rozlišit přidávání od úpravy
 
     private Guest guest = new Guest();
+    private string ModalTitle => GuestId.HasValue ? "Upravit hosta" : "Přidat hosta";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && GuestId.HasValue)
+        {
+            guest = await GuestService.GetGuestAsync(GuestId.Value);
+        }
+        else
+        {
+            guest = new Guest();
+        }
+    }
 
     private async Task HandleValidSubmit()
     {
-        guest.ReservationId = ReservationId;
-        await GuestService.CreateGuestAsync(guest);
-        await OnClose.InvokeAsync(false); // Zavřít modal po uložení
+        try
+        {
+            guest.ReservationId = ReservationId;
+
+            if (GuestId.HasValue)
+            {
+                // Aktualizace existujícího hosta
+                await GuestService.UpdateGuestAsync(guest);
+            }
+            else
+            {
+                // Přidání nového hosta
+                await GuestService.CreateGuestAsync(guest);
+            }
+
+            await OnClose.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+            // Ošetření výjimky
+        }
     }
 
     private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání

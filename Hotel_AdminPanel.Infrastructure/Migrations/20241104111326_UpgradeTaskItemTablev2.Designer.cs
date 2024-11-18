@@ -4,6 +4,7 @@ using Hotel_AdminPanel.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hotel_AdminPanel.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241104111326_UpgradeTaskItemTablev2")]
+    partial class UpgradeTaskItemTablev2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,7 +236,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Hlavní 123",
                             City = "Praha",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3137),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6885),
                             DateOfBirth = new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2030, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2020, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -246,7 +249,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420123456789",
                             PlaceOfBirth = "Praha",
                             PostalCode = "11000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3138)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6886)
                         },
                         new
                         {
@@ -254,7 +257,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Náměstí 456",
                             City = "Brno",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3146),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6894),
                             DateOfBirth = new DateTime(1985, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2029, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2019, 6, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -267,7 +270,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420987654321",
                             PlaceOfBirth = "Brno",
                             PostalCode = "60200",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3147)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6895)
                         },
                         new
                         {
@@ -275,7 +278,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Sokolská 789",
                             City = "Ostrava",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3153),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6902),
                             DateOfBirth = new DateTime(1992, 3, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2031, 7, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2021, 7, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -288,7 +291,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420654789123",
                             PlaceOfBirth = "Ostrava",
                             PostalCode = "70200",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3153)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6903)
                         },
                         new
                         {
@@ -296,7 +299,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Jasná 321",
                             City = "Plzeň",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3159),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6911),
                             DateOfBirth = new DateTime(1988, 8, 30, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2032, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2022, 4, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -309,7 +312,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420321654987",
                             PlaceOfBirth = "Plzeň",
                             PostalCode = "30100",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3160)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6912)
                         },
                         new
                         {
@@ -317,7 +320,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Květná 159",
                             City = "Liberec",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3166),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6919),
                             DateOfBirth = new DateTime(1995, 12, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2031, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2021, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -330,7 +333,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420159753468",
                             PlaceOfBirth = "Liberec",
                             PostalCode = "46000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3167)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6920)
                         },
                         new
                         {
@@ -338,7 +341,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Lípa 753",
                             City = "Ústí nad Labem",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3173),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6927),
                             DateOfBirth = new DateTime(1998, 10, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2030, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2020, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -351,7 +354,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420753951852",
                             PlaceOfBirth = "Ústí nad Labem",
                             PostalCode = "40000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3173)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6928)
                         },
                         new
                         {
@@ -359,7 +362,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Březová 852",
                             City = "Hradec Králové",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3179),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6964),
                             DateOfBirth = new DateTime(1987, 4, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2031, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2021, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -372,7 +375,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420852456789",
                             PlaceOfBirth = "Hradec Králové",
                             PostalCode = "50000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3180)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6965)
                         },
                         new
                         {
@@ -380,7 +383,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Růžová 258",
                             City = "Zlín",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3186),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6973),
                             DateOfBirth = new DateTime(1993, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2031, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2021, 3, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -393,7 +396,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420258963147",
                             PlaceOfBirth = "Zlín",
                             PostalCode = "76000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3187)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6974)
                         },
                         new
                         {
@@ -401,7 +404,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Modrá 369",
                             City = "Karlovy Vary",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3192),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6981),
                             DateOfBirth = new DateTime(1980, 9, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2028, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2018, 4, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -414,7 +417,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420369258147",
                             PlaceOfBirth = "Karlovy Vary",
                             PostalCode = "36000",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3193)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6982)
                         },
                         new
                         {
@@ -422,7 +425,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Address = "Violetová 741",
                             City = "Jihlava",
                             Country = "Česká republika",
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3199),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6989),
                             DateOfBirth = new DateTime(1991, 6, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfExpiry = new DateTime(2031, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DateOfIssue = new DateTime(2021, 9, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
@@ -435,7 +438,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             Phone = "+420741852963",
                             PlaceOfBirth = "Jihlava",
                             PostalCode = "58601",
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3200)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6990)
                         });
                 });
 
@@ -651,77 +654,77 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3295),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7060),
                             Currency = "CZK",
                             Description = "",
                             Discount = 0.0m,
-                            DueDate = new DateTime(2024, 12, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3293),
+                            DueDate = new DateTime(2024, 12, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7059),
                             IsPaid = false,
-                            IssueDate = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3291),
+                            IssueDate = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7057),
                             Prepayment = 0.0m,
                             Price = 1500.00m,
                             ReservationId = 1,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3296)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7062)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3302),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7069),
                             Currency = "CZK",
                             Description = "",
                             Discount = 0.0m,
-                            DueDate = new DateTime(2024, 12, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3301),
+                            DueDate = new DateTime(2024, 12, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7068),
                             IsPaid = true,
-                            IssueDate = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3300),
+                            IssueDate = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7067),
                             Prepayment = 0.0m,
                             Price = 2500.00m,
                             ReservationId = 2,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3303)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7070)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3309),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7078),
                             Currency = "CZK",
                             Description = "",
                             Discount = 0.0m,
-                            DueDate = new DateTime(2024, 12, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3308),
+                            DueDate = new DateTime(2024, 12, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7076),
                             IsPaid = false,
-                            IssueDate = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3307),
+                            IssueDate = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7075),
                             Prepayment = 0.0m,
                             Price = 1200.00m,
                             ReservationId = 3,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3309)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7079)
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3315),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7086),
                             Currency = "CZK",
                             Description = "",
                             Discount = 0.0m,
-                            DueDate = new DateTime(2024, 12, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3314),
+                            DueDate = new DateTime(2024, 12, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7085),
                             IsPaid = true,
-                            IssueDate = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3313),
+                            IssueDate = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7084),
                             Prepayment = 0.0m,
                             Price = 2000.00m,
                             ReservationId = 4,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3316)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7087)
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3322),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7094),
                             Currency = "CZK",
                             Description = "",
                             Discount = 0.0m,
-                            DueDate = new DateTime(2024, 12, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3321),
+                            DueDate = new DateTime(2024, 12, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7093),
                             IsPaid = false,
-                            IssueDate = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3320),
+                            IssueDate = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7092),
                             Prepayment = 0.0m,
                             Price = 1700.00m,
                             ReservationId = 5,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3323)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7095)
                         });
                 });
 
@@ -893,14 +896,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             CheckIn = new DateTime(2022, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CheckOut = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Children = 0,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3347),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7122),
                             CustomerId = 1,
                             MealPlanId = 1,
                             ReservationStatusId = 1,
                             RoomId = 1,
                             SpecialRequest = "",
                             TotalPrice = 0m,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3349)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7124)
                         },
                         new
                         {
@@ -910,14 +913,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             CheckIn = new DateTime(2022, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CheckOut = new DateTime(2022, 1, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Children = 0,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3354),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7130),
                             CustomerId = 2,
                             MealPlanId = 2,
                             ReservationStatusId = 2,
                             RoomId = 2,
                             SpecialRequest = "",
                             TotalPrice = 0m,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3355)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7131)
                         },
                         new
                         {
@@ -927,14 +930,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             CheckIn = new DateTime(2022, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CheckOut = new DateTime(2022, 1, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Children = 0,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3360),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7136),
                             CustomerId = 3,
                             MealPlanId = 3,
                             ReservationStatusId = 3,
                             RoomId = 3,
                             SpecialRequest = "",
                             TotalPrice = 0m,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3361)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7137)
                         },
                         new
                         {
@@ -944,14 +947,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             CheckIn = new DateTime(2022, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CheckOut = new DateTime(2022, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Children = 0,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3365),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7143),
                             CustomerId = 4,
                             MealPlanId = 4,
                             ReservationStatusId = 4,
                             RoomId = 4,
                             SpecialRequest = "",
                             TotalPrice = 0m,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3366)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7144)
                         },
                         new
                         {
@@ -961,14 +964,14 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             CheckIn = new DateTime(2022, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             CheckOut = new DateTime(2022, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Children = 2,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3371),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7150),
                             CustomerId = 5,
                             MealPlanId = 5,
                             ReservationStatusId = 1,
                             RoomId = 5,
                             SpecialRequest = "",
                             TotalPrice = 0m,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3372)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(7151)
                         });
                 });
 
@@ -1104,7 +1107,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3029),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6763),
                             Description = "Single Room",
                             Image = "",
                             MaxAdults = 1,
@@ -1113,12 +1116,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "101",
                             RoomStatusId = 1,
                             RoomTypeId = 1,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3077)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6815)
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3083),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6822),
                             Description = "Double Room",
                             Image = "",
                             MaxAdults = 2,
@@ -1127,12 +1130,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "102",
                             RoomStatusId = 1,
                             RoomTypeId = 2,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3084)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6823)
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3086),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6825),
                             Description = "Triple Room",
                             Image = "",
                             MaxAdults = 3,
@@ -1141,12 +1144,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "103",
                             RoomStatusId = 1,
                             RoomTypeId = 3,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3087)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6826)
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3088),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6828),
                             Description = "Quad Room",
                             Image = "",
                             MaxAdults = 4,
@@ -1155,12 +1158,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "104",
                             RoomStatusId = 1,
                             RoomTypeId = 4,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3089)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6829)
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3091),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6831),
                             Description = "Queen Room",
                             Image = "",
                             MaxAdults = 2,
@@ -1169,12 +1172,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "105",
                             RoomStatusId = 1,
                             RoomTypeId = 5,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3091)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6832)
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3093),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6834),
                             Description = "King Room",
                             Image = "",
                             MaxAdults = 2,
@@ -1183,12 +1186,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "106",
                             RoomStatusId = 1,
                             RoomTypeId = 6,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3093)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6834)
                         },
                         new
                         {
                             Id = 7,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3095),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6836),
                             Description = "Twin Room",
                             Image = "",
                             MaxAdults = 2,
@@ -1197,12 +1200,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "107",
                             RoomStatusId = 1,
                             RoomTypeId = 7,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3096)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6837)
                         },
                         new
                         {
                             Id = 8,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3097),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6839),
                             Description = "Double-double Room",
                             Image = "",
                             MaxAdults = 4,
@@ -1211,12 +1214,12 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "108",
                             RoomStatusId = 1,
                             RoomTypeId = 8,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3098)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6840)
                         },
                         new
                         {
                             Id = 9,
-                            CreatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3099),
+                            CreatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6842),
                             Description = "Studio Room",
                             Image = "",
                             MaxAdults = 2,
@@ -1225,7 +1228,7 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                             RoomNumber = "109",
                             RoomStatusId = 1,
                             RoomTypeId = 9,
-                            UpdatedAt = new DateTime(2024, 11, 5, 9, 13, 5, 391, DateTimeKind.Local).AddTicks(3100)
+                            UpdatedAt = new DateTime(2024, 11, 4, 12, 13, 26, 324, DateTimeKind.Local).AddTicks(6843)
                         });
                 });
 
@@ -1351,6 +1354,13 @@ namespace Hotel_AdminPanel.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EmployeeId")

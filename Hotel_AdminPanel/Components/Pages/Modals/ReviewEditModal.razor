@@ -1,0 +1,231 @@
+﻿@inherits OwningComponentBase<IReviewService>
+@inject IReviewService ReviewService
+
+<EditForm Model="review" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Upravit hodnocení</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    @if (IsModalFromRoomDetail)
+                    {
+                        <InputNumber class="form-control" @bind-Value="RoomId" hidden />
+                        <div class="mb-3">
+                            <label for="customerId" class="form-label">Zákazník</label>
+                            <div class="form-group position-relative">
+
+                                <input type="text" class="form-control" placeholder="Vyhledat zákazníka.." @bind="searchTerm" @oninput="SearchCustomer" @onblur="HideCustomers" />
+
+                                @if (filteredCustomers.Any())
+                                {
+                                    <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                        @foreach (var customer in filteredCustomers)
+                                        {
+                                            <li class="list-group-item list-group-item-action" @onmousedown="() => SelectCustomer(customer)">
+                                                <div>
+                                                    <strong>Zákazník:</strong> @customer.FirstName @customer.LastName
+                                                </div>
+                                                <div>
+                                                    <strong>Email:</strong> <a>@customer.Email</a>
+                                                </div>
+                                                <div>
+                                                    <strong>Adresa:</strong> @customer.City, @customer.Address
+                                                </div>
+
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label for="rating" class="form-label">Hodnocení</label>
+                                <InputNumber id="rating" class="form-control" @bind-Value="review.Rating" min="1" max="5" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="comment" class="form-label">Komentář</label>
+                                <InputText id="comment" class="form-control" @bind-Value="review.Comment" />
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <InputNumber class="form-control" @bind-Value="CustomerId" hidden />
+
+                        <div class="mb-3">
+                            <label for="roomId" class="form-label">Room</label>
+                            <div class="form-group position-relative">
+
+                                <input type="text" class="form-control" placeholder="Vyhledat pokoj.." @bind="searchTerm" @oninput="SearchRoom" @onblur="HideRooms" />
+
+                                @if (filteredRooms.Any())
+                                {
+                                    <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                        @foreach (var room in filteredRooms)
+                                        {
+                                            <li class="list-group-item list-group-item-action" @onmousedown="() => SelectRoom(room)">
+                                                <div>
+                                                    <strong>Pokoj:</strong> @room.RoomNumber
+                                                </div>
+                                                <div>
+                                                    <strong>Typ:</strong> @room.RoomType.Name
+                                                </div>
+                                                <div>
+                                                    <strong>Cena:</strong> @room.Price.ToString("C")
+                                                </div>
+
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label for="rating" class="form-label">Hodnocení</label>
+                                <InputNumber id="rating" class="form-control" @bind-Value="review.Rating" min="1" max="5" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="comment" class="form-label">Komentář</label>
+                                <InputText id="comment" class="form-control" @bind-Value="review.Comment" />
+                            </div>
+                        </div>
+                    }
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public int CustomerId { get; set; }
+    [Parameter] public List<Room> Rooms { get; set; }
+    [Parameter] public int RoomId { get; set; }
+    [Parameter] public bool IsModalFromRoomDetail { get; set; }
+    [Parameter] public List<Customer> Customers { get; set; }
+    [Parameter] public int ReviewId { get; set; }
+
+    private string searchTerm = string.Empty;
+    private List<Room> filteredRooms = new List<Room>();
+    private List<Customer> filteredCustomers = new List<Customer>();
+
+
+    private Review review = new Review();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && ReviewId > 0)
+        {
+            review = await ReviewService.GetReviewByIdAsync(ReviewId);
+
+            if (IsModalFromRoomDetail)
+            {
+                RoomId = review.RoomId;
+                searchTerm = $"{review.Customer.FirstName} {review.Customer.LastName}";
+            }
+            else
+            {
+                CustomerId = review.CustomerId;
+                searchTerm = $"{review.Room.RoomType.Name} - {review.Room.RoomNumber}";
+            }
+        }
+    }
+
+
+    private void SearchRoom(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredRooms = Rooms.Where(x => x.RoomNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void SearchCustomer(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredCustomers = Customers.Where(x => x.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void HideRooms()
+    {
+        filteredRooms.Clear();
+    }
+
+    private void HideCustomers()
+    {
+        filteredCustomers.Clear();
+    }
+
+    private void SelectRoom(Room room)
+    {
+        review.RoomId = room.Id;
+        searchTerm = $"{room.RoomType.Name} - {room.RoomNumber}";
+        filteredRooms.Clear();
+    }
+
+    private void SelectCustomer(Customer customer)
+    {
+        review.CustomerId = customer.Id;
+        searchTerm = $"{customer.FirstName} {customer.LastName}";
+        filteredCustomers.Clear();
+    }
+
+
+
+
+    private async Task HandleValidSubmit()
+    {
+        if (IsModalFromRoomDetail)
+        {
+            try
+            {
+                review.RoomId = RoomId;
+                await ReviewService.UpdateReviewAsync(review);
+                await OnClose.InvokeAsync(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        else
+        {
+            try
+            {
+                review.CustomerId = CustomerId;
+                await ReviewService.UpdateReviewAsync(review);
+                await OnClose.InvokeAsync(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
+}

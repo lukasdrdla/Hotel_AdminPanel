@@ -1,0 +1,115 @@
+﻿<!-- CustomerModal.razor -->
+@inherits OwningComponentBase<IPaymentService>
+@inject IPaymentService PaymentService
+@inject IInvoiceService InvoiceService
+
+<EditForm Model="payment" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Přidat hosta</h5>
+                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="invoiceId" class="form-label">Faktura</label>
+                            <div class="form-group position-relative">
+
+                                <input type="text" class="form-control" placeholder="Hledat fakturu.." @bind="searchTerm" @oninput="SearchInvoice" @onblur="HideInvoices" />
+                                @if (filteredInvoices.Any())
+                                {
+                                    <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                        @foreach (var invoice in filteredInvoices)
+                                        {
+                                            <li class="list-group-item list-group-item-action" @onmousedown="() => SelectInvoice(invoice)">
+                                                @invoice.Reservation.Customer.FirstName @invoice.Reservation.Customer.LastName - @invoice.Price Kč
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label">Částka</label>
+                            <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <div class="col-md-6">
+                            <label for="paymentDate" class="form-label">Datum platby</label>
+                            <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="paymentMethod" class="form-label">Způsob platby</label>
+                            <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
+                        </div>
+                    </div>
+
+
+
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
+</EditForm>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public List<Invoice> Invoices { get; set; }
+
+    private Payment payment = new Payment();
+    private List<Invoice> filteredInvoices = new List<Invoice>();
+
+    private string searchTerm = string.Empty;
+
+    private void SearchInvoice(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredInvoices = Invoices.Where(x => x.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void SelectInvoice(Invoice invoice)
+    {
+        searchTerm = $"{invoice.Reservation.Customer.FirstName} {invoice.Reservation.Customer.LastName}";
+        payment.InvoiceId = invoice.Id;
+        payment.TotalAmount = invoice.Price;
+        filteredInvoices.Clear();
+    }
+
+    private void HideInvoices()
+    {
+        filteredInvoices.Clear();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await PaymentService.CreatePaymentAsync(payment);
+            await OnClose.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+        }
+
+    }
+
+    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
+}

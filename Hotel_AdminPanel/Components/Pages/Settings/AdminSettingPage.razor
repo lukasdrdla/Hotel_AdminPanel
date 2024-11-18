@@ -3,7 +3,9 @@
 @inject IRoomService RoomService
 @inject IAccountService AccountService
 @inject IJSRuntime JSRuntime
+
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 
 <h3 class="text-center mb-4 page-title">Admin Nastavení</h3>
 
@@ -456,15 +458,26 @@
 
     private async Task SaveMealPlan(MealPlan mealPlan)
     {
-        await ReservationService.UpdateMealPlanAsync(mealPlan);
-        editMealPlanId = null;
-        MealPlans = await ReservationService.GetMealPlansAsync();
+        try
+        {
+            await ReservationService.UpdateMealPlanAsync(mealPlan);
+            editMealPlanId = null;
+
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     private async Task SaveRole(IdentityRole role)
     {
-        await AccountService.UpdateRoleAsync(role);
-        editRoleId = null;
+        try { 
+            await AccountService.UpdateRoleAsync(role);
+            editRoleId = null;
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     private async Task SaveRStatus(ReservationStatus reservationStatus)
@@ -541,25 +554,56 @@
             switch (ActionType)
             {
                 case "DeleteRole":
-                    await AccountService.DeleteRoleAsync(deleteRoleId);
-                    Roles = await AccountService.GetAllRolesAsync();
+                    try
+                    {
+                        await AccountService.DeleteRoleAsync(deleteRoleId);
+                        Roles = await AccountService.GetAllRolesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                     break;
                 case "DeleteMealPlan":
-                    await ReservationService.DeleteMealPlanAsync(deleteMealPlanId.Value);
-                    MealPlans = await ReservationService.GetMealPlansAsync();
+                    try
+                    {
+                        await ReservationService.DeleteMealPlanAsync(deleteMealPlanId.Value);
+                        MealPlans = await ReservationService.GetMealPlansAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                     break;
                 case "DeleteRoomType":
-                    await RoomService.DeleteRoomTypeAsync(deleteRoomTypeId.Value);
-                    RoomTypes = await RoomService.GetRoomTypesAsync();
+                    try
+                    {
+                        await RoomService.DeleteRoomTypeAsync(deleteRoomTypeId.Value);
+                        RoomTypes = await RoomService.GetRoomTypesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                     break;
                 case "DeleteRoomStatus":
-                    await RoomService.DeleteRoomStatusAsync(deleteRoomStatusId.Value);
-                    RoomStatuses = await RoomService.GetRoomStatusesAsync();
+                    try
+                    {
+                        await RoomService.DeleteRoomStatusAsync(deleteRoomStatusId.Value);
+                        RoomStatuses = await RoomService.GetRoomStatusesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                     break;
                 case "DeleteReservationStatus":
-                    await ReservationService.DeleteReservationStatusAsync(deleteReservationStatusId.Value);
-                    ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
-                    break;
+                    try
+                    {
+                        await ReservationService.DeleteReservationStatusAsync(deleteReservationStatusId.Value);
+                        ReservationStatuses = await ReservationService.GetReservationStatusesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                break;
             }
         }
     }

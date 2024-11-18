@@ -1,4 +1,5 @@
 ﻿@page "/pridat-rezervaci"
+@using Hotel_AdminPanel.Components.Pages.DatePicker
 @inject IReservationService ReservationService
 @inject NavigationManager NavigationManager
 @inject IRoomService RoomService
@@ -24,19 +25,34 @@
                         </div>
 
                         <label for="CustomerId" class="form-label">Zákazník</label>
-                        <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @oninput="OnInputChange" />
+                        <div class="form-group position-relative">
 
-                        @if (filteredCustomers != null && filteredCustomers.Any())
-                        {
-                            <ul class="list-group mt-2">
-                                @foreach (var customer in filteredCustomers)
-                                {
-                                    <li class="list-group-item" @onclick="() => SelectCustomer(customer)">
-                                        @customer.FirstName @customer.LastName - @customer.Email - @customer.City @customer.Address - @customer.DocumentNumber
-                                    </li>
-                                }
-                            </ul>
-                        }
+                            <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @bind:event="oninput" @bind:after="FilterCustomers" @onblur="HideCustomerList" />
+                            @if (filteredCustomers.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                    @foreach (var customer in filteredCustomers)
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onmousedown="() => SelectCustomer(customer)">
+                                            <div>
+                                                <strong> Jméno:</strong> @customer.FirstName @customer.LastName
+                                            </div>
+                                            <div>
+                                                <strong> Kontaktní údaje:</strong> @customer.Email, @customer.Phone
+                                            </div>
+                                            <div>
+                                                <strong> Adresa:</strong> @customer.Address, @customer.City, @customer.PostalCode, @customer.Country
+                                            </div>
+                                            <div>
+                                                <strong> Číslo dokladu:</strong> @customer.DocumentNumber
+                                            </div>
+
+
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                       </div>
                     </div> 
                 </div>
 
@@ -66,7 +82,7 @@
 
                 <div class="form-group mb-3">
                     <label for="RoomId" class="form-label">Pokoj</label>
-                    <select id="RoomId" class="form-control" @onchange="OnRoomSelected" >
+                    <select id="RoomId" class="form-control" @onchange="@(e => OnRoomSelected(e))">
                         <option value="">Vyber pokoj</option>
                         @foreach (var room in rooms)
                         {
@@ -76,15 +92,39 @@
                    
                 </div>
 
-                <div class="mb-3 row">
+                <div class="mb-4 row">
                     <div class="col-md-6">
                         <label for="CheckIn" class="form-label">Check In</label>
-                        <input type="date" id="CheckIn" class="form-control" @onchange="OnDateSelectIn" />
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Vyberte datum"
+                                   value="@reservation.CheckIn.ToShortDateString()" readonly />
+                            <button type="button" class="btn btn-secondary" @onclick="OpenCheckInCalendar">
+                                <i class="bi bi-calendar-date"></i>
+                            </button>
+                        </div>
+                        @if (isCheckInCalendarVisible)
+                        {
+                            <div class="calendar-container">
+                                <CustomDatePicker DisableDates="unavailableDates" OnDateSelected="OnDateSelectIn" />
+                            </div>
+                        }
                     </div>
 
                     <div class="col-md-6">
                         <label for="CheckOut" class="form-label">Check Out</label>
-                        <input type="date" id="CheckOut" class="form-control" @onchange="OnDateSelectOut" />
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Vyberte datum"
+                                   value="@reservation.CheckOut.ToShortDateString()" readonly />
+                            <button type="button" class="btn btn-secondary" @onclick="OpenCheckOutCalendar">
+                                <i class="bi bi-calendar-date"></i>
+                            </button>
+                        </div>
+                        @if (isCheckOutCalendarVisible)
+                        {
+                            <div class="calendar-container">
+                                <CustomDatePicker DisableDates="unavailableDates" OnDateSelected="OnDateSelectOut" />
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -165,10 +205,37 @@
     </div>
 </div>
 
-<Hotel_AdminPanel.Components.Pages.Customers.CustomerAddModal IsVisible="isAddCustomerModalVisible" OnClose="HandleCustomerModalClose" />
+<CustomerAddModal IsVisible="isAddCustomerModalVisible" OnClose="HandleCustomerModalClose" />
 
 
 
+<style>
+    .calendar-container {
+        position: relative;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control {
+        border-radius: 5px 0 0 5px;
+        border: 1px solid #ccc;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            border-color: #14A872; /* Barva na fokus */
+            box-shadow: 0 0 5px rgba(20, 168, 114, 0.5);
+        }
+
+    .btn-secondary {
+        border-radius: 0 5px 5px 0;
+    }
+</style>
 
 
 
@@ -186,7 +253,21 @@
     private bool isAddCustomerModalVisible = false;
     private Customer newCustomerModel = new Customer();
 
+    private List<DateTime> unavailableDates = new List<DateTime>();
 
+    private bool isCheckInCalendarVisible = false;
+    private bool isCheckOutCalendarVisible = false;
+
+
+    private void OpenCheckInCalendar()
+    {
+        isCheckInCalendarVisible = !isCheckInCalendarVisible;
+    }
+
+    private void OpenCheckOutCalendar()
+    {
+        isCheckOutCalendarVisible = !isCheckOutCalendarVisible;
+    }
 
 
     protected override async Task OnInitializedAsync()
@@ -200,32 +281,10 @@
         mealPlans = await ReservationService.GetMealPlansAsync();
         reservationStatuses = await ReservationService.GetReservationStatusesAsync();
 
+
     }
 
-    private void OnInputChange(ChangeEventArgs e)
-    {
-        searchTerm = e.Value.ToString();
-        FilterCustomers();
-        StateHasChanged();
-    }
 
-    private void FilterCustomers()
-    {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            filteredCustomers = new List<Customer>();
-        }
-        else
-        {
-            filteredCustomers = customers
-                .Where(c => c.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                             c.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                             c.FirstName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                             c.LastName.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase)
-                )
-                .ToList();
-        }
-    }
 
     private void SelectCustomer(Customer customer)
     {
@@ -284,17 +343,16 @@
         CalculateTotalPrice();
     }
 
-    private void OnDateSelectIn(ChangeEventArgs e)
+    private void OnDateSelectIn(DateTime? date)
     {
-        reservation.CheckIn = DateTime.Parse(e.Value.ToString());
-
-        CalculateTotalPrice();
+        reservation.CheckIn = date.Value;
+        isCheckInCalendarVisible = false;
     }
 
-    private void OnDateSelectOut(ChangeEventArgs e)
+    private void OnDateSelectOut(DateTime? date)
     {
-        reservation.CheckOut = DateTime.Parse(e.Value.ToString());
-        CalculateTotalPrice();
+        reservation.CheckOut = date.Value;
+        isCheckOutCalendarVisible = false;
     }
 
 
@@ -316,6 +374,8 @@
 
         var roomId = int.Parse(e.Value.ToString());
         selectedRoom = rooms.FirstOrDefault(room => room.Id == roomId);
+
+        unavailableDates = await ReservationService.GetOccupiedDatesForRoomAsync(roomId);
 
         CalculateTotalPrice();
     }
@@ -357,5 +417,17 @@
     private void AddGuest()
     {
         reservation.Guests.Add(new Guest());
+    }
+
+    private void FilterCustomers()
+    {
+        filteredCustomers = customers.Where(x => x.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+
+
+    private void HideCustomerList()
+    {
+        filteredCustomers.Clear();
     }
 }

@@ -2,45 +2,61 @@
 @inject IPaymentService PaymentService
 @inject IInvoiceService InvoiceService
 @inject NavigationManager NavigationManager
-
 @rendermode InteractiveServer
 
 <div class="container mt-2">
-    <div class="card border-0 shadow-sm mx-auto">
+    <div class="card border-0 shadow-sm mx-auto w-50">
         <div class="card-body">
             <h3 class="card-title text-center mb-4 page-title">Přidat Platbu</h3>
             <EditForm Model="payment" OnValidSubmit="HandleValidSubmit" FormName="AddPayment">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div class="mb-3 row">
-                    <div class="col-md-6">
+                <div class="mb-3">
                         <label for="invoiceId" class="form-label">Faktura</label>
-                        <select class="form-select" @onchange="OnInvoiceChanged">
-                            <option value="">Vyberte fakturu</option>
-                            @foreach (var invoice in invoices)
-                            {
-                                <option value="@invoice.Id">@invoice.Id - @invoice.Reservation.Customer.FirstName - @invoice.Reservation.Customer.LastName - @invoice.Reservation.Customer.PersonalIdentificationNumber - @invoice.Price.ToString("C")</option>
-                            }
-                        </select>
-                    </div>
+                        <div class="form-group position-relative">
 
-                    <div class="col-md-6">
-                        <label for="amount" class="form-label">Částka</label>
-                        <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
-                    </div>
+                            <input type="text" class="form-control" placeholder="Hledat fakturu.." @bind="searchTerm" @oninput="SearchInvoice" @onblur="HideInvoices" />
+                            @if (filteredInvoices.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                    @foreach (var invoice in filteredInvoices )
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onmousedown="() => SelectInvoice(invoice)"> 
+                                            <div>
+                                                <strong>Číslo faktury:</strong> @invoice.Id
+                                            </div>
+                                            <div>
+                                                <strong>Zákazník:</strong> @invoice.Reservation.Customer.FirstName @invoice.Reservation.Customer.LastName (<a>@invoice.Reservation.Customer.Email</a>)
+                                            </div>
+                                            <div>
+                                                <strong>Termín:</strong> @invoice.Reservation.CheckIn.ToShortDateString() - @invoice.Reservation.CheckOut.ToShortDateString()
+                                            </div>
+                                            <div>
+                                                <strong>Cena:</strong> @invoice.Price.ToString("C")
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+
+
+                        </div>
                 </div>
 
-                <div class="mb-3 row">
-                    <div class="col-md-6">
-                        <label for="paymentDate" class="form-label">Datum platby</label>
-                        <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
-                    </div>
 
-                    <div class="col-md-6">
-                        <label for="paymentMethod" class="form-label">Způsob platby</label>
-                        <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
-                    </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Částka</label>
+                    <InputNumber id="amount" class="form-control" @bind-Value="payment.TotalAmount" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="paymentDate" class="form-label">Datum platby</label>
+                    <InputDate id="paymentDate" class="form-control" @bind-Value="payment.PaymentDate" />
+                </div>
+                <div class="mb-3">
+                    <label for="paymentMethod" class="form-label">Způsob platby</label>
+                    <InputText id="paymentMethod" class="form-control" @bind-Value="payment.PaymentMethod" />
                 </div>
 
                 <div class="text-center mt-4">
@@ -55,24 +71,38 @@
 @code {
     private Payment payment { get; set; } = new Payment();
     private List<Invoice> invoices = new List<Invoice>();
+    private List<Invoice> filteredInvoices = new List<Invoice>();
+
+    private string searchTerm = string.Empty;
+
+    private void SearchInvoice(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredInvoices = invoices.Where(x => x.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+    }
+
+    private void SelectInvoice(Invoice invoice)
+    {
+        searchTerm = $"{invoice.Reservation.Customer.FirstName} {invoice.Reservation.Customer.LastName}";
+        payment.InvoiceId = invoice.Id;
+        payment.TotalAmount = invoice.Price;
+        filteredInvoices.Clear();
+    }
+
+    private void HideInvoices()
+    {
+        filteredInvoices.Clear();
+    }
 
     protected override async Task OnInitializedAsync()
     {
         invoices = await InvoiceService.GetInvoicesAsync();
+        filteredInvoices = new List<Invoice>();
     }
 
     private async Task HandleValidSubmit()
     {
         await PaymentService.CreatePaymentAsync(payment);
         NavigationManager.NavigateTo("/platby");
-    }
-
-    private void OnInvoiceChanged(ChangeEventArgs e)
-    {
-        var invoiceId = int.Parse(e.Value.ToString());
-        var invoice = invoices.FirstOrDefault(i => i.Id == invoiceId);
-
-        payment.InvoiceId = invoiceId;
-        payment.TotalAmount = invoice.Price;
     }
 }

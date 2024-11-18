@@ -51,7 +51,7 @@
 
                             <TemplateColumn Title="Akce">
                                 <div class="d-inline-flex">
-                                    <button class="btn text-primary" @onclick="() => NavigateToEmployeeDetail(context.User.Id)">
+                                    <button class="btn text-primary" @onclick="() => NavigateToEmployeeDetail(context.User.Email)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.User.Id)">

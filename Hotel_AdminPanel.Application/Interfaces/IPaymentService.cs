@@ -10,5 +10,7 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task CreatePaymentAsync(Payment payment);
         Task UpdatePaymentAsync(Payment payment);
         Task DeletePaymentAsync(int id);
+
+        Task<List<Payment>> GetPaymentsByReservationIdAsync(int reservationId);
     }
 }

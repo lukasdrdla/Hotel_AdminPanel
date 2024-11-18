@@ -1,0 +1,88 @@
+﻿@inject NavigationManager NavigationManager
+<div class="container">
+
+    <div class="form-group position-relative" style="max-width: 400px;">
+        <input type="text" class="form-control form-control-lg rounded-pill shadow-sm mb-5"
+               placeholder="🔍 Hledat..."
+               @bind="searchTerm" @bind:event="oninput" @bind:after="SearchPages" @onblur="Hide" />
+
+        @if (filteredPages.Any())
+        {
+            <ul class="list-group mt-2 shadow rounded position-absolute w-100" style="max-height: 200px; overflow-y: auto; top: 100%; z-index: 1000;">
+                @foreach (var ppage in filteredPages)
+                {
+                    <li class="list-group-item list-group-item-action d-flex align-items-center" @onmousedown="@(() => SelectPage(ppage))">
+                        <span class="fw-bold text-primary me-2">•</span> @ppage.Name
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+
+
+
+@code {
+    private string searchTerm;
+    private List<PageInfo> allPages;
+    private List<PageInfo> filteredPages;
+
+    protected override void OnInitialized()
+    {
+        allPages = new List<PageInfo>
+        {
+            new PageInfo { Name = "Zaměstnanci", Url = "/zamestnanci" },
+            new PageInfo { Name = "Platby", Url = "/platby" },
+            new PageInfo { Name = "Pokoje", Url = "/pokoje" },
+            new PageInfo { Name = "Faktury", Url = "/faktury" },
+            new PageInfo { Name = "Zákaznící", Url = "/zakaznici" },
+            new PageInfo { Name = "Rezervace", Url = "/rezervace" },
+            new PageInfo { Name ="Přidat zaměstnance", Url = "/pridat-zamestnance"},
+            new PageInfo { Name ="Přidat zákazníka", Url = "/pridat-zakaznika"},
+            new PageInfo { Name ="Přidat pokoj", Url = "/pridat-pokoj"},
+            new PageInfo { Name ="Přidat rezervaci", Url = "/pridat-rezervaci"},
+            new PageInfo { Name ="Přidat fakturu", Url = "/pridat-fakturu"},
+            new PageInfo { Name ="Přidat platbu", Url = "/pridat-platbu"},
+            new PageInfo {Name = "Profil", Url = "/muj-profil"},
+            new PageInfo {Name = "Nastavení", Url = "/nastaveni"},
+            new PageInfo {Name = "Todo", Url = "/ukoly"},
+            new PageInfo {Name = "Hlavní stránka", Url = "/"},
+
+
+        };
+        filteredPages = new List<PageInfo>();
+    }
+
+    private void Hide()
+    {
+        filteredPages.Clear();
+    }
+
+    private void SearchPages()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+           filteredPages = new List<PageInfo>();
+        }
+        else
+        {
+            filteredPages = allPages
+                .Where(page => page.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    private void SelectPage(PageInfo page)
+    {
+        NavigationManager.NavigateTo(page.Url);
+        searchTerm = string.Empty;
+    }
+
+    // Třída pro uložení informací o stránce
+    private class PageInfo
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }
+    }
+}

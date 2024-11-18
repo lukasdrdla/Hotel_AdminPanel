@@ -5,6 +5,9 @@ using Hotel_AdminPanel.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Diagnostics.Metrics;
+using System.Net;
 
 namespace Hotel_AdminPanel.Application.Services
 {
@@ -118,6 +121,53 @@ namespace Hotel_AdminPanel.Application.Services
             return null;
         }
 
+        public async Task<DetailUserViewModel> GetUserByEmailAsync(string email)
+        {
+            var user = await _context.Users
+                .Include(u => u.InsuranceCompany) //include
+                .FirstOrDefaultAsync(u => u.Email == email);
+
+            //include
+
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var model = new DetailUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                PersonalIdentificationNumber = user.PersonalIdentificationNumber,
+                PlaceOfBirth = user.PlaceOfBirth,
+                ProfilePicture = user.ProfilePicture,
+                Address = user.Address,
+                City = user.City,
+                PostalCode = user.PostalCode,
+                Country = user.Country,
+                JobTitle = user.JobTitle,
+                StartDate = user.StartDate,
+                Salary = user.Salary,
+                IsEmployed = user.IsEmployed,
+                Role = roles.FirstOrDefault(),
+                InsuranceCompanyId = user.InsuranceCompanyId
+
+            };
+            return model;
+        }
+
+        public async Task<AppUser> GetUserByIdAsync(string Id)
+        {
+            var user = await _userManager.FindByIdAsync(Id);
+            return user;
+        }
+
         public Task<IList<string>> GetUserRolesAsync(AppUser user)
         {
             throw new NotImplementedException();
@@ -167,7 +217,8 @@ namespace Hotel_AdminPanel.Application.Services
                 StartDate = model.StartDate,
                 Salary = model.Salary,
                 IsEmployed = model.IsEmployed,
-                
+                PhoneNumber = model.PhoneNumber
+
             };
 
 
@@ -218,6 +269,44 @@ namespace Hotel_AdminPanel.Application.Services
             existingRole.Name = model.Name;
             var updateResult = await _roleManager.UpdateAsync(existingRole);
             return updateResult;
+
+        }
+
+        public async Task UpdateUserAsync(DetailUserViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null) {
+                throw new Exception("User not found");
+            }
+
+
+            user.Email = model.Email;
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.PersonalIdentificationNumber = model.PersonalIdentificationNumber;
+            user.PlaceOfBirth = model.PlaceOfBirth;
+            user.ProfilePicture = model.ProfilePicture;
+            user.Address = model.Address;
+            user.City = model.City;
+            user.PostalCode = model.PostalCode;
+            user.Country = model.Country;
+            user.JobTitle = model.JobTitle;
+            user.StartDate = model.StartDate;
+            user.Salary = model.Salary;
+            user.IsEmployed = model.IsEmployed;
+            user.InsuranceCompanyId = model.InsuranceCompanyId;
+
+            //role
+            var roles = await _userManager.GetRolesAsync(user);
+            if (roles.FirstOrDefault() != model.Role)
+            {
+                await _userManager.RemoveFromRolesAsync(user, roles);
+                await _userManager.AddToRoleAsync(user, model.Role);
+            }
+
+
+            await _userManager.UpdateAsync(user);
 
         }
 

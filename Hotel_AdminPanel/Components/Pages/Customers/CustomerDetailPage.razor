@@ -1,12 +1,13 @@
 ﻿@page "/zakaznik/{Id:int}"
 @using Hotel_AdminPanel.Components.Pages.Reservations
 @inject ICustomerService CustomerService
+@inject IInvoiceService InvoiceService
 @inject NavigationManager NavigationManager
 @inject IRoomService RoomService
 @inject IReservationService ReservationService
 @inject IReviewService ReviewService
-
 @rendermode InteractiveServer
+
 
 <div class="container mt-2">
     @if (customer == null)
@@ -26,10 +27,6 @@
                     <div class="card-body">
                         <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
                         <EditForm Model="customer" OnValidSubmit="HandleValidSubmit" FormName="EditCustomer">
-                            <div class="mb-3">
-                                <label for="customerId" class="form-label">Číslo Zákazníka</label>
-                                <InputNumber id="customerId" class="form-control" @bind-Value="customer.Id" disabled />
-                            </div>
                             <div class="mb-3">
                                 <label for="firstName" class="form-label">Jméno</label>
                                 <InputText id="firstName" class="form-control" @bind-Value="customer.FirstName" />
@@ -99,7 +96,7 @@
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm mx-auto">
                     <div class="card-body">
-                        <button type="button" class="btn btn-primary" @onclick="OpenAddModalReservation">Přidat Rezervaci</button>
+                       <button type="button" class="btn btn-primary" @onclick="OpenAddModalReservation">Přidat Rezervaci</button>
                         <h3 class="card-title">Rezervace</h3>
                         <div class="table-container">
                             <table>
@@ -117,14 +114,60 @@
                     </div>
                 </div>
                 <div class="card border-0 shadow-sm mx-auto mt-5">
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary" @onclick="OpenAddReviewModal">
+                            <i class="bi bi-plus"></i> Přidat hodnocení
+                        </button>
+                    </div>
                     <div class="card-body">
                         <h3 class="card-title">Hodnocení</h3>
                         <div class="table-container">
                             <table class="w-100">
-                                <QuickGrid Items="customerReviews.AsQueryable()" Pagination="customerReviewPaggination">
-                                    <PropertyColumn Title="Hodnocení" Property="@(r => r.Rating)" Sortable="true" />
+                                <QuickGrid Items="customerReviews.AsQueryable()" Pagination="customerReviewPaggination" Class="w-100">
+                                    <TemplateColumn Title="Hodnocení">
+                                        @{
+                                            int rating = context.Rating; // Získání hodnocení z aktuálního kontextu
+                                            string stars = ""; // Inicializace proměnné pro hvězdičky
+                                        }
+
+                                        @switch (rating)
+                                        {
+                                            case 1:
+                                                stars = "&#9733;&#9734;&#9734;&#9734;&#9734;"; // 1 plná hvězdička, 4 prázdné
+                                                break;
+                                            case 2:
+                                                stars = "&#9733;&#9733;&#9734;&#9734;&#9734;"; // 2 plné hvězdičky, 3 prázdné
+                                                break;
+                                            case 3:
+                                                stars = "&#9733;&#9733;&#9733;&#9734;&#9734;"; // 3 plné hvězdičky, 2 prázdné
+                                                break;
+                                            case 4:
+                                                stars = "&#9733;&#9733;&#9733;&#9733;&#9734;"; // 4 plné hvězdičky, 1 prázdná
+                                                break;
+                                            case 5:
+                                                stars = "&#9733;&#9733;&#9733;&#9733;&#9733;"; // 5 plných hvězdiček
+                                                break;
+                                            default:
+                                                stars = "&#9734;&#9734;&#9734;&#9734;&#9734;"; // Pokud je rating mimo rozsah, zobrazí se 5 prázdných hvězdiček
+                                                break;
+                                        }
+
+                                        @* Zobrazíme hvězdičky *@
+                                        <span>@(new MarkupString(stars))</span>
+
+                                    </TemplateColumn>
                                     <PropertyColumn Title="Komentář" Property="@(r => r.Comment)" Sortable="true" />
                                     <PropertyColumn Title="Datum" Property="@(r => r.CreatedAt.ToShortDateString())" Sortable="true" />
+                                    <TemplateColumn Title="Akce">
+                                        <div class="d-inline-flex">
+                                            <button class="btn text-danger" @onclick="() => OpenDeleteReviewConfirmation(context.Id)">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                            <button class="btn text-primary" @onclick="() => OpenEditReviewModal(context.Id)">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </div>
+                                    </TemplateColumn>
 
                                </QuickGrid>
 
@@ -133,20 +176,18 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Další Informace</h5>
-                <p class="card-text">Zde můžete přidat další obsah nebo informace související se zákazníkem nebo rezervací.</p>
-                <!-- Přidání libovolného obsahu, například další tlačítka nebo detaily -->
+                
             </div>
         </div>
     }
 </div>
 
 <ReservationAddModal IsVisible="IsAddModalVisible" OnClose="CloseAddModal" CustomerId="Id" reservationStatuses="reservationStatuses" rooms="rooms"/>
+<ReviewEditModal IsVisible="IsEditReviewModalVisible" OnClose="CloseEditReviewModal" ReviewId="reviewIdToEdit" Rooms="rooms" IsModalFromRoomDetail="false" />
+<ReviewAddModal IsVisible="IsAddReviewModalVisible" OnClose="CloseAddReviewModal" CustomerId="Id" Rooms="rooms" IsModalFromRoomDetail="false" />
+<DeleteModal Title="Smazání hodnocení" ActionType="DeleteReview" IsVisible="@isDeleteModalVisible" OnClose="HandleModalClose" />
+
 
 @code {
     [Parameter]
@@ -162,14 +203,28 @@
     private PaginationState customerReviewPaggination = new PaginationState { ItemsPerPage = 5 };
 
 
+
     private bool IsAddModalVisible = false;
     private List<Room> rooms = new List<Room>();
     private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
 
+    private bool IsAddReviewModalVisible = false;
+    private bool isDeleteModalVisible = false;
+    private int reviewIdToDelete;
 
+    private bool IsEditReviewModalVisible = false;
+    private int reviewIdToEdit;
 
+    private void OpenEditReviewModal(int id)
+    {
+        reviewIdToEdit = id;
+        IsEditReviewModalVisible = true;
+    }
 
-
+    private void CloseEditReviewModal()
+    {
+        IsEditReviewModalVisible = false;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,10 +232,31 @@
         if (customer != null)
         {
             customerReservations = await ReservationService.GetReservationsByCustomerIdAsync(Id);
+            customerReviews = await ReviewService.GetReviewsByCustomerIdAsync(Id);
         }
 
         rooms = await RoomService.GetRooomsAsync();
         reservationStatuses = await ReservationService.GetReservationStatusesAsync();
+
+
+    }
+
+    private void OpenDeleteReviewConfirmation(int id)
+    {
+        reviewIdToDelete = id;
+        isDeleteModalVisible = true;
+    }
+
+    private async Task HandleModalClose(bool result)
+    {
+        var review = customerReviews.FirstOrDefault(r => r.Id == reviewIdToDelete);
+        isDeleteModalVisible = false;
+
+        if (result)
+        {
+            await ReviewService.DeleteReviewAsync(reviewIdToDelete);
+            customerReviews.Remove(review);
+        }
     }
 
     private void OpenAddModalReservation()
@@ -191,6 +267,16 @@
     private async Task CloseAddModal()
     {
         IsAddModalVisible = false;
+    }
+
+    private void OpenAddReviewModal()
+    {
+        IsAddReviewModalVisible = true;
+    }
+
+    private async Task CloseAddReviewModal()
+    {
+        IsAddReviewModalVisible = false;
     }
 
     private void NavigateToReservationDetail(int id)
@@ -208,5 +294,10 @@
     {
         await CustomerService.DeleteCustomerAsync(Id);
         NavigationManager.NavigateTo("/zakaznici");
+    }
+
+    private void NavigateToInvoiceDetail(int id)
+    {
+        NavigationManager.NavigateTo($"/faktura/{id}");
     }
 }

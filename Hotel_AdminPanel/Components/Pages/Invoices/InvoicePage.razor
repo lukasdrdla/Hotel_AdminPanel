@@ -15,7 +15,7 @@
                 <button class="btn btn-outline-secondary" type="button">Hledat</button>
             </div>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" @onclick="NavigateToAddInvoice">
                     <i class="bi bi-plus"></i> Přidat fakturu
                 </button>
             </div>
@@ -70,7 +70,7 @@
 
                             <TemplateColumn Title="Akce">
                                 <div class="d-inline-flex">
-                                    <button class="btn text-primary" @onclick="() => NavigateToInvoiceDetail(context.Id)">
+                                    <button class="btn text-primary" @onclick="() => OpenEditModal(context.Id)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="btn text-danger" @onclick="() => OpenDeleteConfirmation(context.Id)">
@@ -91,6 +91,7 @@
 </div>
 
 <DeleteModal Title="Smazání faktury" ActionType="DeleteInvoice" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
+<InvoiceEditModal IsVisible="@isInvoiceModalVisible" InvoiceId="invoiceIdToEdit" OnClose="HandleEditClose" />
 
 
 
@@ -105,11 +106,28 @@
     private bool isModalVisible = false;
     private int? invoiceIdToDelete;
 
+    private int invoiceIdToEdit;
+
     private void OpenDeleteConfirmation(int invoiceId)
     {
         invoiceIdToDelete = invoiceId;
         isModalVisible = true;
     }
+
+    private void OpenEditModal(int id)
+    {
+        invoiceIdToEdit = id;
+        isInvoiceModalVisible = true;
+    }
+
+    private async Task HandleEditClose(bool result)
+    {
+        isInvoiceModalVisible = false;
+        invoices = await InvoiceService.GetInvoicesAsync();
+        filteredInvoices = invoices;
+    }
+
+
 
     private async Task HandleModalClose(bool result)
     {
@@ -159,9 +177,10 @@
 
     }
 
-    private void NavigateToInvoiceDetail(int id)
+
+    private void NavigateToAddInvoice()
     {
-        NavigationManager.NavigateTo($"/faktura/{id}");
+        NavigationManager.NavigateTo("/pridat-fakturu");
     }
 
 

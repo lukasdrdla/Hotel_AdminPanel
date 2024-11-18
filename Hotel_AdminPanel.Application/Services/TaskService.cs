@@ -19,8 +19,9 @@ namespace Hotel_AdminPanel.Application.Services
             _context = context;
         }
 
-        public async Task CreateTask(TaskItem task)
+        public async Task CreateTask(TaskItem task, string employeeId)
         {
+            task.EmployeeId = employeeId;
             await _context.TaskItems.AddAsync(task);
             await _context.SaveChangesAsync();
         }
@@ -51,14 +52,23 @@ namespace Hotel_AdminPanel.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<List<TaskItem>> GetTasksForEmployeeAsync(int employeeId)
+        public async Task<List<TaskItem>> GetTasksForEmployeeAsync(string employeeId)
         {
-            throw new NotImplementedException();
+            var tasks = await _context.TaskItems.Where(t => t.EmployeeId == employeeId).ToListAsync();
+            return tasks;
         }
 
-        public Task UpdateTask(TaskItem task)
+        public async Task UpdateTask(TaskItem task)
         {
-            throw new NotImplementedException();
+            var existingTask = await _context.TaskItems.FindAsync(task.Id);
+
+            if (existingTask != null)
+            {
+                existingTask.Title = task.Title;
+                existingTask.IsCompleted = task.IsCompleted;
+
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

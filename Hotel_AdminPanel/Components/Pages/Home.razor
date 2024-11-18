@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using ChartJs.Blazor.PieChart
 @inject NavigationManager Navigation
 @inject IRoomService RoomService
 @inject ICustomerService CustomerService
@@ -45,32 +46,35 @@
             <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
                     <p>
-                        <i class="bi bi-percent"></i>
-                        Vytíženost hotelu
+                        <i class="bi bi-cash"></i> <!-- Ikona pro peníze -->
+                        Příjem poslední měsíc
                     </p>
-                    <h3>@HotelOccupancy.ToString("0.00") %</h3>
+                    <h3>@TotalRevenue.ToString("C2")</h3> <!-- Zobrazení celkového zisku s formátováním -->
                 </div>
             </div>
         </div>
+
 
     </div>
 
-    <div class="row mt-5">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mx-auto">
-                <div class="card-body">
+    <div class="row mt-4 d-flex">
+        <div class="col-lg-8 d-flex">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
+                <div class="card-body chart-container">
+                    <Chart Config="_config"></Chart>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mx-auto">
+        <div class="col-lg-4 d-flex ">
+            <div class="card border-0 shadow-sm mx-auto flex-fill">
                 <div class="card-body">
+                    <Chart Config="_pieConfig"></Chart>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-4">
         <div class="col-lg-12">
             <div class="card border-0 shadow-sm mx-auto">
                 <div class="card-body">
@@ -95,6 +99,12 @@
         </div>
     </div>
 </div>
+
+<style>
+    .chart-container {
+        overflow: hidden; /* Zajišťuje, že překročené části nebudou zobrazeny */
+    }
+</style>
  
 @code {
     private int TotalReservations;
@@ -107,10 +117,23 @@
     private List<Reservation> reservations = new List<Reservation>();
     private PaginationState paginationState = new PaginationState() { ItemsPerPage = 5 };
     private List<Room> maintenanceRooms = new List<Room>();
+    private List<Customer> customers = new List<Customer>();
     private decimal TotalRevenue;
 
+    private BarConfig _config = new BarConfig();
+    private PieConfig _pieConfig = new PieConfig();
 
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            _config = GenerateBarChart(reservations);
+            _pieConfig = GeneratePieChart();
+            await InvokeAsync(() => StateHasChanged());
+        }
+    }
 
 
     protected override async Task OnInitializedAsync()
@@ -130,10 +153,118 @@
         TotalRevenue = reservationsLastMonth.Sum(r => r.TotalPrice);
 
         upcomingReservations = (await ReservationService.GetReservationsAsync()).Where(r => r.CheckIn.Date == DateTime.Today || r.CheckOut.Date == DateTime.Today).ToList();
-
+        customers = await CustomerService.GetCustomersAsync();
         // Vytíženost hotelu
         HotelOccupancy = ((double)occupiedRooms / TotalRooms) * 100;
 
 
     }
+
+
+    private BarConfig GenerateBarChart(List<Reservation> reservations)
+    {
+        var config = new BarConfig
+            {
+                Options = new BarOptions
+                {
+                    Responsive = true,
+                    Title = new OptionsTitle
+                    {
+                        Display = true,
+                        Text = "Počty rezervací podle měsíců"
+                    },
+
+                    AspectRatio = 1,
+                    MaintainAspectRatio= false
+
+                }
+
+            };
+
+        var months = new[] { "Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec" };
+        foreach (var month in months)
+        {
+            config.Data.Labels.Add(month);
+        }
+
+        int[] monthlyReservationCounts = new int[12];
+
+        foreach (var reservation in reservations)
+        {
+            var month = reservation.CheckIn.Month; 
+            monthlyReservationCounts[month - 1]++;
+        }
+
+        var dataset = new BarDataset<int>(monthlyReservationCounts)
+            {
+                Label = "Počet rezervací",
+                BackgroundColor = ColorUtil.RandomColorString(),
+                BorderColor = ColorUtil.RandomColorString(),
+                BorderWidth = 1
+            };
+
+        config.Data.Datasets.Add(dataset);
+
+        return config;
+    }
+
+    private PieConfig GeneratePieChart()
+    {
+        var config = new PieConfig
+            {
+                Options = new PieOptions
+                {
+                    Responsive = true,
+                    Title = new OptionsTitle
+                    {
+                        Display = true,
+                        Text = "Počty zákazníků podle věku"
+                    },
+                    AspectRatio = 1.1
+                }
+            };
+
+        // Věkové kategorie
+        var ageCategories = new[] { "<20", "20-39", "40-59", "60+" };
+        foreach (var category in ageCategories)
+        {
+            config.Data.Labels.Add(category);
+        }
+
+        int[] ageCategoryCounts = new int[4];
+
+        foreach (var customer in customers)
+        {
+            var age = DateTime.Now.Year - customer.DateOfBirth.Year;
+
+            if (age < 20)
+            {
+                ageCategoryCounts[0]++;
+            }
+            else if (age >= 20 && age < 40)
+            {
+                ageCategoryCounts[1]++;
+            }
+            else if (age >= 40 && age < 60)
+            {
+                ageCategoryCounts[2]++;
+            }
+            else if (age >= 60)
+            {
+                ageCategoryCounts[3]++;
+            }
+        }
+
+        var dataset = new PieDataset<int>(ageCategoryCounts)
+            {
+                BackgroundColor = new[] { "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0" }, // Nastavení barev
+                BorderColor = new[] { "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0" },
+                BorderWidth = 1
+            };
+
+        config.Data.Datasets.Add(dataset);
+
+        return config;
+    }
+
 }

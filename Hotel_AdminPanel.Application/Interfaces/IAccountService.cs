@@ -13,6 +13,11 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<AppUser> GetCurrentUserAsync();
         //DeleteUserAsync
         Task<IdentityResult> DeleteUserAsync(string Id);
+        //GetUserByIdAsync
+        Task<AppUser> GetUserByIdAsync(string Id);
+
+        Task UpdateUserAsync(DetailUserViewModel model);
+        Task<DetailUserViewModel> GetUserByEmailAsync(string email);
 
 
         Task<List<UserWithRolesViewModel>> GetAllUsersAsync();

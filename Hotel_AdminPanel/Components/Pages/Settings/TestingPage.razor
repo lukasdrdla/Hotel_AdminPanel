@@ -1,43 +1,49 @@
-﻿@inherits OwningComponentBase
+﻿@page "/testing"
+@using System.Globalization
+@using iTextSharp.text
+@using iTextSharp.text.pdf
+@inject IRoomService RoomService
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
 
-<EditForm Model="Model" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<h3 class="mb-4 page-title">Button to generate PDF server</h3>
 
-    <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@Title</h5>
-                    <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
-                </div>
-                <div class="modal-body">
-                    @ChildContent
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
-                    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<button class="btn btn-primary" @onclick="GeneratePdf">Generate PDF</button>
 
-    <div class="modal-backdrop fade @(IsVisible ? "show" : "")" style="display:@(IsVisible ? "block" : "none")"></div>
-</EditForm>
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public string Title { get; set; }
-    [Parameter] public string SubmitButtonText { get; set; }
-    [Parameter] public object Model { get; set; }
-    [Parameter] public EventCallback<bool> OnClose { get; set; }
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    private List<Room> rooms = new List<Room>();
 
-    private async Task HandleValidSubmit()
+    protected override async Task OnInitializedAsync()
     {
-        // Logika pro zpracování formuláře
-        await OnClose.InvokeAsync(false); // Zavřít modal po uložení
+        rooms = await RoomService.GetRooomsAsync();
     }
 
-    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
+    private async Task GeneratePdf()
+    {
+        Document document = new Document(iTextSharp.text.PageSize.A4, 50, 50, 25, 25);
+
+        //save file to desktop
+        PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/test.pdf", FileMode.Create));
+
+        document.Open();
+
+        //add rooms table
+        PdfPTable table = new PdfPTable(3);
+        table.AddCell("Room Number");
+        table.AddCell("Room Type");
+        table.AddCell("Price");
+
+        foreach (var room in rooms)
+        {
+            table.AddCell(room.RoomNumber.ToString());
+            table.AddCell(room.RoomType.Name);
+            table.AddCell(room.Price.ToString());
+        }
+
+        document.Add(table);
+
+        document.Close();
+    }
+
 }

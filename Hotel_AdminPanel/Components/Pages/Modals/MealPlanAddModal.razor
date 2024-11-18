@@ -52,9 +52,15 @@
 
     private async Task HandleValidSubmit()
     {
-
-        await ReservationService.CreateMealPlanAsync(mealPlan);
-        await OnClose.InvokeAsync(false);
+        try
+        {
+            await ReservationService.CreateMealPlanAsync(mealPlan);
+            await OnClose.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private Task Close() => OnClose.InvokeAsync(false);

@@ -1,6 +1,7 @@
 ﻿@page "/rezervace/{id:int}"
 @inject IReservationService ReservationService
 @inject IInvoiceService InvoiceService
+@inject IPaymentService PaymentService
 @inject IRoomService RoomService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -47,13 +48,8 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="id" class="form-label">Id</label>
-                                <InputNumber id="id" class="form-control" @bind-Value="reservation.Id" disabled />
-                            </div>
-
-                            <div class="mb-3">
                                 <label for="room" class="form-label">Pokoj</label>
-                                <InputSelect id="room" class="form-control" @bind-Value="reservation.RoomId">
+                                <InputSelect id="room" class="form-control" @bind-Value="reservation.RoomId" disabled>
                                     <option value="">Vyber pokoj</option>
                                     @foreach (var room in rooms)
                                     {
@@ -65,12 +61,12 @@
 
                             <div class="mb-3">
                                 <label for="checkIn" class="form-label">Datum příjezdu</label>
-                                <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" />
+                                <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" disabled />
                             </div>
 
                             <div class="mb-3">
                                 <label for="checkOut" class="form-label">Datum odjezdu</label>
-                                <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" />
+                                <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" disabled />
                             </div>
 
                             <div class="mb-3">
@@ -101,7 +97,7 @@
                             <div class="mb-3">
                                 <label for="mealPlan" class="form-label">Stravování</label>
                                 <InputSelect id="mealPlan" class="form-control" @bind-Value="reservation.MealPlanId">
-                                    @foreach (var mealPlan in MealPlans)
+                                    @foreach (var mealPlan in mealPlans)
                                     {
                                         <option value="@mealPlan.Id">@mealPlan.Name</option>
                                     }
@@ -150,12 +146,21 @@
                         @if (guests != null && guests.Any())
                         {
                             <div class="table-container">
-                                <table>
-                                    <QuickGrid Items="guests.AsQueryable()" Pagination="paginationGuestState">
+                                <table class="w-100">
+                                    <QuickGrid Items="guests.AsQueryable()" Pagination="paginationGuestState" Class="w-100">
                                         <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true"/>
                                         <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true"/>
                                         <PropertyColumn Title="Datum narození" Property="@(x => x.DateOfBirth.ToShortDateString())" Sortable="true"/>
-                                        <PropertyColumn Title="Číslo dokladu" Property="@(x => x.DocumentNumber)" Sortable="true"/>
+                                        <TemplateColumn Title="Akce">
+                                            <div class="d-inline-flex">
+                                                <button class="btn text-primary" @onclick="() => OpenEditGuestModal(context.Id)">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn text-danger" @onclick="() => DeleteGuest(context.Id)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </TemplateColumn>
 
                                     </QuickGrid>
                                     <Paginator State="paginationGuestState" />
@@ -194,9 +199,13 @@
                                         <PropertyColumn Title="Cena" Property="@(x => x.Price)" Sortable="true"/>
                                         <TemplateColumn Title="Akce">
                                             <div class="d-inline-flex">
-                                                <button class="btn text-primary" @onclick="() => NavigateToInvoiceDetail(context.Id)">
+                                                <button class="btn text-primary" @onclick="() => OpenEditInvoiceModal(context.Id)">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
+                                                <button class="btn text-danger" @onclick="() => DeleteInvoice(context.Id)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+
                                             </div>
                                         </TemplateColumn>
                                     </QuickGrid>
@@ -212,6 +221,7 @@
                     </div>
 
                 </div>
+             
             </div>
 
         </div>
@@ -219,47 +229,144 @@
     }
 </div>
 
-<GuestAddModal IsVisible="@isAddGuestModalVisible" OnClose="CloseAddGuestModal" ReservationId="Id" />
-<InvoiceAddModal IsVisible="@isAddInvoiceModalVisible" OnClose="CloseAddInvoiceModal" ReservationId="Id" />
 
 
+<InvoiceModal 
+    IsVisible="@isEditInvoiceModalVisible" 
+    OnClose="CloseEditInvoiceModal" 
+    Reservations="reservations" 
+    InvoiceId="invoiceIdToEdit" 
+    IsEditMode="true" />
+
+<InvoiceModal 
+    IsVisible="@isAddInvoiceModalVisible" 
+    OnClose="CloseAddInvoiceModal" 
+    Reservations="reservations" 
+    InvoiceId="0" 
+    IsEditMode="false" />
+
+<GuestModal IsVisible="@isAddGuestModalVisible"
+            OnClose="CloseAddGuestModal"
+            ReservationId="Id"
+            GuestId="null" />
+
+<GuestModal IsVisible="@isEditGuestModalVisible"
+            OnClose="CloseEditGuestModal"
+            ReservationId="Id"
+            GuestId="@guestIdToEdit" />
+
+<DeleteModal 
+    Title="@modalTitle" 
+    ActionType="@(isDeletingGuest ? "DeleteGuest" : "DeleteInvoice")" 
+    IsVisible="@isDeleteModalVisible" 
+    OnClose="CloseDeleteModal" />
 
 @code {
     [Parameter]
     public int Id { get; set; }
 
     private Reservation reservation = new Reservation();
-    
 
     private List<ReservationStatus> reservationStatuses = new List<ReservationStatus>();
-    private List<MealPlan> MealPlans = new List<MealPlan>();
+    private List<MealPlan> mealPlans = new List<MealPlan>();
     private List<Room> rooms = new List<Room>();
+    private List<Reservation> reservations = new List<Reservation>();
     private List<Invoice> invoices = new List<Invoice>();
-    private PaginationState paginationInvoiceState = new PaginationState() { ItemsPerPage = 5 };
-
     private List<Guest> guests = new List<Guest>();
+
+    private PaginationState paginationInvoiceState = new PaginationState() { ItemsPerPage = 5 };
     private PaginationState paginationGuestState = new PaginationState() { ItemsPerPage = 5 };
 
-
-
+    private bool isDeleteModalVisible = false;
+    private bool isEditGuestModalVisible = false;
+    private bool isEditInvoiceModalVisible = false;
     private bool isAddGuestModalVisible = false;
     private bool isAddInvoiceModalVisible = false;
+
+
+    private int guestIdToEdit;
+    private int guestIdToDelete;
+    private int invoiceIdToEdit;
+    private int invoiceIdToDelete;
+
+
+    private string modalTitle;
+    private bool isDeletingGuest;
+
+
+
+
+    private void DeleteInvoice(int id)
+    {
+        invoiceIdToDelete = id;
+        modalTitle = "Smazání faktury";
+        isDeletingGuest = false;
+
+        isDeleteModalVisible = true;
+    }
+
+    private void DeleteGuest(int id)
+    {
+        guestIdToDelete = id;
+        isDeleteModalVisible = true;
+        modalTitle = "Smazání hosta";
+        isDeletingGuest = true; // Určuje, že se maže host
+    }
+
+    private async Task CloseDeleteModal(bool result)
+    {
+        isDeleteModalVisible = false;
+
+
+        if (result)
+        {
+            if (invoiceIdToDelete != 0)
+            {
+                await InvoiceService.DeleteInvoiceAsync(invoiceIdToDelete);
+                invoices = await InvoiceService.GetInvoiceByReservationIdAsync(Id);
+            }
+            else
+            {
+                await ReservationService.DeleteGuestAsync(guestIdToDelete);
+                guests = await ReservationService.GetGuestsByReservationIdAsync(Id);
+            }
+        }
+    }
+
+
+
 
     private void OpenAddInvoiceModal()
     {
         isAddInvoiceModalVisible = true;
+        isEditInvoiceModalVisible = false;
     }
 
     private void OpenAddGuestModal()
     {
         isAddGuestModalVisible = true;
+        isEditGuestModalVisible = false;
     }
 
-    private void CloseAddGuestModal()
+    private void OpenEditGuestModal(int guestId)
     {
+        guestIdToEdit = guestId;
+        isEditGuestModalVisible = true;
         isAddGuestModalVisible = false;
-        //handle refresh
     }
+
+
+    private void OpenEditInvoiceModal(int invoiceId)
+    {
+        invoiceIdToEdit = invoiceId;
+        isEditInvoiceModalVisible = true;
+        isAddInvoiceModalVisible = false;
+    }
+
+
+
+
+
 
     private void CloseAddInvoiceModal()
     {
@@ -267,20 +374,47 @@
         //handle refresh
     }
 
+
+    private void CloseAddGuestModal(bool result)
+    {
+        isAddGuestModalVisible = false;
+    }
+
+    private void CloseEditGuestModal(bool result)
+    {
+        isEditGuestModalVisible = false;
+    }
+
+
+
+    private async Task CloseEditInvoiceModal(bool result)
+    {
+        isEditInvoiceModalVisible = false;
+        invoices = await InvoiceService.GetInvoiceByReservationIdAsync(Id);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         reservation = await ReservationService.GetReservationByIdAsync(Id);
         reservationStatuses = await ReservationService.GetReservationStatusesAsync();
-        MealPlans = await ReservationService.GetMealPlansAsync();
+        mealPlans = await ReservationService.GetMealPlansAsync();
         guests = await ReservationService.GetGuestsByReservationIdAsync(Id);
         rooms = await RoomService.GetRooomsAsync();
         invoices = await InvoiceService.GetInvoiceByReservationIdAsync(Id);
+        reservations = await ReservationService.GetReservationsAsync();
     }
 
     private async Task HandleValidSubmit()
     {
-        await ReservationService.UpdateReservationAsync(reservation);
-        NavigationManager.NavigateTo("/reservations");
+        try
+        {
+
+            await ReservationService.UpdateReservationAsync(reservation);
+            NavigationManager.NavigateTo("/rezervace");
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     private void NavigateToCustomerDetail()

@@ -40,9 +40,10 @@ namespace Hotel_AdminPanel.Application.Services
             throw new NotImplementedException();
         }
 
-        public Task<Guest> GetGuestAsync(int id)
+        public async Task<Guest> GetGuestAsync(int id)
         {
-            throw new NotImplementedException();
+            var guest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == id);
+            return guest;
         }
 
         public async Task<List<Guest>> GetGuestsAsync()
@@ -52,9 +53,28 @@ namespace Hotel_AdminPanel.Application.Services
 
         }
 
-        public Task UpdateGuestAsync(Guest guestDto)
+        public async Task UpdateGuestAsync(Guest guestDto)
         {
-            throw new NotImplementedException();
+            var existingGuest = await _context.Guests.FirstOrDefaultAsync(g => g.Id == guestDto.Id);
+            if (existingGuest == null)
+            {
+                throw new Exception("Guest not found");
+            }
+            existingGuest.FirstName = guestDto.FirstName;
+            existingGuest.LastName = guestDto.LastName;
+            existingGuest.DocumentNumber = guestDto.DocumentNumber;
+            existingGuest.DateOfBirth = guestDto.DateOfBirth;
+
+            try
+            {
+
+                _context.Guests.Update(existingGuest);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Error updating guest");
+            }
         }
     }
 }

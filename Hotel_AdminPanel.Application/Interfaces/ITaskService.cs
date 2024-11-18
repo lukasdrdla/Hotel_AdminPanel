@@ -9,10 +9,10 @@ namespace Hotel_AdminPanel.Application.Interfaces
 {
     public interface ITaskService
     {
-        Task<List<TaskItem>> GetTasksForEmployeeAsync(int employeeId);
+        Task<List<TaskItem>> GetTasksForEmployeeAsync(string employeeId);
         Task<List<TaskItem>> GetAllTasksAsync();
         Task<TaskItem> GetTaskById(int id);
-        Task CreateTask(TaskItem task);
+        Task CreateTask(TaskItem task, string employeeId);
         Task UpdateTask(TaskItem task);
         Task DeleteTask(int id);
 

@@ -26,26 +26,20 @@
                 </div>
 
                 <div class="form-group mb-3">
-                    <div class="form-group mb-3">
+                        <label for="roomType" class="form-label">Typ pokoje</label>
+                        <div class="form-group position-relative">
+                            <input type="text" class="form-control" placeholder="Hledat pokoj.." @bind="searchTerm" @oninput="SearchRoom" @onblur="HideRoomList" />
 
-                        <label for="RoomType" class="form-label">Room Type</label>
-                        <input type="text" class="form-control" placeholder="Hledat typ pokoje" @bind="searchTerm" @oninput="OnInputChange" />
-
-                        @if (filteredRoomTypes != null && filteredRoomTypes.Any())
-                        {
-                            <ul class="list-group mt-2">
-                                @foreach (var roomType in filteredRoomTypes)
-                                {
-                                    <li class="list-group-item" @onclick="() => SelectRoomType(roomType)">
-                                        @roomType.Name
-                                    </li>
-                                    
-                                }
-                            </ul>
-                        }
-
-
-                    </div>
+                        @if (filteredRoomTypes.Any())
+                            {
+                                <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                @foreach (var room in filteredRoomTypes)
+                                    {
+                                        <li class="list-group-item list-group-item-action" @onclick="@(() => SelectRoomType(room))">@room.Name</li>
+                                    }
+                                </ul>
+                            }
+                        </div>
                 </div>
 
                 <div class="form-group mb-3">
@@ -99,11 +93,7 @@
     private Room room { get; set; } = new Room();
 
     private string searchTerm;
-
-
-
     private List<RoomType> roomTypes = new List<RoomType>();
-
     private List<RoomType> filteredRoomTypes = new List<RoomType>();
 
     private List<RoomStatus> roomStatuses = new List<RoomStatus>();
@@ -117,18 +107,10 @@
 
     }
 
-    private async Task OnInputChange(ChangeEventArgs e)
+    private async Task SearchRoom(ChangeEventArgs e)
     {
         searchTerm = e.Value.ToString();
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            filteredRoomTypes = new List<RoomType>();
-        }
-        else
-        {
-            filteredRoomTypes = roomTypes.Where(rt => rt.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
-           
-        }
+        filteredRoomTypes = roomTypes.Where(x => x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     private void SelectRoomType(RoomType roomType)
@@ -136,6 +118,11 @@
         room.RoomTypeId = roomType.Id;
         searchTerm = $"{roomType.Name}";
         filteredRoomTypes = new List<RoomType>();
+    }
+
+    private void HideRoomList()
+    {
+        filteredRoomTypes.Clear();
     }
 
     private async void HandleValidSubmit()

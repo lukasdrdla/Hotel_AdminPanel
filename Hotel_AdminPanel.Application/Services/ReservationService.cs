@@ -81,7 +81,7 @@ namespace Hotel_AdminPanel.Application.Services
 
 
         public async Task<Reservation> GetReservationByIdAsync(int id)
-            {
+        {
             var reservation = await _context.Reservations
                 .Include(r => r.Customer)
                 .Include(r => r.Room)
@@ -92,9 +92,33 @@ namespace Hotel_AdminPanel.Application.Services
 
         }
 
-        public Task UpdateReservationAsync(Reservation reservation)
+        public async Task UpdateReservationAsync(Reservation reservation)
         {
-            throw new NotImplementedException();
+            var existingReservation = await _context.Reservations.FirstOrDefaultAsync(r => r.Id == reservation.Id);
+
+            if (existingReservation == null)
+            {
+                throw new InvalidOperationException("Reservation not found");
+            }
+            else
+            {
+                existingReservation.CustomerId = reservation.CustomerId;
+                existingReservation.RoomId = reservation.RoomId;
+                existingReservation.CheckIn = reservation.CheckIn;
+                existingReservation.CheckOut = reservation.CheckOut;
+                existingReservation.TotalPrice = reservation.TotalPrice;
+                existingReservation.MealPlanId = reservation.MealPlanId;
+                existingReservation.ReservationStatusId = reservation.ReservationStatusId;
+                existingReservation.Adults = reservation.Adults;
+                existingReservation.Children = reservation.Children;
+                existingReservation.SpecialRequest = reservation.SpecialRequest;
+                existingReservation.AdminNote = reservation.AdminNote;
+                existingReservation.UpdatedAt = DateTime.Now;
+
+                _context.Update(existingReservation);
+                await _context.SaveChangesAsync();
+
+            }
         }
 
         public async Task DeleteReservationAsync(int id)
@@ -162,7 +186,7 @@ namespace Hotel_AdminPanel.Application.Services
         public async Task UpdateMealPlanAsync(MealPlan mealPlan)
         {
             var exisitngMealPlan = await _context.MealPlans.FirstOrDefaultAsync(mp => mp.Id == mealPlan.Id);
-
+            
             if (exisitngMealPlan == null)
             {
                 throw new InvalidOperationException("Meal Plan not found");
@@ -260,5 +284,38 @@ namespace Hotel_AdminPanel.Application.Services
 
             }
         }
+        public async Task<int[]> GetReservationsByMonthAsync()
+        {
+            // Načtení všech rezervací
+            var reservations = await _context.Reservations.ToListAsync();
+
+            // Inicializace pole pro počty rezervací
+            int[] monthlyReservationCounts = new int[12];
+
+            // Agregace rezervací podle měsíců
+            foreach (var reservation in reservations)
+            {
+                // Předpokládáme, že rezervace mají datum check-in
+                var month = reservation.CheckIn.Month; // Získání měsíce check-inu
+                monthlyReservationCounts[month - 1]++; // Zvýšení počtu rezervací pro daný měsíc
+            }
+
+            return monthlyReservationCounts; // Vrátí pole s počty rezervací za jednotlivé měsíce
+        }
+
+        public async Task DeleteGuestAsync(int id)
+        {
+            var guestToDelete = await _context.Guests.FindAsync(id);
+            if (guestToDelete == null)
+            {
+                throw new InvalidOperationException("Guest not found");
+            }
+            else
+            {
+                _context.Guests.Remove(guestToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }
+

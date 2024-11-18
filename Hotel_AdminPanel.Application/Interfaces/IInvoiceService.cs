@@ -13,6 +13,8 @@ namespace Hotel_AdminPanel.Application.Interfaces
         Task<bool> CheckIfInvoiceExistsForReservation(int reservationId);
         Task<List<Invoice>> GetInvoiceByReservationIdAsync(int reservationId);
 
+        Task<List<Invoice>> GetInvoicesByCustomerIdAsync(int customerId);
+
 
     }
 }

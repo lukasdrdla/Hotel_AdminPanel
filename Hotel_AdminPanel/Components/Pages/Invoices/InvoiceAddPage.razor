@@ -13,22 +13,43 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <div class="mb-3">
-                    <label for="customerSearch" class="form-label">Zákazník</label>
-                    <button type="button" class="btn btn-primary" @onclick="ShowAllCustomers">Zobrazit všechny zákazníky</button>
-                    <input type="text" class="form-control" placeholder="Hledat zákazníka" @bind="searchTerm" @oninput="OnInputChange" />
+                
 
-                    @if (filteredReservations != null && filteredReservations.Any())
+                <div class="mb-3">
+                    <label for="customerSearch" class="form-label">Rezervace</label>
+                    <div class="form-group position-relative">
+
+                    <input type="text" class="form-control" placeholder="Hledat rezervaci" @bind="searchTerm" @oninput="SearchReservation" @onblur="HideReservationList"  />
+                    @if (filteredReservations.Any())
                     {
-                        <ul class="list-group mt-2">
+                        <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
                             @foreach (var reservation in filteredReservations)
                             {
-                                <li class="list-group-item" @onclick="() => SelectCustomer(reservation)">
-                                    @reservation.Customer.FirstName @reservation.Customer.LastName - @reservation.Customer.Email - @reservation.Customer.City @reservation.Customer.Address - @reservation.Customer.DocumentNumber
-                                </li>
+                                    <li class="list-group-item list-group-item-action" @onmousedown="() => SelectCustomer(reservation)">
+                                        <div>
+                                            <strong>Rezervace:</strong> č. @reservation.Id
+                                        </div>
+                                        <div>
+                                            <strong>Termín:</strong> @reservation.CheckIn.ToShortDateString() - @reservation.CheckOut.ToShortDateString()
+                                        </div>
+                                        <div>
+                                            <strong>Pokoj:</strong> @reservation.Room.RoomNumber
+                                        </div>
+                                        <div>
+                                            <strong>Zákazník:</strong> @reservation.Customer.FirstName @reservation.Customer.LastName
+                                            (<a href="mailto:@reservation.Customer.Email">@reservation.Customer.Email</a>)
+                                        </div>
+                                        <div>
+                                            <strong>Adresa:</strong> @reservation.Customer.City, @reservation.Customer.Address
+                                        </div>
+                                        <div>
+                                            <strong>Číslo dokladu:</strong> @reservation.Customer.DocumentNumber
+                                        </div>
+                                    </li>
                             }
                         </ul>
                     }
+                    </div>
                 </div>
 
                 <div class="mb-3 row">
@@ -78,8 +99,10 @@
                     <a href="/faktury" class="btn btn-outline-secondary">Zpět na seznam</a>
                 </div>
             </EditForm>
-        </div>
-    </div>
+
+            </div>
+       </div>
+    
 </div>
 
 @code {
@@ -89,31 +112,32 @@
     private string searchTerm { get; set; }
     private List<Reservation> filteredReservations { get; set; } = new List<Reservation>();
 
-    private async Task OnInputChange(ChangeEventArgs e)
+
+    private async Task SearchReservation(ChangeEventArgs e)
     {
         searchTerm = e.Value.ToString();
 
-        if (!string.IsNullOrEmpty(searchTerm))
-        {
+        var avaibleReservations = await GetAvailableReservationsAsync();
 
-            var avaibleReservations = await GetAvailableReservationsAsync();
+        filteredReservations = avaibleReservations
+            .Where(r => r.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                         r.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
-            filteredReservations = avaibleReservations
-                .Where(r => r.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                             r.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-        else
-        {
-            filteredReservations.Clear();
-        }
     }
+
+    private async void HideReservationList()
+    {
+        filteredReservations.Clear();
+    }
+
 
     private void SelectCustomer(Reservation reservation)
     {
-        invoice.ReservationId = reservation.Id; // Uložení ReservationId do faktury
-        searchTerm = $"{reservation.Customer.FirstName} {reservation.Customer.LastName}"; // Aktualizace pole pro vyhledávání
-        filteredReservations.Clear(); // Vymazání filtrovaného seznamu
+        invoice.ReservationId = reservation.Id;
+        searchTerm = $"{reservation.Customer.FirstName} {reservation.Customer.LastName} - {reservation.CheckIn.ToShortDateString()} až {reservation.CheckOut.ToShortDateString()} - Pokoj: {reservation.Room.RoomNumber}";
+        filteredReservations.Clear();
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -129,7 +153,7 @@
 
     private async Task ShowAllCustomers()
     {
-        filteredReservations = await GetAvailableReservationsAsync(); // Načtení všech dostupných zákazníků
+        filteredReservations = await GetAvailableReservationsAsync();
 
     }
 

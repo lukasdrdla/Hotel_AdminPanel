@@ -1,0 +1,245 @@
+﻿@page "/zamestnanec/{email}"
+@inject ITaskService TaskService
+@inject IAccountService AccountService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<div class="container mt-2">
+    @if (user == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <p class="mt-2">Načítám podrobnosti o zaměstnanci...</p>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="card-body">
+                        <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
+                        <EditForm Model="user" OnValidSubmit="HandleValidSubmit" FormName="EditUser">
+
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="role" class="form-label">Role</label>
+                                    <InputSelect id="role" class="form-control" @bind-Value="user.Role">
+                                        <option value="">-- Vyberte roli --</option>
+                                        @foreach (var role in roles)
+                                        {
+                                            <option value="@role">@role</option>
+                                        }
+
+                                    </InputSelect>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="insurenceId" class="form-label">Pojištovna</label>
+                                    <div class="form-group position-relative">
+                                        <input type="text" class="form-control" placeholder="Hledat pojištovnu.." @bind="searchTerm" @oninput="OnInputChange" @onblur="HideCompanyList" />
+
+                                        @if (filteredInsuranceCompanies.Any())
+                                        {
+                                            <ul class="list-group mt-1" style="max-height: 200px; overflow-y: auto; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;">
+                                                @foreach (var company in filteredInsuranceCompanies)
+                                                {
+                                                    <li class="list-group-item list-group-item-action" @onmousedown="@(() => SelectCompany(company))">@company.Name</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="profilePicture" class="form-label">Profilový obrázek</label>
+                                    <InputText id="profilePicture" class="form-control" @bind-Value="user.ProfilePicture" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="Email" class="form-label">Email</label>
+                                    <InputText id="Email" class="form-control" @bind-Value="user.Email" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">Jméno</label>
+                                    <InputText id="firstName" class="form-control" @bind-Value="user.FirstName" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Příjmení</label>
+                                    <InputText id="lastName" class="form-control" @bind-Value="user.LastName" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="personalId" class="form-label">Osobní číslo</label>
+                                    <InputText id="personalId" class="form-control" @bind-Value="user.PersonalIdentificationNumber" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="phoneNumber" class="form-label">Telefon</label>
+                                    <InputText id="phoneNumber" class="form-control" @bind-Value="user.PhoneNumber" />
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="placeOfBirth" class="form-label">Místo narození</label>
+                                    <InputText id="placeOfBirth" class="form-control" @bind-Value="user.PlaceOfBirth" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="address" class="form-label">Adresa</label>
+                                    <InputText id="address" class="form-control" @bind-Value="user.Address" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="city" class="form-label">Město</label>
+                                    <InputText id="city" class="form-control" @bind-Value="user.City" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="postalCode" class="form-label">PSČ</label>
+                                    <InputText id="postalCode" class="form-control" @bind-Value="user.PostalCode" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="country" class="form-label">Země</label>
+                                    <InputText id="country" class="form-control" @bind-Value="user.Country" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="jobTitle" class="form-label">Pozice</label>
+                                    <InputText id="jobTitle" class="form-control" @bind-Value="user.JobTitle" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label">Datum začátku</label>
+                                    <InputDate id="startDate" class="form-control" @bind-Value="user.StartDate" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="salary" class="form-label">Plat</label>
+                                    <InputNumber id="salary" class="form-control" @bind-Value="user.Salary" />
+                                </div>
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label class="form-check-label">
+                                    <InputCheckbox class="form-check-input" @bind-Value="user.IsEmployed" />
+                                    Zaměstnán
+                                </label>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Uložit</button>
+                            </div>
+
+                        </EditForm>
+                     </div>
+                    </div>
+                </div>
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm mx-auto">
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            To-Do List
+                        </h3>
+                        <div class="table-container">
+                            <table class="w-100">
+                                <QuickGrid Items="tasks.AsQueryable()" Pagination="tasksPaggination" Class="w-100">
+                                    <PropertyColumn Title="Úkol" Property="@(r => r.Title)" Sortable="true" />
+
+                                    <TemplateColumn Title="Stav">
+                                        @if (context.IsCompleted)
+                                        {
+                                            <span class="badge bg-success">Hotovo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">Nedokončeno</span>
+                                        }
+
+                                    </TemplateColumn>
+                                </QuickGrid>
+
+                                <Paginator State="tasksPaggination" />
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public string email { get; set; } 
+
+    [SupplyParameterFromForm]
+    private DetailUserViewModel user { get; set; } = new DetailUserViewModel();
+    private List<IdentityRole> roles = new List<IdentityRole>();
+
+    private List<TaskItem> tasks = new List<TaskItem>();
+    PaginationState tasksPaggination = new PaginationState() {ItemsPerPage = 5};
+
+    private string searchTerm = string.Empty;
+    private List<InsuranceCompany> filteredInsuranceCompanies = new List<InsuranceCompany>();
+    private List<InsuranceCompany> insuranceCompanies = new List<InsuranceCompany>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await AccountService.GetUserByEmailAsync(email);
+        tasks = await TaskService.GetTasksForEmployeeAsync(user.Id);
+        insuranceCompanies = await AccountService.GetAllInsuranceCompaniesAsync();
+        filteredInsuranceCompanies = new List<InsuranceCompany>();
+        roles = await AccountService.GetAllRolesAsync();
+
+        searchTerm = insuranceCompanies.FirstOrDefault(x => x.Id == user.InsuranceCompanyId).Name;
+
+    }
+
+    private async void HandleValidSubmit()
+    {
+        await AccountService.UpdateUserAsync(user);
+    }
+
+    private void SelectCompany(InsuranceCompany company)
+    {
+        user.InsuranceCompanyId = company.Id;
+        searchTerm = company.Name;
+        filteredInsuranceCompanies.Clear();
+    }
+
+    private void OnInputChange(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        filteredInsuranceCompanies = insuranceCompanies.Where(x => x.Name.Contains(searchTerm)).ToList();
+    }
+
+    private void HideCompanyList()
+    {
+        filteredInsuranceCompanies.Clear();
+    }
+
+}

@@ -21,23 +21,53 @@ namespace Hotel_AdminPanel.Application.Services
 
         public Task CreateReviewAsync(Review review)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.Reviews.Add(review);
+                return _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při vytváření recenze.", ex);
+            }
         }
 
-        public Task DeleteReviewAsync(int id)
+        public async Task DeleteReviewAsync(int id)
         {
-            throw new NotImplementedException();
+            var reviewToDelete = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+            if (reviewToDelete == null)
+            {
+                throw new NullReferenceException("Recenze nebyla nalezena.");
+            }
+
+            try
+            {
+                _context.Reviews.Remove(reviewToDelete);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při mazání recenze.", ex);
+            }
         }
 
 
-        public Task<Review> GetReviewByIdAsync(int id)
+        public async Task<Review> GetReviewByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var review = await _context.Reviews
+                .Include(r => r.Customer)
+                .Include(r => r.Room)
+                .FirstOrDefaultAsync(r => r.Id == id);
+            return review;
         }
 
         public Task<List<Review>> GetReviewsAsync()
         {
-            throw new NotImplementedException();
+            var reviews = _context.Reviews
+                .Include(r => r.Customer)
+                .Include(r => r.Room)
+                .ToListAsync();
+            return reviews;
         }
 
         public Task<List<Review>> GetReviewsByCustomerIdAsync(int customerId)
@@ -51,9 +81,39 @@ namespace Hotel_AdminPanel.Application.Services
             return reviews;
         }
 
-        public Task UpdateReviewAsync(Review review)
+        public async Task<List<Review>> GetRoomReviewsAsync(int roomId)
         {
-            throw new NotImplementedException();
+            var review = await _context.Reviews
+                .Include(r => r.Customer)
+                .Include(r => r.Room)
+                .Where(r => r.RoomId == roomId)
+                .ToListAsync();
+            return review;
+        }
+
+        public async Task UpdateReviewAsync(Review review)
+        {
+            var existingReview = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == review.Id);
+            if (existingReview == null)
+            {
+                throw new NullReferenceException("Recenze nebyla nalezena.");
+            }
+            review.Id = existingReview.Id;
+            review.CustomerId = existingReview.CustomerId;
+            review.RoomId = existingReview.RoomId;
+            review.Comment = existingReview.Comment;
+            review.Rating = existingReview.Rating;
+
+            try
+            {
+                _context.Reviews.Update(review);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new DbUpdateException("Chyba při aktualizaci recenze.", ex);
+            }
+
         }
     }
 }

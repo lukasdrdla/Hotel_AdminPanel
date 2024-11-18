@@ -1,7 +1,9 @@
-using Blazored.LocalStorage;
+
+using CurrieTechnologies.Razor.SweetAlert2;
 using Hotel_AdminPanel.Application.Interfaces;
 using Hotel_AdminPanel.Application.Services;
 using Hotel_AdminPanel.Components;
+using Hotel_AdminPanel.Components.Pages.Settings;
 using Hotel_AdminPanel.Domain.Entities;
 using Hotel_AdminPanel.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
 
 
 
@@ -41,8 +44,9 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IGuestService, GuestService>();
+builder.Services.AddScoped<PdfService>();
 
-builder.Services.AddBlazoredLocalStorage();
+
 
 var app = builder.Build();
 
