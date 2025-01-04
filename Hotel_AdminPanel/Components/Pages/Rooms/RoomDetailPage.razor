@@ -20,149 +20,143 @@
     }
     else
     {
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm mx-auto" style="max-width: 800px;">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4 page-title">Upravit Pokoj</h3>
+        <div class="card border-0 shadow-sm mx-auto">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4 page-title">Upravit Pokoj</h3>
 
-                        <EditForm Model="room" OnValidSubmit="HandleValidSubmit" FormName="EditRoom">
+                <EditForm Model="room" OnValidSubmit="HandleValidSubmit" FormName="EditRoom">
+                    <DataAnnotationsValidator />
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="roomNumber" class="form-label">Číslo Pokoje</label>
+                            <input class="form-control" @bind="room.RoomNumber" readonly disabled id="roomNumber"/>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="roomNumber" class="form-label">Číslo Pokoje</label>
-                                <input class="form-control" @bind="room.RoomNumber" readonly disabled id="roomNumber" />
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="roomType" class="form-label">Typ Pokoje</label>
+                            <InputSelect class="form-control" @bind-Value="room.RoomTypeId" id="roomType">
+                                @foreach (var type in roomTypes)
+                                {
+                                <option value="@type.Id">@type.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="roomType" class="form-label">Typ Pokoje</label>
-                                <InputSelect class="form-control" @bind-Value="room.RoomTypeId" id="roomType">
-                                    @foreach (var type in roomTypes)
-                                    {
-                                        <option value="@type.Id">@type.Name</option>
-                                    }
-                                </InputSelect>
+                        <div class="col-md-6 mb-3">
+                            <label for="roomStatus" class="form-label">Status</label>
+                            <InputSelect class="form-control" @bind-Value="room.RoomStatusId" id="roomStatus">
+                                @foreach (var status in roomStatuses)
+                                {
+                                <option value="@status.Id">@status.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
 
-                            </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Cena</label>
+                            <InputNumber class="form-control" @bind-Value="room.Price" id="price"/>
+                        </div>
 
+                        <div class="col-md-6 mb-3">
+                            <label for="maxAdults" class="form-label">Max Dospělí</label>
+                            <InputNumber class="form-control" @bind-Value="room.MaxAdults" id="maxAdults"/>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="roomStatus" class="form-label">Status</label>
-                                <InputSelect class="form-control" @bind-Value="room.RoomStatusId" id="roomStatus">
-                                    @foreach (var status in roomStatuses)
-                                    {
-                                        <option value="@status.Id">@status.Name</option>
-                                    }
-                                </InputSelect>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Cena</label>
-                                <InputNumber class="form-control" @bind-Value="room.Price" id="price" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="maxAdults" class="form-label">Max Dospělí</label>
-                                <InputNumber class="form-control" @bind-Value="room.MaxAdults" id="maxAdults" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="maxChildren" class="form-label">Max Děti</label>
-                                <InputNumber class="form-control" @bind-Value="room.MaxChildren" id="maxChildren" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Popis</label>
-                                <InputTextArea class="form-control" @bind-Value="room.Description" />
-                            </div>
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary">Uložit</button>
-                                <a href="/pokoje" class="btn btn-outline-secondary">Zpět na seznam</a>
-                                <button type="button" class="btn btn-danger" @onclick="HandleRemoveRoom">Odstranit</button>
-                            </div>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm mx-auto">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" @onclick="OpenAddReviewModal">
-                            <i class="bi bi-plus"></i> Přidat hodnocení
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Hodnocení</h3>
-                        <div class="table-container">
-                            <table class="w-100">
-                                <QuickGrid Items="roomReviews.AsQueryable()" Pagination="roomReviewPaggination" Class="w-100">
-                                    <TemplateColumn Title="Hodnocení">
-                                        @{
-                                            int rating = context.Rating; // Získání hodnocení z aktuálního kontextu
-                                            string stars = ""; // Inicializace proměnné pro hvězdičky
-                                        }
-
-                                        @switch (rating)
-                                        {
-                                            case 1:
-                                                stars = "&#9733;&#9734;&#9734;&#9734;&#9734;"; // 1 plná hvězdička, 4 prázdné
-                                                break;
-                                            case 2:
-                                                stars = "&#9733;&#9733;&#9734;&#9734;&#9734;"; // 2 plné hvězdičky, 3 prázdné
-                                                break;
-                                            case 3:
-                                                stars = "&#9733;&#9733;&#9733;&#9734;&#9734;"; // 3 plné hvězdičky, 2 prázdné
-                                                break;
-                                            case 4:
-                                                stars = "&#9733;&#9733;&#9733;&#9733;&#9734;"; // 4 plné hvězdičky, 1 prázdná
-                                                break;
-                                            case 5:
-                                                stars = "&#9733;&#9733;&#9733;&#9733;&#9733;"; // 5 plných hvězdiček
-                                                break;
-                                            default:
-                                                stars = "&#9734;&#9734;&#9734;&#9734;&#9734;"; // Pokud je rating mimo rozsah, zobrazí se 5 prázdných hvězdiček
-                                                break;
-                                        }
-
-                                        @* Zobrazíme hvězdičky *@
-                                        <span>@(new MarkupString(stars))</span>
-
-                                    </TemplateColumn>
-                                    <PropertyColumn Title="Komentář" Property="@(r => r.Comment)" Sortable="true" />
-                                    <PropertyColumn Title="Datum" Property="@(r => r.CreatedAt.ToShortDateString())" Sortable="true" />
-                                    <TemplateColumn Title="Akce">
-                                        <div class="d-inline-flex">
-                                            <button class="btn text-danger" @onclick="() => OpenDeleteReviewConfirmation(context.Id)">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                            <button class="btn text-primary" @onclick="() => OpenUpdateReviewModal(context.Id)">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                        </div>
-                                    </TemplateColumn>
-
-                                </QuickGrid>
-
-                                <Paginator State="roomReviewPaggination" />
-                            </table>
+                        <div class="col-md-6 mb-3">
+                            <label for="maxChildren" class="form-label">Max Děti</label>
+                            <InputNumber class="form-control" @bind-Value="room.MaxChildren" id="maxChildren"/>
                         </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Popis</label>
+                        <InputTextArea class="form-control" @bind-Value="room.Description" id="description"/>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <a href="/pokoje" class="btn btn-outline-secondary">Zpět na seznam</a>
+                        <button type="button" class="btn btn-danger" @onclick="HandleRemoveRoom">Odstranit</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm mx-auto mt-5">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title mb-0">
+                        Hodnocení
+                    </h3>
+                    <button class="btn btn-primary" @onclick="OpenAddReviewModal">
+                        <i class="bi bi-plus"></i> Přidat hodnocení
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="w-100">
+                        <QuickGrid Items="roomReviews.AsQueryable()" Pagination="roomReviewPaggination" Class="w-100">
+                            <TemplateColumn Title="Hodnocení">
+                                @{
+                                    int rating = context.Rating; // Získání hodnocení z aktuálního kontextu
+                                    string stars = ""; // Inicializace proměnné pro hvězdičky
+                                }
+
+                                @switch (rating)
+                                {
+                                    case 1:
+                                        stars = "&#9733;&#9734;&#9734;&#9734;&#9734;"; // 1 plná hvězdička, 4 prázdné
+                                        break;
+                                    case 2:
+                                        stars = "&#9733;&#9733;&#9734;&#9734;&#9734;"; // 2 plné hvězdičky, 3 prázdné
+                                        break;
+                                    case 3:
+                                        stars = "&#9733;&#9733;&#9733;&#9734;&#9734;"; // 3 plné hvězdičky, 2 prázdné
+                                        break;
+                                    case 4:
+                                        stars = "&#9733;&#9733;&#9733;&#9733;&#9734;"; // 4 plné hvězdičky, 1 prázdná
+                                        break;
+                                    case 5:
+                                        stars = "&#9733;&#9733;&#9733;&#9733;&#9733;"; // 5 plných hvězdiček
+                                        break;
+                                    default:
+                                        stars = "&#9734;&#9734;&#9734;&#9734;&#9734;"; // Pokud je rating mimo rozsah, zobrazí se 5 prázdných hvězdiček
+                                        break;
+                                }
+
+                                @* Zobrazíme hvězdičky *@
+                                <span>@(new MarkupString(stars))</span>
+
+                            </TemplateColumn>
+                            <PropertyColumn Title="Komentář" Property="@(r => r.Comment)" Sortable="true"/>
+                            <PropertyColumn Title="Datum" Property="@(r => r.CreatedAt.ToShortDateString())" Sortable="true"/>
+                            <TemplateColumn Title="Akce">
+                                <div class="d-inline-flex">
+                                    <button class="btn text-danger" @onclick="() => OpenDeleteReviewConfirmation(context.Id)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <button class="btn text-primary" @onclick="() => OpenUpdateReviewModal(context.Id)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </TemplateColumn>
+
+                        </QuickGrid>
+
+                        <Paginator State="roomReviewPaggination"/>
+                    </table>
                 </div>
             </div>
         </div>
-        
     }
 </div>
 
 <ReviewAddModal IsModalFromRoomDetail="true" RoomId="Id" IsVisible="IsAddReviewModalVisible" OnClose="CloseAddReviewModal" Customers="customers"/>
-<ReviewEditModal IsModalFromRoomDetail="true" RoomId="Id" IsVisible="IsEditReviewModalVisible" ReviewId="selectedReviewId" OnClose="CloseEditReviewModal" Customers="customers" />
-<DeleteModal IsVisible="@isModalVisible" Title="Smazání pokoje" ActionType="DeleteRoom" OnClose="CloseModal" />
+<ReviewEditModal IsModalFromRoomDetail="true" RoomId="Id" IsVisible="IsEditReviewModalVisible" ReviewId="selectedReviewId" OnClose="CloseEditReviewModal" Customers="customers"/>
+<DeleteModal IsVisible="@isModalVisible" Title="Smazání pokoje" ActionType="DeleteRoom" OnClose="CloseModal"/>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
-    [SupplyParameterFromForm]
-    private Room room { get; set; } = new Room();
+    [SupplyParameterFromForm] private Room room { get; set; } = new Room();
 
     private List<RoomStatus> roomStatuses = new List<RoomStatus>();
     private List<RoomType> roomTypes = new List<RoomType>();
@@ -179,17 +173,14 @@
     private int selectedReviewId;
 
 
-
     protected override async Task OnInitializedAsync()
     {
-
         room = await RoomService.GetRoomByIdAsync(Id);
         roomStatuses = await RoomService.GetRoomStatusesAsync();
         roomTypes = await RoomService.GetRoomTypesAsync();
 
         roomReviews = await ReviewService.GetRoomReviewsAsync(Id);
         customers = await CustomerService.GetCustomersAsync();
-
     }
 
     private void OpenAddReviewModal()
@@ -211,12 +202,15 @@
     private void CloseAddReviewModal(bool result)
     {
         IsAddReviewModalVisible = false;
+        
     }
+
+
 
     private async Task HandleValidSubmit()
     {
         await RoomService.UpdateRoomAsync(room);
-        NavigationManager.NavigateTo("/pokoje");
+        room = await RoomService.GetRoomByIdAsync(Id);
     }
 
     private async Task HandleRemoveRoom()
@@ -242,6 +236,8 @@
             roomReviews.Remove(review);
         }
     }
+    
+
 
 
 }

@@ -128,6 +128,8 @@
     [Parameter] public int RoomId { get; set; }
     [Parameter] public bool IsModalFromRoomDetail { get; set; }
     [Parameter] public List<Customer> Customers { get; set; }
+    
+
 
     private string searchTerm = string.Empty;
     private List<Room> filteredRooms = new List<Room>();
@@ -207,5 +209,5 @@
 
     }
 
-    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
+    private Task Close() => OnClose.InvokeAsync(false);
 }

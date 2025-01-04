@@ -1,122 +1,142 @@
-﻿@page "/calculator"
+﻿@page "/kalkulacka"
 @using System.Data
 @rendermode InteractiveServer
 
 <h3 class="mb-4 page-title">Kalkulačka</h3>
 
 <div class="calculator" @onkeydown="OnKeyDown" tabindex="0">
-    <input type="text" class="form-control mb-3" @bind="display" disabled />
+    <input type="text" class="form-control mb-3 display" @bind="display" disabled />
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="() => Add('1')">1</button>
-        <button class="btn btn-primary" @onclick="() => Add('2')">2</button>
-        <button class="btn btn-primary" @onclick="() => Add('3')">3</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('1')">1</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('2')">2</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('3')">3</button>
     </div>
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="() => Add('4')">4</button>
-        <button class="btn btn-primary" @onclick="() => Add('5')">5</button>
-        <button class="btn btn-primary" @onclick="() => Add('6')">6</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('4')">4</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('5')">5</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('6')">6</button>
     </div>
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="() => Add('7')">7</button>
-        <button class="btn btn-primary" @onclick="() => Add('8')">8</button>
-        <button class="btn btn-primary" @onclick="() => Add('9')">9</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('7')">7</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('8')">8</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('9')">9</button>
     </div>
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="() => Add('0')">0</button>
-        <button class="btn btn-primary" @onclick="() => Add('+')">+</button>
-        <button class="btn btn-primary" @onclick="() => Add('-')">-</button>
-        <button class="btn btn-primary" @onclick="() => Add('*')">*</button>
-        <button class="btn btn-primary" @onclick="() => Add('/')">/</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('0')">0</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('+')">+</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('-')">-</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('*')">*</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('/')">/</button>
     </div>
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="() => Add('(')">(</button>
-        <button class="btn btn-primary" @onclick="() => Add(')')">)</button>
-        <button class="btn btn-primary" @onclick="() => Add('.')">.</button>
-        <button class="btn btn-clear" @onclick="() => display = string.Empty">C</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('(')">(</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add(')')">)</button>
+        <button class="btn btn-primary btn-calc" @onclick="() => Add('.')">.</button>
+        <button class="btn btn-clear clear" @onclick="() => display = string.Empty">C</button>
     </div>
 
     <div class="row">
-        <button class="btn btn-primary" @onclick="Calculate">=</button>
+        <button class="btn btn-primary equal" @onclick="Calculate">=</button>
     </div>
 
 </div>
 
 <style>
     .calculator {
-        max-width: 250px;
+        max-width: 400px;
         margin: 0 auto;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        background-color: #f4f4f4;
+        padding: 20px;
+        border-radius: 20px;
+        background-color: #f1f1f1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-        .calculator .form-control {
-            width: 100%;
-            height: 40px;
-            text-align: right;
-            font-size: 24px;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    .display {
+        width: 100%;
+        height: 70px;
+        font-size: 36px;
+        text-align: right;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #fff;
+        border: none;
+        border-radius: 12px;
+        color: #333;
+        box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        .calculator .row {
-            margin-bottom: 10px;
-        }
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
 
-        .calculator .btn {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            margin: 5px;
-            padding: 0;
-            text-align: center;
-            border-radius: 5px;
-            border: none;
-            background-color: #3498db;
-            color: #fff;
-        }
+    .btn-calc {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+        border-radius: 12px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        margin: 5px;
+        transition: background-color 0.2s ease-in-out;
+    }
 
-            .calculator .btn:hover {
-                background-color: #2980b9;
-            }
+    .btn-calc:hover {
+        background-color: #2980b9;
+    }
 
-            .calculator .btn:active {
-                background-color: #1c5989;
-            }
+    .btn-calc:active {
+        background-color: #1f6fa5;
+    }
 
-        .calculator .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
+    .operator {
+        background-color: #f39c12;
+    }
 
-            .calculator .btn-primary:hover {
-                background-color: #2980b9;
-            }
+    .operator:hover {
+        background-color: #e67e22;
+    }
 
-            .calculator .btn-primary:active {
-                background-color: #1c5989;
-            }
+    .operator:active {
+        background-color: #d35400;
+    }
 
-        .calculator .btn-clear {
-            background-color: #e74c3c;
-        }
+    .clear {
+        background-color: #e74c3c;
+    }
 
-            .calculator .btn-clear:hover {
-                background-color: #c0392b;
-            }
+    .clear:hover {
+        background-color: #c0392b;
+    }
 
-            .calculator .btn-clear:active {
-                background-color: #a93226;
-            }
+    .clear:active {
+        background-color: #a93226;
+    }
+
+    .equal {
+        background-color: #2ecc71;
+        width: 100%;
+        font-size: 32px;
+    }
+
+    .equal:hover {
+        background-color: #27ae60;
+    }
+
+    .equal:active {
+        background-color: #1e8449;
+    }
 
 </style>
 

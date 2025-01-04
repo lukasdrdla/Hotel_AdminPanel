@@ -34,7 +34,6 @@
                 <div class="table-responsive">
                     <table class="w-100">
                         <QuickGrid Items="filteredEmployees.AsQueryable()" Pagination="pagginationState" Class="w-100">
-                            <PropertyColumn Title="Id" Property="@(r => r.User.Id)" Sortable="true" />
                             <PropertyColumn Title="Jméno" Property="@(r => r.User.FirstName)" Sortable="true" />
                             <PropertyColumn Title="Příjmení" Property="@(r => r.User.LastName)" Sortable="true" />
                             <PropertyColumn Title="Email" Property="@(r => r.User.Email)" Sortable="true" />
@@ -61,6 +60,7 @@
                             </TemplateColumn>
 
                         </QuickGrid>
+                        <Paginator State="pagginationState" />
 
                     </table>
                 </div>

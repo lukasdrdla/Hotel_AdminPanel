@@ -18,252 +18,241 @@
     }
     else
     {
+        <div class="card border-0 shadow-sm mx-auto">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4 page-title">Rezervace č.@reservation.Id</h3>
+                <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit" FormName="EditReservation">
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm mx-auto">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4 page-title">Rezervace č.@reservation.Id</h3>
-                        <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit" FormName="EditReservation">
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
 
-                            <DataAnnotationsValidator />
-                            <ValidationSummary />
-
-                            <div class="mb-3">
-                                @if (reservation.Customer != null)
-                                {
-                                   
-                                    <h4>Zákazník</h4>
-                                    <ul class="list-group">
-                                        <li class="list-group-item">
-                                            <a @onclick="NavigateToCustomerDetail" style="cursor:pointer;">@reservation.Customer.FirstName @reservation.Customer.LastName - @reservation.Customer.DateOfBirth.ToShortDateString() - Číslo dokladu: @reservation.Customer.DocumentNumber</a>
-                                        </li>
-                                    </ul>
-
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Zákazník nebyl nalezen.</span>
-                                }
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="room" class="form-label">Pokoj</label>
-                                <InputSelect id="room" class="form-control" @bind-Value="reservation.RoomId" disabled>
-                                    <option value="">Vyber pokoj</option>
-                                    @foreach (var room in rooms)
-                                    {
-                                        <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
-                                    }
-                                </InputSelect>
-                            </div>
-                            
-
-                            <div class="mb-3">
-                                <label for="checkIn" class="form-label">Datum příjezdu</label>
-                                <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" disabled />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="checkOut" class="form-label">Datum odjezdu</label>
-                                <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" disabled />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Cena</label>
-                                <InputNumber id="price" class="form-control" @bind-Value="reservation.TotalPrice" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <InputSelect id="status" class="form-control" @bind-Value="reservation.ReservationStatusId">
-                                    @foreach (var status in reservationStatuses)
-                                    {
-                                        <option value="@status.Id">@status.Name</option>
-                                    }
-                                </InputSelect>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="adults" class="form-label">Dospělí</label>
-                                <InputNumber id="adults" class="form-control" @bind-Value="reservation.Adults" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="children" class="form-label">Děti</label>
-                                <InputNumber id="children" class="form-control" @bind-Value="reservation.Children" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="mealPlan" class="form-label">Stravování</label>
-                                <InputSelect id="mealPlan" class="form-control" @bind-Value="reservation.MealPlanId">
-                                    @foreach (var mealPlan in mealPlans)
-                                    {
-                                        <option value="@mealPlan.Id">@mealPlan.Name</option>
-                                    }
-                                </InputSelect>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="specialRequest" class="form-label">Speciální požadavek</label>
-                                <InputTextArea id="specialRequest" class="form-control" @bind-Value="reservation.SpecialRequest" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="adminNote" class="form-label">Poznámka zaměstnance</label>
-                                <InputTextArea id="adminNote" class="form-control" @bind-Value="reservation.AdminNote" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="createdAt" class="form-label">Vytvořeno</label>
-                                <InputDate id="createdAt" class="form-control" @bind-Value="reservation.CreatedAt" disabled />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="updatedAt" class="form-label">Aktualizováno</label>
-                                <InputDate id="updatedAt" class="form-control" @bind-Value="reservation.UpdatedAt" />
-                            </div>
-
-                            <div class="mb-3">
-                                <button type="submit" class="btn btn-primary">Uložit</button>
-                            </div>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm mx-auto">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" @onclick="OpenAddGuestModal">
-                            <i class="bi bi-plus"></i> Přidat hosta
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Hosté</h3>
-                        @if (guests != null && guests.Any())
+                    <div class="mb-3">
+                        @if (reservation.Customer != null)
                         {
-                            <div class="table-container">
-                                <table class="w-100">
-                                    <QuickGrid Items="guests.AsQueryable()" Pagination="paginationGuestState" Class="w-100">
-                                        <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true"/>
-                                        <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true"/>
-                                        <PropertyColumn Title="Datum narození" Property="@(x => x.DateOfBirth.ToShortDateString())" Sortable="true"/>
-                                        <TemplateColumn Title="Akce">
-                                            <div class="d-inline-flex">
-                                                <button class="btn text-primary" @onclick="() => OpenEditGuestModal(context.Id)">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn text-danger" @onclick="() => DeleteGuest(context.Id)">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </TemplateColumn>
-
-                                    </QuickGrid>
-                                    <Paginator State="paginationGuestState" />
-                                </table>
-                            </div>
+                            <h4>Zákazník</h4>
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a @onclick="NavigateToCustomerDetail" style="cursor:pointer;">@reservation.Customer.FirstName @reservation.Customer.LastName - @reservation.Customer.DateOfBirth.ToShortDateString() - Číslo dokladu: @reservation.Customer.DocumentNumber</a>
+                                </li>
+                            </ul>
                         }
                         else
                         {
-                            <p class="text-muted">Žádní hosté nejsou přiřazeni.</p>
-                        }
-                    </div>
-                </div>
-                <div class="card border-0 shadow-sm mx-auto mt-5">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" @onclick="OpenAddInvoiceModal">
-                            <i class="bi bi-plus"></i> Přidat Fakturu
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <h3 class="card-title">Faktury</h3>
-                        @if (invoices != null)
-                        {
-                            <div class="table-container">
-                                <table class="w-100">
-                                    <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationInvoiceState" Class="w-100">
-                                        <TemplateColumn Title="Stav">
-                                            <div class="d-inline-flex">
-                                                <span class="badge bg-@(context.IsPaid ? "success" : "danger")">
-                                                    @(context.IsPaid ? "Zaplacena" : "Nezaplacena")
-                                                </span>
-                                            </div>
-                                        </TemplateColumn>
-
-                                        <PropertyColumn Title="Splatnosti" Property="@(x => x.DueDate.ToShortDateString())" Sortable="true"/>
-                                        <PropertyColumn Title="Měna" Property="@(x => x.Currency)" Sortable="true"/>
-                                        <PropertyColumn Title="Cena" Property="@(x => x.Price)" Sortable="true"/>
-                                        <TemplateColumn Title="Akce">
-                                            <div class="d-inline-flex">
-                                                <button class="btn text-primary" @onclick="() => OpenEditInvoiceModal(context.Id)">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn text-danger" @onclick="() => DeleteInvoice(context.Id)">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-
-                                            </div>
-                                        </TemplateColumn>
-                                    </QuickGrid>
-                                    <Paginator State="paginationInvoiceState" />
-                                </table>
-                            </div>
-                        }
-
-                        else
-                        {
-                            <p class="text-muted">Žádná faktura není přiřazena k této rezervaci.</p>
+                            <span class="text-muted">Zákazník nebyl nalezen.</span>
                         }
                     </div>
 
-                </div>
-             
+                    <div class="mb-3">
+                        <label for="room" class="form-label">Pokoj</label>
+                        <InputSelect id="room" class="form-control" @bind-Value="reservation.RoomId" disabled>
+                            <option value="">Vyber pokoj</option>
+                            @foreach (var room in rooms)
+                            {
+                                <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="checkIn" class="form-label">Datum příjezdu</label>
+                        <InputDate id="checkIn" class="form-control" @bind-Value="reservation.CheckIn" disabled/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="checkOut" class="form-label">Datum odjezdu</label>
+                        <InputDate id="checkOut" class="form-control" @bind-Value="reservation.CheckOut" disabled/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Cena</label>
+                        <InputNumber id="price" class="form-control" @bind-Value="reservation.TotalPrice"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <InputSelect id="status" class="form-control" @bind-Value="reservation.ReservationStatusId">
+                            @foreach (var status in reservationStatuses)
+                            {
+                                <option value="@status.Id">@status.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adults" class="form-label">Dospělí</label>
+                        <InputNumber id="adults" class="form-control" @bind-Value="reservation.Adults"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="children" class="form-label">Děti</label>
+                        <InputNumber id="children" class="form-control" @bind-Value="reservation.Children"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mealPlan" class="form-label">Stravování</label>
+                        <InputSelect id="mealPlan" class="form-control" @bind-Value="reservation.MealPlanId">
+                            @foreach (var mealPlan in mealPlans)
+                            {
+                                <option value="@mealPlan.Id">@mealPlan.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="specialRequest" class="form-label">Speciální požadavek</label>
+                        <InputTextArea id="specialRequest" class="form-control" @bind-Value="reservation.SpecialRequest"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="adminNote" class="form-label">Poznámka zaměstnance</label>
+                        <InputTextArea id="adminNote" class="form-control" @bind-Value="reservation.AdminNote"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="createdAt" class="form-label">Vytvořeno</label>
+                        <InputDate id="createdAt" class="form-control" @bind-Value="reservation.CreatedAt" disabled/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="updatedAt" class="form-label">Aktualizováno</label>
+                        <InputDate id="updatedAt" class="form-control" @bind-Value="reservation.UpdatedAt"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                    </div>
+                </EditForm>
             </div>
-
         </div>
-   
+
+
+        <div class="card border-0 shadow-sm mx-auto mt-5">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title mb-0">
+                        Hosté
+                    </h3>
+                    <button class="btn btn-primary" @onclick="OpenAddGuestModal">
+                        <i class="bi bi-plus"></i> Přidat hosta
+                    </button>
+                </div>
+                @if (guests != null && guests.Any())
+                {
+                    <div class="table-container">
+                        <table class="w-100">
+                            <QuickGrid Items="guests.AsQueryable()" Pagination="paginationGuestState" Class="w-100">
+                                <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true"/>
+                                <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true"/>
+                                <PropertyColumn Title="Datum narození" Property="@(x => x.DateOfBirth.ToShortDateString())" Sortable="true"/>
+                                <TemplateColumn Title="Akce">
+                                    <div class="d-inline-flex">
+                                        <button class="btn text-primary" @onclick="() => OpenEditGuestModal(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => DeleteGuest(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </TemplateColumn>
+
+                            </QuickGrid>
+                            <Paginator State="paginationGuestState"/>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Žádní hosté nejsou přiřazeni.</p>
+                }
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mx-auto mt-5">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="card-title mb-0">
+                        Faktury
+                    </h3>
+                    <button class="btn btn-primary" @onclick="OpenAddInvoiceModal">
+                        <i class="bi bi-plus"></i> Přidat fakturu
+                    </button>
+                </div>
+                @if (invoices != null && invoices.Any())
+                {
+                    <div class="table-container">
+                        <table class="w-100">
+                            <QuickGrid Items="invoices.AsQueryable()" Pagination="paginationInvoiceState" Class="w-100">
+                                <TemplateColumn Title="Stav">
+                                    <div class="d-inline-flex">
+                                        <span class="badge bg-@(context.IsPaid ? "success" : "danger")">
+                                            @(context.IsPaid ? "Zaplacena" : "Nezaplacena")
+                                        </span>
+                                    </div>
+                                </TemplateColumn>
+
+                                <PropertyColumn Title="Splatnosti" Property="@(x => x.DueDate.ToShortDateString())" Sortable="true"/>
+                                <PropertyColumn Title="Měna" Property="@(x => x.Currency)" Sortable="true"/>
+                                <PropertyColumn Title="Cena" Property="@(x => x.Price)" Sortable="true"/>
+                                <TemplateColumn Title="Akce">
+                                    <div class="d-inline-flex">
+                                        <button class="btn text-primary" @onclick="() => OpenEditInvoiceModal(context.Id)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn text-danger" @onclick="() => DeleteInvoice(context.Id)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                    </div>
+                                </TemplateColumn>
+                            </QuickGrid>
+                            <Paginator State="paginationInvoiceState"/>
+                        </table>
+                    </div>
+                }
+
+                else
+                {
+                    <p class="text-muted">Žádná faktura není přiřazena k této rezervaci.</p>
+                }
+            </div>
+        </div>
     }
 </div>
 
 
+<InvoiceModal
+    IsVisible="@isEditInvoiceModalVisible"
+    OnClose="CloseEditInvoiceModal"
+    Reservations="reservations"
+    InvoiceId="invoiceIdToEdit"
+    IsEditMode="true"/>
 
-<InvoiceModal 
-    IsVisible="@isEditInvoiceModalVisible" 
-    OnClose="CloseEditInvoiceModal" 
-    Reservations="reservations" 
-    InvoiceId="invoiceIdToEdit" 
-    IsEditMode="true" />
-
-<InvoiceModal 
-    IsVisible="@isAddInvoiceModalVisible" 
-    OnClose="CloseAddInvoiceModal" 
-    Reservations="reservations" 
-    InvoiceId="0" 
-    IsEditMode="false" />
+<InvoiceModal
+    IsVisible="@isAddInvoiceModalVisible"
+    OnClose="CloseAddInvoiceModal"
+    Reservations="reservations"
+    InvoiceId="0"
+    IsEditMode="false"/>
 
 <GuestModal IsVisible="@isAddGuestModalVisible"
             OnClose="CloseAddGuestModal"
             ReservationId="Id"
-            GuestId="null" />
+            GuestId="null"/>
 
 <GuestModal IsVisible="@isEditGuestModalVisible"
             OnClose="CloseEditGuestModal"
             ReservationId="Id"
-            GuestId="@guestIdToEdit" />
+            GuestId="@guestIdToEdit"/>
 
-<DeleteModal 
-    Title="@modalTitle" 
-    ActionType="@(isDeletingGuest ? "DeleteGuest" : "DeleteInvoice")" 
-    IsVisible="@isDeleteModalVisible" 
-    OnClose="CloseDeleteModal" />
+<DeleteModal
+    Title="@modalTitle"
+    ActionType="@(isDeletingGuest ? "DeleteGuest" : "DeleteInvoice")"
+    IsVisible="@isDeleteModalVisible"
+    OnClose="CloseDeleteModal"/>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
     private Reservation reservation = new Reservation();
 
@@ -292,8 +281,6 @@
 
     private string modalTitle;
     private bool isDeletingGuest;
-
-
 
 
     private void DeleteInvoice(int id)
@@ -334,8 +321,6 @@
     }
 
 
-
-
     private void OpenAddInvoiceModal()
     {
         isAddInvoiceModalVisible = true;
@@ -364,14 +349,9 @@
     }
 
 
-
-
-
-
     private void CloseAddInvoiceModal()
     {
         isAddInvoiceModalVisible = false;
-        //handle refresh
     }
 
 
@@ -384,7 +364,6 @@
     {
         isEditGuestModalVisible = false;
     }
-
 
 
     private async Task CloseEditInvoiceModal(bool result)
@@ -408,12 +387,15 @@
     {
         try
         {
-
             await ReservationService.UpdateReservationAsync(reservation);
-            NavigationManager.NavigateTo("/rezervace");
+            reservation = await ReservationService.GetReservationByIdAsync(Id);
+            
+            
         }
         catch (Exception ex)
         {
+            throw new Exception("An error occurred while updating the reservation.", ex);
+            
         }
     }
 
@@ -426,4 +408,5 @@
     {
         NavigationManager.NavigateTo($"/faktura/{id}");
     }
+
 }

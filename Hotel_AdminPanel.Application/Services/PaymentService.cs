@@ -37,7 +37,7 @@ namespace Hotel_AdminPanel.Application.Services
             }
         }
 
-        public async Task DeletePaymentAsync(int id)
+        public async Task DeletePaymentAsync(string id)
         {
             var paymentToDelete = await _context.Payments.FirstOrDefaultAsync(p => p.Id == id);
             if (paymentToDelete == null)
@@ -57,7 +57,7 @@ namespace Hotel_AdminPanel.Application.Services
 
         }
 
-        public async Task<Payment> GetPaymentByIdAsync(int id)
+        public async Task<Payment> GetPaymentByIdAsync(string id)
         {
             var payment = await _context.Payments
                 .Include(p => p.Invoice)

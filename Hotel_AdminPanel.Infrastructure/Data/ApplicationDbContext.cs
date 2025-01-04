@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace Hotel_AdminPanel.Infrastructure.Data
@@ -37,7 +38,7 @@ namespace Hotel_AdminPanel.Infrastructure.Data
                 .HasOne(r => r.Customer)
                 .WithMany(c => c.Reservations)
                 .HasForeignKey(r => r.CustomerId);
-
+            
             SeedData(builder);
         }
 
@@ -140,7 +141,37 @@ namespace Hotel_AdminPanel.Infrastructure.Data
                 new MealPlan { Id = 6, Name = "Bezlepkový", Price = 350.00m },
                 new MealPlan { Id = 7, Name = "Dětský", Price = 150.00m }
             );
-
+            
+            var adminRole = new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Admin", NormalizedName = "ADMIN" };
+            modelBuilder.Entity<IdentityRole>().HasData(adminRole);
+            
+            var adminUser = new AppUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = "admin",
+                NormalizedUserName = "ADMIN",
+                Email = "admin@admin.com",
+                NormalizedEmail = "ADMIN@ADMIN.COM",
+                EmailConfirmed = true,
+                FirstName = "Admin",
+                LastName = "Admin",
+                PhoneNumber = "+420123456789",
+                Salary = 0,
+                JobTitle = "Admin",
+                PostalCode = "00000",
+                Address = "Adminova 1",
+                City = "Adminov",
+                Country = "Adminie",
+                IsEmployed = true,
+                PlaceOfBirth = "Adminov",
+                StartDate = DateTime.Now,
+                ProfilePicture = "none",
+                PersonalIdentificationNumber = "0000000000",
+                InsuranceCompanyId = 2,
+            };
+            var passwordHasher = new PasswordHasher<AppUser>();
+            adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "admin");
+            modelBuilder.Entity<AppUser>().HasData(adminUser);
 
         }
 

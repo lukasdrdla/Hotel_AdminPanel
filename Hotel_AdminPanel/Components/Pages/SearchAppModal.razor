@@ -3,7 +3,7 @@
 
     <div class="form-group position-relative" style="max-width: 400px;">
         <input type="text" class="form-control form-control-lg rounded-pill shadow-sm mb-5"
-               placeholder="🔍 Hledat..."
+               placeholder="🔍 Rychlé vyhledávání stránek"
                @bind="searchTerm" @bind:event="oninput" @bind:after="SearchPages" @onblur="Hide" />
 
         @if (filteredPages.Any())

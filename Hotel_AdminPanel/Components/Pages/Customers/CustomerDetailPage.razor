@@ -22,7 +22,6 @@
     else
     {
         <div class="row">
-            <div class="col-lg-6">
                 <div class="card border-0 shadow-sm mx-auto">
                     <div class="card-body">
                         <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
@@ -90,17 +89,21 @@
                             </div>
                         </EditForm>
                     </div>
-                </div>
             </div>
 
-            <div class="col-lg-6">
-                <div class="card border-0 shadow-sm mx-auto">
+                <div class="card border-0 shadow-sm mx-auto mt-5">
                     <div class="card-body">
-                       <button type="button" class="btn btn-primary" @onclick="OpenAddModalReservation">Přidat Rezervaci</button>
-                        <h3 class="card-title">Rezervace</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="card-title mb-0">
+                                Rezervace
+                            </h3>
+                            <button class="btn btn-primary" @onclick="OpenAddModalReservation">
+                                <i class="bi bi-plus"></i> Přidat rezervaci
+                            </button>
+                        </div>
                         <div class="table-container">
-                            <table>
-                                <QuickGrid Items="customerReservations.AsQueryable()" Pagination="customerReservationsPaggination">
+                            <table class="w-100">
+                                <QuickGrid Items="customerReservations.AsQueryable()" Pagination="customerReservationsPaggination" Class="w-100">
                                     <PropertyColumn Title="Číslo Rezervace" Property="@(r => r.Id)" Sortable="true" />
                                     <PropertyColumn Title="Check In" Property="@(r => r.CheckIn.ToShortDateString())" Sortable="true" />
                                     <PropertyColumn Title="Check Out" Property="@(r => r.CheckOut.ToShortDateString())" Sortable="true" />
@@ -114,13 +117,15 @@
                     </div>
                 </div>
                 <div class="card border-0 shadow-sm mx-auto mt-5">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" @onclick="OpenAddReviewModal">
-                            <i class="bi bi-plus"></i> Přidat hodnocení
-                        </button>
-                    </div>
                     <div class="card-body">
-                        <h3 class="card-title">Hodnocení</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="card-title mb-0">
+                                Hodnocení
+                            </h3>
+                            <button class="btn btn-primary" @onclick="OpenAddReviewModal">
+                                <i class="bi bi-plus"></i> Přidat hodnocení
+                            </button>
+                        </div>                        
                         <div class="table-container">
                             <table class="w-100">
                                 <QuickGrid Items="customerReviews.AsQueryable()" Pagination="customerReviewPaggination" Class="w-100">
@@ -179,7 +184,6 @@
 
                 
             </div>
-        </div>
     }
 </div>
 

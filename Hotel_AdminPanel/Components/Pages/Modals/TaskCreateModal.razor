@@ -1,26 +1,25 @@
-﻿@inherits OwningComponentBase<IReservationService>
-@inject IReservationService ReservationService
+@inherits OwningComponentBase<ITaskService>
+@inject ITaskService TaskService
+@inject IInvoiceService InvoiceService
 
-<EditForm Model="reservationStatus" OnValidSubmit="HandleValidSubmit">
+<EditForm Model="taskItem" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="modal fade @(IsVisible ? "show" : "")" tabindex="-1" style="display:@(IsVisible ? "block" : "none")">
-        <div class="modal-dialog modal-md">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Přidat status rezervace</h5>
+                    <h5 class="modal-title">Přidat TodoItem</h5>
                     <button type="button" class="btn-close" aria-label="Zavřít" @onclick="Close"></button>
                 </div>
                 <div class="modal-body">
-
+                    
                     <div class="mb-3 form-group">
                         <label for="name" class="form-label">Název</label>
-                        <InputText id="name" class="form-control" @bind-Value="reservationStatus.Name" />
+                        <InputText id="name" class="form-control" @bind-Value="taskItem.Title" />
                     </div>
-
-
-
+                    
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @onclick="Close">Zavřít</button>
@@ -37,16 +36,27 @@
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public string EmployeeId { get; set; }
 
-    private ReservationStatus reservationStatus = new ReservationStatus();
-
+    private TaskItem taskItem = new TaskItem();
+    
+    
 
     private async Task HandleValidSubmit()
     {
+        
+        try
+        {
+            await TaskService.CreateTask(taskItem, EmployeeId);
+            await OnClose.InvokeAsync(false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
 
-        await ReservationService.CreateReservationStatusAsync(reservationStatus);
-        await OnClose.InvokeAsync(false);
+
     }
 
-    private Task Close() => OnClose.InvokeAsync(false);
+    private Task Close() => OnClose.InvokeAsync(false); // Zavřít modal na zavolání
 }

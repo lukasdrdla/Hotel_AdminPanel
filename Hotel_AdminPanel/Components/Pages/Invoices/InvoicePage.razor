@@ -33,12 +33,12 @@
                 <div class="table-responsive">
                     <table class="w-100">
                         <QuickGrid Items="filteredInvoices.AsQueryable()" Pagination="pagginationState" Class="w-100">
-                            <PropertyColumn Title="Datum vystavení" Property="@(r => r.IssueDate.ToShortDateString())" Sortable="true" />
-                            <PropertyColumn Title="Datum splatnosti" Property="@(r => r.DueDate.ToShortDateString())" Sortable="true" />
+                            <PropertyColumn Title="Vystaveno" Property="@(r => r.IssueDate.ToShortDateString())" Sortable="true" />
+                            <PropertyColumn Title="Splatnost" Property="@(r => r.DueDate.ToShortDateString())" Sortable="true" />
                             <TemplateColumn Title="Zákazník">
                                 @if (context.Reservation != null && context.Reservation.Customer.FirstName != null)
                                 {
-                                    <span>@context.Reservation.Customer.FirstName - @context.Reservation.Customer.LastName - RČ: @context.Reservation.Customer.PersonalIdentificationNumber </span>
+                                    <span>@context.Reservation.Customer.FirstName @context.Reservation.Customer.LastName</span>
                                 }
                                 else
                                 {
@@ -91,7 +91,7 @@
 </div>
 
 <DeleteModal Title="Smazání faktury" ActionType="DeleteInvoice" IsVisible="@isModalVisible" OnClose="HandleModalClose" />
-<InvoiceEditModal IsVisible="@isInvoiceModalVisible" InvoiceId="invoiceIdToEdit" OnClose="HandleEditClose" />
+<InvoiceModal IsVisible="@isInvoiceModalVisible" InvoiceId="invoiceIdToEdit" OnClose="HandleEditClose" IsEditMode="true" />
 
 
 

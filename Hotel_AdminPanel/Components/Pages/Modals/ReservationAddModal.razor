@@ -1,4 +1,5 @@
-﻿@inherits OwningComponentBase<IReservationService>
+﻿@using Hotel_AdminPanel.Components.Pages.DatePicker
+@inherits OwningComponentBase<IReservationService>
 @inject ICustomerService CustomerService
 @inject IRoomService RoomService
 @inject IReservationService ReservationService
@@ -21,27 +22,52 @@
                             <InputNumber id="CustomerId" class="form-control" @bind-Value="CustomerId" readonly />
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="form-group mb-3">
                             <label for="RoomId" class="form-label">Pokoj</label>
-                            <InputSelect id="RoomId" class="form-control" @bind-Value="reservation.RoomId">
+                            <select id="RoomId" class="form-control" @onchange="@(e => OnRoomSelected(e))">
                                 <option value="">Vyber pokoj</option>
                                 @foreach (var room in rooms)
                                 {
-                                    <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
+                                <option value="@room.Id">@room.RoomNumber - @room.RoomType.Name</option>
                                 }
-                            </InputSelect>
+                            </select>
+
                         </div>
                     </div>
 
-                    <div class="mb-3 row">
+                    <div class="mb-4 row">
                         <div class="col-md-6">
                             <label for="CheckIn" class="form-label">Check In</label>
-                            <InputDate id="CheckIn" class="form-control" @bind-Value="reservation.CheckIn" />
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Vyberte datum"
+                                       value="@reservation.CheckIn.ToShortDateString()" />
+                                <button type="button" class="btn btn-secondary" @onclick="OpenCheckInCalendar">
+                                    <i class="bi bi-calendar-date"></i>
+                                </button>
+                            </div>
+                            @if (isCheckInCalendarVisible)
+                            {
+                            <div class="calendar-container">
+                                <CustomDatePicker DisableDates="unavailableDates" OnDateSelected="OnDateSelectIn" />
+                            </div>
+                            }
                         </div>
 
                         <div class="col-md-6">
                             <label for="CheckOut" class="form-label">Check Out</label>
-                            <InputDate id="CheckOut" class="form-control" @bind-Value="reservation.CheckOut" />
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Vyberte datum"
+                                       value="@reservation.CheckOut.ToShortDateString()" readonly />
+                                <button type="button" class="btn btn-secondary" @onclick="OpenCheckOutCalendar">
+                                    <i class="bi bi-calendar-date"></i>
+                                </button>
+                            </div>
+                            @if (isCheckOutCalendarVisible)
+                            {
+                            <div class="calendar-container">
+                                <CustomDatePicker DisableDates="unavailableDates" OnDateSelected="OnDateSelectOut" />
+                            </div>
+                            }
                         </div>
                     </div>
 
@@ -87,7 +113,13 @@
     [Parameter] public List<Room> rooms { get; set; }
     [Parameter] public List<ReservationStatus> reservationStatuses { get; set; }
     [Parameter] public int CustomerId { get; set; } // Nový parametr
+    
 
+    private bool isCheckInCalendarVisible = false;
+    private bool isCheckOutCalendarVisible = false;
+    private List<DateTime> unavailableDates = new List<DateTime>();
+    private Room selectedRoom = new Room();
+    
     private Reservation reservation = new Reservation();
 
     private async Task HandleValidSubmit()
@@ -95,6 +127,41 @@
         reservation.CustomerId = CustomerId; // Nastavení ID zákazníka do rezervace
         await ReservationService.CreateReservationAsync(reservation);
         await OnClose.InvokeAsync(false);
+    }
+    
+    private async void OnRoomSelected(ChangeEventArgs e)
+    {
+        isCheckInCalendarVisible = false;
+        reservation.RoomId = int.Parse(e.Value.ToString());
+        var selectedValue = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(selectedValue))
+        { 
+            reservation.Adults = 0;
+            reservation.Children = 0;
+            reservation.TotalPrice = 0;
+            reservation.MealPlanId = 0;
+            return;
+        }
+        var roomId = int.Parse(e.Value.ToString());
+        selectedRoom = rooms.FirstOrDefault(room => room.Id == roomId);
+        unavailableDates = await ReservationService.GetOccupiedDatesForRoomAsync(roomId);
+
+    }
+    
+    private void OpenCheckInCalendar() => isCheckInCalendarVisible = !isCheckInCalendarVisible;
+    private void OpenCheckOutCalendar() => isCheckOutCalendarVisible = !isCheckOutCalendarVisible;
+    
+    private void OnDateSelectIn(DateTime? date)
+    {
+        reservation.CheckIn = date.Value;
+        isCheckInCalendarVisible = false;
+    }
+    
+    private void OnDateSelectOut(DateTime? date)
+    {
+        reservation.CheckOut = date.Value;
+        isCheckOutCalendarVisible = false;
     }
 
 

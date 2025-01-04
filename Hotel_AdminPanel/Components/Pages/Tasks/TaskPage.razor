@@ -42,8 +42,6 @@
 @code {
     private string newTask;
     private List<TaskItem> tasks = new List<TaskItem>();
-
-    //current user
     private AppUser user;
 
     protected override async Task OnInitializedAsync()
@@ -59,7 +57,7 @@
             var task = new TaskItem { Title = newTask, IsCompleted = false };
             await TaskService.CreateTask(task, user.Id);
             tasks.Add(task);
-            newTask = string.Empty; // Reset the input
+            newTask = string.Empty;
         }
     }
 

@@ -11,7 +11,7 @@
 
 <div class="container mt-5">
     <div class="row">
-        <div class="col-md-6 d-flex flex-fill">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-primary" @onclick="OpenAddMealPlanModal">
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 d-flex flex-fill">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-primary" @onclick="OpenAddReservationStatusModal">
@@ -126,16 +126,18 @@
 
     </div>
 
-    <div class="row mt-5">
-        <div class="col-md-6 d-flex flex-fill">
+    <div class="row">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
-                <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary" @onclick="OpenAddRoomTypeModal">
-                        <i class="bi bi-plus"></i> Přidat typ pokoje
-                    </button>
-                </div>
                 <div class="card-body">
-                    <h3 class="text-center mb-4 page-title">Nastavení typu pokojů</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="card-title mb-0">
+                            Typy pokojů
+                        </h3>
+                        <button class="btn btn-primary" @onclick="OpenAddRoomTypeModal">
+                            <i class="bi bi-plus"></i> Přidat typ pokoje
+                        </button>
+                    </div>
                     <div class="table-responsive">
                         <QuickGrid Items="RoomTypes.AsQueryable()" Pagination="paginationRoomTypeState" Class="w-100">
                             <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
@@ -177,16 +179,17 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 d-flex flex-fill">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
-                <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary" @onclick="OpenAddRoomStatusModal">
-                        <i class="bi bi-plus"></i> Přidat status pokoje
-                    </button>
-                </div>
                 <div class="card-body">
-                    <h3 class="text-center mb-4 page-title">Nastavení statusů pokojů</h3>
-                    <div class="table-responsive">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="card-title mb-0">
+                            Statusy pokoje
+                        </h3>
+                        <button class="btn btn-primary" @onclick="OpenAddRoomStatusModal">
+                            <i class="bi bi-plus"></i> Přidat status pokoje
+                        </button>
+                    </div>                    <div class="table-responsive">
                         <QuickGrid Items="RoomStatuses.AsQueryable()" Pagination="paginationRoomStatusState" Class="w-100">
                             <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
                             <TemplateColumn Title="Status">
@@ -230,8 +233,8 @@
     </div>
 
 
-    <div class="row mt-5">
-        <div class="col-md-6 d-flex flex-fill">
+    <div class="row">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
                 <div class="d-flex justify-content-end mb-3">
                     <button class="btn btn-primary" @onclick="OpenAddRoleModal">
@@ -242,7 +245,6 @@
                     <h3 class="text-center mb-4 page-title">Nastavení rolí</h3>
                     <div class="table-responsive">
                         <QuickGrid Items="Roles.AsQueryable()" Pagination="paginationRoleTypeState" Class="w-100">
-                            <PropertyColumn Title="Id" Property="@(x => x.Id)" Sortable="true" />
                             <TemplateColumn Title="Role">
                                 @if (editRoleId == context.Id)
                                 {
@@ -282,7 +284,7 @@
             </div>
         </div>
 
-        <div class="col-md-6 d-flex flex-fill">
+        <div class="col-xl-6 d-flex flex-fill mt-5">
             <div class="card border-0 shadow-sm mx-auto flex-fill">
                 <div class="card-body">
                 </div>

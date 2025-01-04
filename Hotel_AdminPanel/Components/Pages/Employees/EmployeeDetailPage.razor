@@ -16,10 +16,10 @@
     else
     {
         <div class="row">
-            <div class="col-lg-6">
+            <div class="">
                 <div class="card border-0 shadow-sm mx-auto">
                     <div class="card-body">
-                        <h3 class="card-title text-center mb-4 page-title">Upravit Zákazníka</h3>
+                        <h3 class="card-title text-center mb-4 page-title">Upravit Zaměstnance</h3>
                         <EditForm Model="user" OnValidSubmit="HandleValidSubmit" FormName="EditUser">
 
                             <DataAnnotationsValidator />
@@ -57,25 +57,27 @@
 
                             </div>
 
-                            <div class="mb-3 row">
-                                <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="">
                                     <label for="profilePicture" class="form-label">Profilový obrázek</label>
                                     <InputText id="profilePicture" class="form-control" @bind-Value="user.ProfilePicture" />
                                 </div>
+                            </div>
 
-                                <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="">
                                     <label for="Email" class="form-label">Email</label>
                                     <InputText id="Email" class="form-control" @bind-Value="user.Email" />
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <div class="col-md-6">
+                                <div class="col-xxl-6">
                                     <label for="firstName" class="form-label">Jméno</label>
                                     <InputText id="firstName" class="form-control" @bind-Value="user.FirstName" />
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-xxl-6">
                                     <label for="lastName" class="form-label">Příjmení</label>
                                     <InputText id="lastName" class="form-control" @bind-Value="user.LastName" />
                                 </div>
@@ -154,19 +156,24 @@
                             </div>
 
                         </EditForm>
-                     </div>
                     </div>
                 </div>
-            <div class="col-lg-6">
+            </div>
+            <div class="mt-5">
                 <div class="card border-0 shadow-sm mx-auto">
                     <div class="card-body">
-                        <h3 class="card-title">
-                            To-Do List
-                        </h3>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="card-title mb-0">
+                                To-Do List
+                            </h3>
+                            <button class="btn btn-primary" @onclick="OpenTaskModal">
+                                <i class="bi bi-plus"></i> Přidat Úkol
+                            </button>
+                        </div>
                         <div class="table-container">
                             <table class="w-100">
                                 <QuickGrid Items="tasks.AsQueryable()" Pagination="tasksPaggination" Class="w-100">
-                                    <PropertyColumn Title="Úkol" Property="@(r => r.Title)" Sortable="true" />
+                                    <PropertyColumn Title="Úkol" Property="@(r => r.Title)" Sortable="true"/>
 
                                     <TemplateColumn Title="Stav">
                                         @if (context.IsCompleted)
@@ -181,7 +188,7 @@
                                     </TemplateColumn>
                                 </QuickGrid>
 
-                                <Paginator State="tasksPaggination" />
+                                <Paginator State="tasksPaggination"/>
                             </table>
                         </div>
                     </div>
@@ -190,6 +197,8 @@
         </div>
     }
 </div>
+
+<TaskCreateModal IsVisible="@isTaskModalVisible" OnClose="CloseTaskModal" EmployeeId="@user.Id" />
 
 
 @code {
@@ -206,6 +215,8 @@
     private string searchTerm = string.Empty;
     private List<InsuranceCompany> filteredInsuranceCompanies = new List<InsuranceCompany>();
     private List<InsuranceCompany> insuranceCompanies = new List<InsuranceCompany>();
+    
+    private bool isTaskModalVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -217,6 +228,16 @@
 
         searchTerm = insuranceCompanies.FirstOrDefault(x => x.Id == user.InsuranceCompanyId).Name;
 
+    }
+    
+    private void CloseTaskModal(bool isVisible)
+    {
+        isTaskModalVisible = isVisible;
+    }
+    
+    private void OpenTaskModal()
+    {
+        isTaskModalVisible = true;
     }
 
     private async void HandleValidSubmit()

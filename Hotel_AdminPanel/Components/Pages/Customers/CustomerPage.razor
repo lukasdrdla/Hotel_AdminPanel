@@ -37,10 +37,8 @@
                         <QuickGrid Items="filteredCustomers.AsQueryable()" Pagination="paginationState" Class=" w-100">
                             <PropertyColumn Title="Jméno" Property="@(x => x.FirstName)" Sortable="true" />
                             <PropertyColumn Title="Příjmení" Property="@(x => x.LastName)" Sortable="true" />
-                            <PropertyColumn Title="Číslo Dokladu" Property="@(x => x.DocumentNumber)" Sortable="true" />
                             <PropertyColumn Title="Email" Property="@(x => x.Email)" Sortable="true" />
                             <PropertyColumn Title="Telefon" Property="@(x => x.Phone)" Sortable="true" />
-                            <PropertyColumn Title="Adresa" Property="@(x => x.Address)" Sortable="true" />
                             <PropertyColumn Title="Město" Property="@(x => x.City)" Sortable="true" />
                             <TemplateColumn Title="Akce">
                                 <div class="d-inline-flex">

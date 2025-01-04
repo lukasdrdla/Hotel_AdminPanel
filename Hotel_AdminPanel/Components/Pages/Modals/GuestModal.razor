@@ -57,7 +57,7 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> OnClose { get; set; }
     [Parameter] public int ReservationId { get; set; }
-    [Parameter] public int? GuestId { get; set; } // GuestId je nullable, aby bylo snadné rozlišit přidávání od úpravy
+    [Parameter] public int? GuestId { get; set; } 
 
     private Guest guest = new Guest();
     private string ModalTitle => GuestId.HasValue ? "Upravit hosta" : "Přidat hosta";

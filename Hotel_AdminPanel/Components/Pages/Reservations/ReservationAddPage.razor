@@ -4,7 +4,6 @@
 @inject NavigationManager NavigationManager
 @inject IRoomService RoomService
 @inject ICustomerService CustomerService
-@inject IReservationService ReservationService
 @inject IJSRuntime JSRuntime
 
 
@@ -97,7 +96,7 @@
                         <label for="CheckIn" class="form-label">Check In</label>
                         <div class="input-group">
                             <input type="text" class="form-control" placeholder="Vyberte datum"
-                                   value="@reservation.CheckIn.ToShortDateString()" readonly />
+                                   value="@reservation.CheckIn.ToShortDateString()" />
                             <button type="button" class="btn btn-secondary" @onclick="OpenCheckInCalendar">
                                 <i class="bi bi-calendar-date"></i>
                             </button>
@@ -359,6 +358,7 @@
 
     private async void OnRoomSelected(ChangeEventArgs e)
     {
+        isCheckInCalendarVisible = false;
         reservation.RoomId = int.Parse(e.Value.ToString());
         var selectedValue = e.Value?.ToString();
 
@@ -370,13 +370,11 @@
             reservation.MealPlanId = 0;
             return;
         }
-
-
         var roomId = int.Parse(e.Value.ToString());
         selectedRoom = rooms.FirstOrDefault(room => room.Id == roomId);
-
         unavailableDates = await ReservationService.GetOccupiedDatesForRoomAsync(roomId);
-
+        
+        
         CalculateTotalPrice();
     }
 

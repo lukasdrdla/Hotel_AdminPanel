@@ -159,16 +159,21 @@ namespace Hotel_AdminPanel.Application.Services
 
             foreach (var reservation in reservations)
             {
-                var dates = Enumerable.Range(0, (int)(reservation.CheckOut - reservation.CheckIn).TotalDays)
-                    .Select(i => reservation.CheckIn.AddDays(i))
-                    .ToList();
+                var totalDays = (reservation.CheckOut - reservation.CheckIn).TotalDays;
 
-                occupiedDates.AddRange(dates);
+                if (totalDays > 0) // Přidat kontrolu pro záporné hodnoty
+                {
+                    var dates = Enumerable.Range(0, (int)totalDays)
+                        .Select(i => reservation.CheckIn.AddDays(i))
+                        .ToList();
+
+                    occupiedDates.AddRange(dates);
+                }
             }
 
             return occupiedDates;
-
         }
+
 
         public async Task CreateMealPlanAsync(MealPlan mealPlan)
         {

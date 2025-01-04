@@ -35,20 +35,21 @@
                 <div class="table-responsive">
                     <table class="w-100">
                         <QuickGrid Items="filteredPayments.AsQueryable()" Pagination="pagginationState" Class="w-100">
-                            <PropertyColumn Title="Id" Property="@(r => r.Id)" Sortable="true" />
                             <PropertyColumn Title="Datum platby" Property="@(r => r.PaymentDate.ToShortDateString())" Sortable="true" />
                             <PropertyColumn Title="Částka" Property="@(r => r.TotalAmount.ToString("C"))" Sortable="true" />
                             <PropertyColumn Title="Způsob platby" Property="@(r => r.PaymentMethod)" Sortable="true" />
                             <PropertyColumn Title="Číslo faktury" Property="@(r => r.Invoice.Id)" Sortable="true" />
                             <TemplateColumn Title="Zákazník">
-                                @if (context.Invoice.Reservation != null && context.Invoice.Reservation.Customer.FirstName != null)
-                                {
-                                    <span>@context.Invoice.Reservation.Customer.FirstName - @context.Invoice.Reservation.Customer.LastName - RČ: @context.Invoice.Reservation.Customer.PersonalIdentificationNumber </span>
-                                }
-                                else
-                                {
-                                    <span>N/A</span>
-                                }
+                                <div class="customer-info">
+                                    @if (context.Invoice.Reservation != null && context.Invoice.Reservation.Customer.FirstName != null)
+                                    {
+                                        <span>@context.Invoice.Reservation.Customer.FirstName  @context.Invoice.Reservation.Customer.LastName </span>
+                                    }
+                                    else
+                                    {
+                                        <span>N/A</span>
+                                    }
+                                </div>
                             </TemplateColumn>
 
 
@@ -64,6 +65,8 @@
                             </TemplateColumn>
 
                         </QuickGrid>
+
+                        <Paginator State="pagginationState" />
 
                     </table>
                 </div>
@@ -84,12 +87,12 @@
 
     private string? searchTerm;
     private bool isEditModalVisible = false;
-    private int selectedPaymentId;
+    private string selectedPaymentId;
 
     private bool isModalVisible = false;
-    private int paymentIdToDelete;
+    private string paymentIdToDelete;
 
-    private void OpenEditModal(int id)
+    private void OpenEditModal(string id)
     {
         selectedPaymentId = id;
         isEditModalVisible = true;
@@ -97,7 +100,7 @@
 
 
 
-    private void OpenDeleteConfirmation(int id)
+    private void OpenDeleteConfirmation(string id)
     {
         paymentIdToDelete = id;
         isModalVisible = true;
@@ -157,7 +160,8 @@
             || r.TotalAmount.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
             || r.Invoice.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
             || r.Invoice.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-            || r.Invoice.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            || r.Invoice.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || r.Id.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                
             
             ).ToList();
    

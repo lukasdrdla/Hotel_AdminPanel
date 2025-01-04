@@ -78,7 +78,7 @@
     private void SearchInvoice(ChangeEventArgs e)
     {
         searchTerm = e.Value.ToString();
-        filteredInvoices = invoices.Where(x => x.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        filteredInvoices = invoices.Where(x => x.IsPaid == false && (x.Reservation.Customer.FirstName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.LastName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.Reservation.Customer.PersonalIdentificationNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))).ToList();
     }
 
     private void SelectInvoice(Invoice invoice)
